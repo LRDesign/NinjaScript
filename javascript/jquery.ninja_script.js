@@ -59,7 +59,8 @@
     return this
   }
 
-  Behavior.prototype = {
+  Behavior.prototype = {   
+    //XXX apply_to?
     apply: function(elem) {
       if (!$(elem).data("ninja_behaviors")) {
         new this.in_context(elem).apply(elem)
@@ -70,6 +71,7 @@
       var handle
       var stop_default = true
       var stop_propagate = true
+      //XXX should default to false
       var stop_immediate = true
       if (typeof config == "function") {
         handle = config
@@ -209,7 +211,8 @@
       $.ninja.tools.message("Server error: " + xhr.statusText, "error")
     }
   }
-
+   
+  // START READING HERE
   var Ninja = {
     config: {
       message_wrapping: function(text, classes) {
@@ -240,7 +243,6 @@
       },
 
       //Currently, this doesn't respect changes to the original block...
-      //Also certain elements (which ones are poorly understood) evade correct overlay
       build_overlay_for: function(elem) {
         var overlay = $(document.createElement("div"))
         var hideMe = $(elem)
@@ -270,7 +272,8 @@
     //  table sorting
     //  decaying blocks (recoverable?)
     //  dynamic validation?
-    //  autocomplete
+    //  autocomplete    
+    //  observe_form / observe_field
 
     ajax_submission: function(configs) {
       if(typeof configs == "undefined") {

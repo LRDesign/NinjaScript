@@ -265,9 +265,11 @@
         return new AjaxSubmitter(form)
       },
       busy_overlay: function(elem) {
-        var overlay = this.build_overlay_for(elem)
-        overlay.addClass("ninja busy")
-        return overlay
+				if (typeof elem != "undefined") {
+	        var overlay = this.build_overlay_for(elem)
+	        overlay.addClass("ninja busy")
+	        return overlay
+				}	
       },
 
       //Currently, this doesn't respect changes to the original block...
@@ -304,6 +306,33 @@
     //  observe_form / observe_field
     //  links  (link_to_remote)
 
+		ajax_link: function(configs) {
+      if(typeof configs == "undefined") { configs = {} }
+      if(typeof configs.busy_element == "undefined") {
+        configs.busy_element = function(elem) {}
+      }
+
+			return new Behavior({
+				helpers: {
+          	find_overlay: configs.busy_element
+				},
+			  events: {
+					click:  function(evnt) {
+            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+            var submitter = $.ninja.tools.ajax_submitter(evnt.target)
+
+            submitter.response_handler = function() {
+              return function(xhr, statusTxt) {
+								if (typeof overlay != "undefined") { overlay.remove() }
+                Ninja.tools.fire_mutation_event()
+              }
+            }
+            if (typeof overlay != "undefined") { $("body").append(overlay) }
+            submitter.submit()						
+					}
+				}
+			})
+		},
     ajax_submission: function(configs) {
       if(typeof configs == "undefined") {
         configs = {}

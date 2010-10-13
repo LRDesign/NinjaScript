@@ -163,16 +163,34 @@
     }
   }
 
-  function AjaxSubmitter(form) {
-    this.form_data = $(form).serializeArray()
-    this.action = form.action
-    this.method = form.method
+  function AjaxSubmitter(element) {
+    if(element.tagName.toLowerCase() == 'a') {
+      this.form_data = []
+      this.action = element.href
+      this.method = "GET"
+    } 
+    else {
+      this.form_data = $(element).serializeArray()
+      this.action = element.action
+      this.method = element.method
+    }
+
     this.dataType = 'script'
 
-    for(var i=0, len = this.form_data.length; i<len; i++) {
-      if(this.form_data[i].name == "_method") {
-        this.method = this.form_data[i].value
-        break
+    if(element.dataset != undefined) {
+      if(element.dataset["method"] != undefined) {
+        this.method = element.dataset["method"]
+      }
+    }
+    else if(element.attr("data-method") != undefined) {
+      this.method = element.dataset["method"]
+    }
+    else {
+      for(var i=0, len = this.form_data.length; i<len; i++) {
+        if(this.form_data[i].name == "_method") {
+          this.method = this.form_data[i].value
+          break
+        }
       }
     }
 

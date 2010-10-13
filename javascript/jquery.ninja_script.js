@@ -182,7 +182,7 @@
         this.method = element.dataset["method"]
       }
     }
-    else if(element.attr("data-method") != undefined) {
+    else if($(element).attr("data-method") != undefined) {
       this.method = element.dataset["method"]
     }
     else {

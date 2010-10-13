@@ -196,7 +196,6 @@
     return this
   }
 
-  //Possibly, this should be just $.ajax with complex ajax_data
   AjaxSubmitter.prototype = {
     submit: function() {
       $.ajax(this.ajax_data())
@@ -387,9 +386,6 @@
   }
 
   function handleMutation(evnt) {
-    //TODO Queue up re-applications
-    //TODO Restrict application to changed part of subtree
-
     $(this).data("ninja-behavior").event_triggered(evnt);
   }
 

@@ -130,15 +130,19 @@
     },
     handle_queue: function(){
       while (this.event_queue.length != 0){
-        var target = this.event_queue.pop().target
+        var target = this.event_queue[0].target
         var use_target = true
         this.event_queue = this.event_queue.filter(function(val, idx, queue) {
-          use_target = use_target && !($.contains(val, target))
+          if(idx == 0) {
+            return true 
+          }
+          use_target = use_target && !($.contains(val.target, target))
           return !($.contains(target, val))
         })
         if(use_target){
-          this.apply(target);
+          this.apply(target)
         }
+        this.event_queue.shift()
       }
     },
     apply: function(root){
@@ -157,17 +161,17 @@
     }
   }
 
-  function AjaxSubmitter(form_data, action, method) {
-    this.form_data = form_data
-    this.action = action
-    this.method = method
+  function AjaxSubmitter(form) {
+    this.form_data = $(form).serializeArray()
+    this.action = form.action
+    this.method = form.method
     this.dataType = 'script'
 
-    var method_fields = $.grep(form_data, function(pair) {
-      return (pair.name == "_method");
-    });
-    if ( method_fields.length > 0 ){
-      this.method = method_fields[0].value;
+    for(var i=0, len = this.form_data.length; i<len; i++) {
+      if(this.form_data[i].name == "_method") {
+        this.method = this.form_data[i].value
+        break
+      }
     }
 
     return this
@@ -185,18 +189,24 @@
         dataType: this.dataType,
         url: this.action,
         type: this.method,
-        complete: this.response_handler,
-        success: this.success_handler,
+        complete: this.response_handler(),
+        success: this.success_handler(),
         error: this.on_error,
-        submitter: this
       }
     },
-    success_handler: function(data, statusTxt, xhr) {
-      this.submitter.on_success(xhr, statusTxt, data)
+
+    success_handler: function() {
+      var submitter = this
+      return function(data, statusTxt, xhr) {
+        submitter.on_success(xhr, statusTxt, data)
+      }
     },
-    response_handler: function(xhr, statusTxt) {
-      this.submitter.on_response(xhr, statusTxt)
-      Ninja.tools.fire_mutation_event()
+    response_handler: function() {
+      var submitter = this
+      return function(xhr, statusTxt) {
+        submitter.on_response(xhr, statusTxt)
+        Ninja.tools.fire_mutation_event()
+      }
     },
 
     on_response: function(xhr, statusTxt) {
@@ -230,8 +240,8 @@
           }
         })
       },
-      ajax_submitter: function(form_data, action, method) {
-        return new AjaxSubmitter(form_data, action, method)
+      ajax_submitter: function(form) {
+        return new AjaxSubmitter(form)
       },
       busy_overlay: function(elem) {
         var overlay = this.build_overlay_for(elem)
@@ -288,13 +298,14 @@
         },
         events: {
           submit: function(evnt) {
-            var form_data = $(evnt.target).serializeArray()
             var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
-            var submitter = $.ninja.tools.ajax_submitter(form_data, 
-            evnt.target.action, 
-            evnt.target.method)
-            submitter.on_response = function(x,t) {
-              overlay.remove()
+            var submitter = $.ninja.tools.ajax_submitter(evnt.target)
+
+            submitter.response_handler = function() {
+              return function(xhr, statusTxt) {
+                overlay.remove()
+                Ninja.tools.fire_mutation_event()
+              }
             }
             $("body").append(overlay)
             submitter.submit()
@@ -331,9 +342,14 @@
           }
 
           var link = $("<a href='#'>" + link_text + "</a>")
-          this.form_data = $(form).serializeArray()
-          this.action = form.action
-          this.method = form.method
+          this.submitter = $.ninja.tools.ajax_submitter(form)
+          this.submitter.response_handler = function() {
+            var submitter = this
+            return function(xhr, statusTxt) {
+              submitter.overlay.remove()
+              Ninja.tools.fire_mutation_event()
+            }
+          }
 
           $(form).replaceWith(link)
           return link
@@ -341,12 +357,9 @@
         events: {
           click: function(evnt, elem){
             var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
-            var submitter = $.ninja.tools.ajax_submitter( this.form_data, this.action, this.method)
-            submitter.on_response = function(x,t) {
-              overlay.remove()
-            }
+            this.submitter.overlay = overlay
             $("body").append(overlay)
-            submitter.submit()
+            this.submitter.submit()
           }
         }
       })

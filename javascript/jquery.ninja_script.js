@@ -62,7 +62,7 @@
   Behavior.prototype = {   
     //XXX apply_to?
     apply: function(elem) {
-      if (!$(elem).data("ninja_behaviors")) {
+      if (!$(elem).data("ninja-behaviors")) {
         new this.in_context(elem).apply(elem)
       }
     },
@@ -154,7 +154,7 @@
         var selector = pair[0]
         var behavior = pair[1]
         $(root).find(selector).each( function(index, elem){
-          if (!$(elem).data("ninja_behaviors")) {
+          if (!$(elem).data("ninja-behaviors")) {
             behavior.apply(elem)
           }
         })
@@ -177,7 +177,8 @@
     this.dataType = 'script'
 
     if(element.dataset != undefined) {
-      if(element.dataset["method"] != undefined) {
+      if(element.dataset["method"] != undefined && 
+        element.dataset["method"].length > 0) {
         this.method = element.dataset["method"]
       }
     }
@@ -230,7 +231,8 @@
     on_response: function(xhr, statusTxt) {
     },
     on_success: function(xhr, statusTxt, data) {
-      var response = eval(data)
+      //jQuery "helpfully" does this for us
+      //var response = eval(data)
     },
     on_error: function(xhr, statusTxt, errorThrown) {
       console.log(xhr.responseText)

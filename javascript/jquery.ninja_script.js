@@ -71,8 +71,7 @@
       var handle
       var stop_default = true
       var stop_propagate = true
-      //XXX should default to false
-      var stop_immediate = true
+      var stop_immediate = false
       if (typeof config == "function") {
         handle = config
       }

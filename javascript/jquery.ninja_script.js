@@ -284,6 +284,7 @@
     //  dynamic validation?
     //  autocomplete    
     //  observe_form / observe_field
+    //  links  (link_to_remote)
 
     ajax_submission: function(configs) {
       if(typeof configs == "undefined") {

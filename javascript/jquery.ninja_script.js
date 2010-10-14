@@ -335,7 +335,7 @@
         }
       })
     },
-    make_ajax_link: function(configs) {
+    becomes_ajax_link: function(configs) {
       if(typeof configs == "undefined") {
         configs = {}
       }
@@ -364,6 +364,16 @@
           }
 
           var link = $("<a href='#'>" + link_text + "</a>")
+          var jq_form = $(form)
+          var attrs= ["id", "class", "lang", "dir", "title"].reduce(function(atts, att, idx, arry) {
+            var att_val = jq_form.attr(att)
+            if(typeof att_val !== "undefined" && att_val.length > 0) {
+              atts[att] = att_val
+            }
+            return atts
+          }, {})
+          link.attr(attrs)
+
           this.submitter = $.ninja.tools.ajax_submitter(form)
           this.submitter.response_handler = function() {
             var submitter = this

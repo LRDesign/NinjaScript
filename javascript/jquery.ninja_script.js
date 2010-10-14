@@ -292,6 +292,7 @@
       busy_overlay: function(elem) {
         var overlay = this.overlay(elem)
         overlay.set.addClass("ninja busy")
+        overlay.laziness = Ninja.config.busy_laziness
         return overlay
       },
 
@@ -501,6 +502,7 @@
 
   function Overlay(list) {
     var elements = this.convert_to_element_array(list)
+    this.laziness = 0
     this.set = $(elements.map(function(element, idx, list) {
       return this.build_overlay_for(element)
     }, this))
@@ -546,7 +548,7 @@
     },
     affix: function() {
       this.set.appendTo($("body"))
-      this.set.delay(Ninja.config.busy_laziness).css("display", "block")
+      this.set.delay(this.laziness).css("display", "block")
     },
     remove: function() {
       this.set.remove()

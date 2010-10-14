@@ -1,5 +1,259 @@
-// vim: sw=2
+// vim: sw=2 ft=javascript
 (function($) {
+  // START READING HERE
+  var Ninja = {
+    //Stock behaviors
+    //Converts a link to send its GET request via Ajax - we assume that we get
+    //Javascript back, which is eval'd.  While we're waiting, we'll throw up a
+    //busy overlay if configured to do so.  By default, we don't use a busy overlay.
+    //
+    //$.ninja.submit_as_ajax_link({
+    //  busy_element: function(elem) { elem.parent }
+    //})
+    //
+    submits_as_ajax_link: function(configs) {
+      if(typeof configs == "undefined") { configs = {} }
+      if(typeof configs.busy_element == "undefined") {
+        configs.busy_element = function(elem) {}
+      }
+
+      return new Behavior({
+        helpers: {
+          find_overlay: configs.busy_element
+        },
+        events: {
+          click:  function(evnt) {
+            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+            var submitter = $.ninja.tools.ajax_submitter(evnt.target)
+
+            submitter.response_handler = function() {
+              return function(xhr, statusTxt) {
+                if (typeof overlay != "undefined") { overlay.remove() }
+                Ninja.tools.fire_mutation_event()
+              }
+            }
+            if (typeof overlay != "undefined") { $("body").append(overlay) }
+            submitter.submit()						
+          }
+        }
+      })
+    },
+
+    //Converts a form to send its request via Ajax - we assume that we getv
+    //Javascript back, which is eval'd.  We pull the method from the form:
+    //either from the method attribute itself, a data-method attribute or a
+    //_method input. While we're waiting, we'll throw up a busy overlay if
+    //configured to do so.  By default, we use the form itself as the busy
+    //element.
+    //
+    //$.ninja.submit_as_ajax_form({
+    //  busy_element: function(elem) { elem.parent }
+    //})
+    //
+    submits_as_ajax_form: function(configs) {
+      if(typeof configs == "undefined") {
+        configs = {}
+      }
+
+      if(typeof configs.busy_element == "undefined") {
+        configs.busy_element = function(elem) {
+          return elem
+        }
+      }
+      return new Behavior({
+        helpers: {
+          find_overlay: configs.busy_element
+        },
+        events: {
+          submit: function(evnt) {
+            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+            var submitter = $.ninja.tools.ajax_submitter(evnt.target)
+
+            submitter.response_handler = function() {
+              return function(xhr, statusTxt) {
+                overlay.remove()
+                Ninja.tools.fire_mutation_event()
+              }
+            }
+            $("body").append(overlay)
+            submitter.submit()
+          }
+        }
+      })
+    },
+
+    //Converts a whole form into a link that submits via AJAX.  The intention
+    //is that you create a <form> elements with hidden inputs and a single
+    //submit button - then when we transform it, you don't lose anything in
+    //terms of user interface.  Like submits_as_ajax_form, it will put up a
+    //busy overlay - by default we use the element's parent.
+    //
+    //$.ninja.becomes_ajax_link({
+    //  busy_element: function(elem) { $("#user-notification") }
+    //})
+    becomes_ajax_link: function(configs) {
+      if(typeof configs == "undefined") {
+        configs = {}
+      }
+
+      if(typeof configs.busy_element == "undefined") {
+        configs.busy_element = function(elem) {
+          return elem.parentNode
+        }
+      }
+      return new Behavior({
+        helpers: {
+          find_overlay: configs.busy_element
+        },
+        transform: function(form){
+          var link_text
+          if ((images = $('input[type=image]', form)).size() > 0){
+            image = images[0]
+            link_text = "<img src='" + image.src + "' alt='" + image.alt +"'";
+          } 
+          else if((submits = $('input[type=submit]', form)).size() > 0) {
+            submit = submits[0]
+            link_text = submit.value
+          } 
+          else {
+            console.log("Couldn't find a submit input in form");
+          }
+
+          var link = $("<a href='#'>" + link_text + "</a>")
+          var jq_form = $(form)
+          var attrs= ["id", "class", "lang", "dir", "title"].reduce(function(atts, att, idx, arry) {
+            var att_val = jq_form.attr(att)
+            if(typeof att_val !== "undefined" && att_val.length > 0) {
+              atts[att] = att_val
+            }
+            return atts
+          }, {})
+          link.attr(attrs)
+
+          this.submitter = $.ninja.tools.ajax_submitter(form)
+          this.submitter.response_handler = function() {
+            var submitter = this
+            return function(xhr, statusTxt) {
+              submitter.overlay.remove()
+              Ninja.tools.fire_mutation_event()
+            }
+          }
+
+          $(form).replaceWith(link)
+          return link
+        },
+        events: {
+          click: function(evnt, elem){
+            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+            this.submitter.overlay = overlay
+            $("body").append(overlay)
+            this.submitter.submit()
+          }
+        }
+      })
+    },
+
+    //Use for elements that should be transient.  For instance, the default
+    //behavior of failed AJAX calls is to insert a message into a
+    //div#messages with a "flash" class.  You can use this behavior to have
+    //those disappear after a few seconds.
+    //
+    //Configs:
+    //{ lifetime: 10000, dies_for: 600 }
+
+    decays: function(configs) {
+      if(typeof configs == "undefined") { configs = {} }
+
+      if(typeof configs.lifetime == "undefined") {
+        configs.lifetime = 10000
+      }
+
+      if(typeof configs.dies_for == "undefined") {
+        configs.dies_for = 600
+      }
+
+      return new Behavior({
+        transform: function(elem) {
+          $(elem).delay(configs.lifetime).slideUp(configs.dies_for, function(){
+          $(elem).remove()})
+        },
+        events: {
+          click:  function(evnt, elem) {
+            $(elem).remove();
+          }
+        }
+      })
+    },
+
+    //Wishlist:
+    //  tooltip
+    //  watermarking
+    //  rounded corners
+    //  block drop shadow
+    //  text -> image
+    //  image redboxing
+    //  table sorting
+    //  decaying blocks (recoverable?)
+    //  dynamic validation?
+    //  autocomplete    
+    //  observe_form / observe_field
+    //  links  (link_to_remote)
+
+    config: {
+      message_wrapping: function(text, classes) {
+        return "<div class='flash " + classes +"'><p>" + text + "</p></div>"
+      },
+      message_list: "#messages",
+      use_jquery_live: true
+    },
+    tools: {
+      fire_mutation_event: function() {
+        $(document.firstChild).trigger("NinjaChangedDOM");
+      },
+      suppress_change_events: function() {
+        return new Behavior({
+          events: {
+            DOMSubtreeModified: function(e){},
+            DOMNodeInserted: function(e){}
+          }
+        })
+      },
+      ajax_submitter: function(form) {
+        return new AjaxSubmitter(form)
+      },
+      busy_overlay: function(elem) {
+        if (typeof elem != "undefined") {
+          var overlay = this.build_overlay_for(elem)
+          overlay.addClass("ninja busy")
+          return overlay
+        }	
+      },
+
+      //Currently, this doesn't respect changes to the original block...
+      build_overlay_for: function(elem) {
+        var overlay = $(document.createElement("div"))
+        var hideMe = $(elem)
+        var offset = hideMe.offset()
+        overlay.css("position", "absolute")
+        overlay.css("top", offset.top)
+        overlay.css("left", offset.left)
+        overlay.width(hideMe.outerWidth())
+        overlay.height(hideMe.outerHeight())
+        overlay.css("zIndex", "2")
+        return overlay
+      },
+      message: function(text, classes) {
+        var adding_message = Ninja.config.message_wrapping(text, classes)
+        $(Ninja.config.message_list).append(adding_message)
+      }
+    }
+
+  }
+
+  //Below here is the Ninja dojo - the engines that make NinjaScript work.
+  //With any luck, only the helpful and curious should have call to keep
+  //reading
+
   function Behavior(handlers) {
     this.helpers = {}
     this.event_handlers = []
@@ -178,7 +432,7 @@
 
     if(element.dataset != undefined) {
       if(element.dataset["method"] != undefined && 
-        element.dataset["method"].length > 0) {
+      element.dataset["method"].length > 0) {
         this.method = element.dataset["method"]
       }
     }
@@ -239,193 +493,7 @@
       $.ninja.tools.message("Server error: " + xhr.statusText, "error")
     }
   }
-   
-  // START READING HERE
-  var Ninja = {
-    config: {
-      message_wrapping: function(text, classes) {
-        return "<div class='flash " + classes +"'><p>" + text + "</p></div>"
-      },
-      message_list: "#messages",
-      use_jquery_live: true
-    },
-    tools: {
-      fire_mutation_event: function() {
-        $(document.firstChild).trigger("NinjaChangedDOM");
-      },
-      suppress_change_events: function() {
-        return new Behavior({
-          events: {
-            DOMSubtreeModified: function(e){},
-            DOMNodeInserted: function(e){}
-          }
-        })
-      },
-      ajax_submitter: function(form) {
-        return new AjaxSubmitter(form)
-      },
-      busy_overlay: function(elem) {
-				if (typeof elem != "undefined") {
-	        var overlay = this.build_overlay_for(elem)
-	        overlay.addClass("ninja busy")
-	        return overlay
-				}	
-      },
 
-      //Currently, this doesn't respect changes to the original block...
-      build_overlay_for: function(elem) {
-        var overlay = $(document.createElement("div"))
-        var hideMe = $(elem)
-        var offset = hideMe.offset()
-        overlay.css("position", "absolute")
-        overlay.css("top", offset.top)
-        overlay.css("left", offset.left)
-        overlay.width(hideMe.outerWidth())
-        overlay.height(hideMe.outerHeight())
-        overlay.css("zIndex", "2")
-        return overlay
-      },
-      message: function(text, classes) {
-        var adding_message = Ninja.config.message_wrapping(text, classes)
-        $(Ninja.config.message_list).append(adding_message)
-      }
-    },
-
-    //Stock behaviors
-    //Wishlist:
-    //  tooltip
-    //  watermarking
-    //  rounded corners
-    //  block drop shadow
-    //  text -> image
-    //  image redboxing
-    //  table sorting
-    //  decaying blocks (recoverable?)
-    //  dynamic validation?
-    //  autocomplete    
-    //  observe_form / observe_field
-    //  links  (link_to_remote)
-
-		ajax_link: function(configs) {
-      if(typeof configs == "undefined") { configs = {} }
-      if(typeof configs.busy_element == "undefined") {
-        configs.busy_element = function(elem) {}
-      }
-
-			return new Behavior({
-				helpers: {
-          	find_overlay: configs.busy_element
-				},
-			  events: {
-					click:  function(evnt) {
-            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
-            var submitter = $.ninja.tools.ajax_submitter(evnt.target)
-
-            submitter.response_handler = function() {
-              return function(xhr, statusTxt) {
-								if (typeof overlay != "undefined") { overlay.remove() }
-                Ninja.tools.fire_mutation_event()
-              }
-            }
-            if (typeof overlay != "undefined") { $("body").append(overlay) }
-            submitter.submit()						
-					}
-				}
-			})
-		},
-    ajax_submission: function(configs) {
-      if(typeof configs == "undefined") {
-        configs = {}
-      }
-
-      if(typeof configs.busy_element == "undefined") {
-        configs.busy_element = function(elem) {
-          return elem
-        }
-      }
-      return new Behavior({
-        helpers: {
-          find_overlay: configs.busy_element
-        },
-        events: {
-          submit: function(evnt) {
-            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
-            var submitter = $.ninja.tools.ajax_submitter(evnt.target)
-
-            submitter.response_handler = function() {
-              return function(xhr, statusTxt) {
-                overlay.remove()
-                Ninja.tools.fire_mutation_event()
-              }
-            }
-            $("body").append(overlay)
-            submitter.submit()
-          }
-        }
-      })
-    },
-    becomes_ajax_link: function(configs) {
-      if(typeof configs == "undefined") {
-        configs = {}
-      }
-
-      if(typeof configs.busy_element == "undefined") {
-        configs.busy_element = function(elem) {
-          return elem
-        }
-      }
-      return new Behavior({
-        helpers: {
-          find_overlay: configs.busy_element
-        },
-        transform: function(form){
-          var link_text
-          if ((images = $('input[type=image]', form)).size() > 0){
-            image = images[0]
-            link_text = "<img src='" + image.src + "' alt='" + image.alt +"'";
-          } 
-          else if((submits = $('input[type=submit]', form)).size() > 0) {
-            submit = submits[0]
-            link_text = submit.value
-          } 
-          else {
-            console.log("Couldn't find a submit input in form");
-          }
-
-          var link = $("<a href='#'>" + link_text + "</a>")
-          var jq_form = $(form)
-          var attrs= ["id", "class", "lang", "dir", "title"].reduce(function(atts, att, idx, arry) {
-            var att_val = jq_form.attr(att)
-            if(typeof att_val !== "undefined" && att_val.length > 0) {
-              atts[att] = att_val
-            }
-            return atts
-          }, {})
-          link.attr(attrs)
-
-          this.submitter = $.ninja.tools.ajax_submitter(form)
-          this.submitter.response_handler = function() {
-            var submitter = this
-            return function(xhr, statusTxt) {
-              submitter.overlay.remove()
-              Ninja.tools.fire_mutation_event()
-            }
-          }
-
-          $(form).replaceWith(link)
-          return link
-        },
-        events: {
-          click: function(evnt, elem){
-            var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
-            this.submitter.overlay = overlay
-            $("body").append(overlay)
-            this.submitter.submit()
-          }
-        }
-      })
-    }
-  }
 
   function handleMutation(evnt) {
     $(this).data("ninja-behavior").event_triggered(evnt);

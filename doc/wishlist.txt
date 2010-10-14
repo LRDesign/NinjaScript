@@ -1,11 +1,11 @@
 Pre-defined behaviors we would like to have eventually:
 
 EVENT BEHAVIORS
-  - link or form via ajax                 [ submits_as_ajax ]
+  - link or form via ajax                 [ submits_as_ajax ] 
 
-  - link submits (requests?) via ajax     [ submits_as_ajax_link ]
+  x link submits (requests?) via ajax     [ submits_as_ajax_link ]
       
-  - form submits via ajax                 [ submits_as_ajax_form ]
+  x form submits via ajax                 [ submits_as_ajax_form ]
   
   - mouseover triggers tooltip            [ pops_tooltip ]
      
@@ -30,7 +30,7 @@ TRANSFORMATIONS
   
 
 TRANSFORM / EVENT COMBOS
-  - form converts to ajax link            [ becomes_ajax_link ]
+  x form converts to ajax link            [ becomes_ajax_link ]
 
   - watermark on <input>:                 [ watermarked ]
       xform: inserts watermark, sets styles

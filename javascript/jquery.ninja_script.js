@@ -248,6 +248,29 @@
           $(document.firstChild).trigger("NinjaChangedDOM")
         }
       },
+      get_root_collection: function() {
+        if($("html").data("ninja-behavior") instanceof BehaviorCollection) {
+          return $("html").data("ninja-behavior")
+        }
+
+        var collection = new BehaviorCollection()
+        $("html").data("ninja-behavior", collection);
+        $("html").bind("DOMSubtreeModified DOMNodeInserted NinjaChangedDOM", handleMutation);
+        //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
+        //hack, so nerf it
+        $("html").one("DOMSubtreeModified DOMNodeInserted", function(){
+          Ninja.tools.fire_mutation_event = function(){}
+          Ninja.tools.add_mutation_targets = function(t){}
+        })
+        return collection
+      },
+      derive_elements_from: function(element, means){
+        switch(typeof means){
+          case 'undefined': return element
+          case 'string': return $(element).children(means)
+          case 'function': return means(element)
+        }
+      },
       suppress_change_events: function() {
         return new Behavior({
           events: {
@@ -258,6 +281,9 @@
       },
       ajax_submitter: function(form) {
         return new AjaxSubmitter(form)
+      },
+      overlay: function() {
+        return new Overlay([].map.apply(arguments,[function(i) {return i}]))
       },
       busy_overlay: function(elem) {
         if (typeof elem != "undefined") {
@@ -471,6 +497,58 @@
     }
   }
 
+  function Overlay(list) {
+    var elements = this.convert_to_element_array(list)
+    this.set = $(elements.map(function(element, idx, list) {
+      return this.build_overlay_for(element)
+    }, this))
+  }
+
+  Overlay.prototype = {
+    convert_to_element_array: function(list) {
+      var h = this
+      switch(typeof list) {
+        case 'undefined': return []
+        case 'boolean': return []
+        case 'string': return h.convert_to_element_array($(list))
+        case 'function': return h.convert_to_element_array(list())
+        case 'object': {
+          if(list instanceof Element) {
+            return [list]
+          }
+          else if("length" in list && "0" in list) {
+            var result = Array.prototype.reduce.apply(list, [function(newlist, element, idx, list) {
+              return newlist.concat(h.convert_to_element_array(element))
+            }, []])
+            return result
+          }
+          else {
+            return []
+          }
+        }
+      }
+    },
+
+    build_overlay_for: function(elem) {
+      var overlay = $(document.createElement("div"))
+      var hideMe = $(elem)
+      var offset = hideMe.offset()
+      overlay.css("position", "absolute")
+      overlay.css("top", offset.top)
+      overlay.css("left", offset.left)
+      overlay.width(hideMe.outerWidth())
+      overlay.height(hideMe.outerHeight())
+      overlay.css("zIndex", "2")
+      return overlay
+    },
+    affix: function() {
+      this.set.appendTo($("body"))
+    },
+    remove: function() {
+      this.set.each(function(i, elem){elem.remove()})
+    }
+  }
+
   function AjaxSubmitter(element) {
     if(element.tagName.toLowerCase() == 'a') {
       this.form_data = []
@@ -558,9 +636,8 @@
     ninja: Ninja,
     behavior: function(dispatching) 
     {
-      var collection = new BehaviorCollection()
-      var selector
-      for(selector in dispatching) 
+      var collection = Ninja.get_root_collection()
+      for(var selector in dispatching) 
       {
         if(typeof dispatching[selector] == "undefined") {
           console.log("Selector " + selector + " not properly defined - ignoring")
@@ -578,14 +655,6 @@
           }
         }
       }
-      $("html").data("ninja-behavior", collection);
-      $("html").bind("DOMSubtreeModified DOMNodeInserted NinjaChangedDOM", handleMutation);
-      //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
-      //hack, so nerf it
-      $("html").one("DOMSubtreeModified DOMNodeInserted", function(){
-        Ninja.tools.fire_mutation_event = function(){}
-        Ninja.tools.add_mutation_targets = function(t){}
-      })
       $(function(){ Ninja.tools.fire_mutation_event(); });
     }
   });

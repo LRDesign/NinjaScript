@@ -4,6 +4,12 @@
   var Ninja = {
     //Stock behaviors
 
+    //Converts either a link or a form to send its requests via AJAX - we eval
+    //the Javascript we get back.  We get an busy overlay if configured to do
+    //so.
+    //
+    //This farms out the actual behavior to submits_as_ajax_link and
+    //submits_as_ajax_form, c.f.
 
     submits_as_ajax: function(configs) {
       return new Metabehavior(function(meta) {

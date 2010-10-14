@@ -49,11 +49,11 @@
 
             submitter.response_handler = function() {
               return function(xhr, statusTxt) {
-                if (typeof overlay != "undefined") { overlay.remove() }
+                overlay.remove()
                 Ninja.tools.fire_mutation_event()
               }
             }
-            if (typeof overlay != "undefined") { $("body").append(overlay) }
+            overlay.affix()
             submitter.submit()						
           }
         }
@@ -96,7 +96,7 @@
                 Ninja.tools.fire_mutation_event()
               }
             }
-            $("body").append(overlay)
+            overlay.affix()
             submitter.submit()
           }
         }
@@ -167,7 +167,7 @@
           click: function(evnt, elem){
             var overlay = $.ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
             this.submitter.overlay = overlay
-            $("body").append(overlay)
+            overlay.affix()
             this.submitter.submit()
           }
         }
@@ -289,11 +289,9 @@
         return new Overlay([].map.apply(arguments,[function(i) {return i}]))
       },
       busy_overlay: function(elem) {
-        if (typeof elem != "undefined") {
-          var overlay = this.build_overlay_for(elem)
-          overlay.addClass("ninja busy")
-          return overlay
-        }	
+        var overlay = this.overlay(elem)
+        overlay.set.addClass("ninja busy")
+        return overlay
       },
 
       //Currently, this doesn't respect changes to the original block...

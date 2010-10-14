@@ -33,14 +33,14 @@
     //})
     //
     submits_as_ajax_link: function(configs) {
-      if(typeof configs == "undefined") { configs = {} }
-      if(typeof configs.busy_element == "undefined") {
-        configs.busy_element = function(elem) {}
+      if(!(configs instanceof Object)) {
+        configs = { busy_element: undefined }
       }
-
       return new Behavior({
         helpers: {
-          find_overlay: configs.busy_element
+          find_overlay: function(elem) {
+            return Ninja.tools.derive_elements_from(elem, configs.busy_element)
+          }
         },
         events: {
           click:  function(evnt) {
@@ -72,18 +72,14 @@
     //})
     //
     submits_as_ajax_form: function(configs) {
-      if(typeof configs == "undefined") {
-        configs = {}
-      }
-
-      if(typeof configs.busy_element == "undefined") {
-        configs.busy_element = function(elem) {
-          return elem
-        }
+      if(!(configs instanceof Object)) {
+        configs = { busy_element: undefined }
       }
       return new Behavior({
         helpers: {
-          find_overlay: configs.busy_element
+          find_overlay: function(elem) {
+            return Ninja.tools.derive_elements_from(elem, configs.busy_element)
+          }
         },
         events: {
           submit: function(evnt) {
@@ -113,18 +109,14 @@
     //  busy_element: function(elem) { $("#user-notification") }
     //})
     becomes_ajax_link: function(configs) {
-      if(typeof configs == "undefined") {
-        configs = {}
-      }
-
-      if(typeof configs.busy_element == "undefined") {
-        configs.busy_element = function(elem) {
-          return elem.parentNode
-        }
+      if(!(configs instanceof Object)) {
+        configs = { busy_element: undefined }
       }
       return new Behavior({
         helpers: {
-          find_overlay: configs.busy_element
+          find_overlay: function(elem) {
+            return Ninja.tools.derive_elements_from(elem, configs.busy_element)
+          }
         },
         transform: function(form){
           var link_text
@@ -271,7 +263,7 @@
       derive_elements_from: function(element, means){
         switch(typeof means){
           case 'undefined': return element
-          case 'string': return $(element).children(means)
+          case 'string': return $(means)
           case 'function': return means(element)
         }
       },

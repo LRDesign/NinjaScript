@@ -199,16 +199,33 @@
     //  observe_form / observe_field
     //  links  (link_to_remote)
 
+
+    //NinjaScript-wide configurations.  Currently, not very many
     config: {
+      //This is the half-assed
       message_wrapping: function(text, classes) {
         return "<div class='flash " + classes +"'><p>" + text + "</p></div>"
       },
       message_list: "#messages",
       use_jquery_live: true
     },
+    mutation_targets: [],
     tools: {
+      add_mutation_targets: function(targets) {
+        Ninja.tools.mutation_targets = Ninja.tools.mutation_targets.concat(target)
+      },
       fire_mutation_event: function() {
-        $(document.firstChild).trigger("NinjaChangedDOM");
+        var targets = Ninja.mutation_targets
+        if (targets.length > 0 ) {
+          for(var target = targets.shift(); 
+          targets.length > 0; 
+          target = targets.shift()) {
+            $(target).trigger("NinjaChangedDOM")
+          }
+        }
+        else {
+          $(document.firstChild).trigger("NinjaChangedDOM")
+        }
       },
       suppress_change_events: function() {
         return new Behavior({
@@ -283,7 +300,7 @@
       this.apply = function(element) {
         var elem = this.transform(element)
 
-        $(elem).data("ninja-behaviors", true)
+        $(elem).data("ninja-visited", true)
         var len = this.handlers.length
         for(var i = 0; i < len; i++) {
           var event_name = this.handlers[i][0]
@@ -316,7 +333,7 @@
   Behavior.prototype = {   
     //XXX apply_to?
     apply: function(elem) {
-      if (!$(elem).data("ninja-behaviors")) {
+      if (!$(elem).data("ninja-visited")) {
         new this.in_context(elem).apply(elem)
       }
     },
@@ -363,6 +380,8 @@
       return elem 
     }
   }
+
+  Ninja.behavior = Behavior
 
   function BehaviorCollection() {
     this.event_queue = []
@@ -526,8 +545,11 @@
       }
       $("html").data("ninja-behavior", collection);
       $("html").bind("DOMSubtreeModified DOMNodeInserted NinjaChangedDOM", handleMutation);
+      //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
+      //hack, so nerf it
       $("html").one("DOMSubtreeModified DOMNodeInserted", function(){
         Ninja.tools.fire_mutation_event = function(){}
+        Ninja.tools.add_mutation_targets = function(t){}
       })
       $(function(){ Ninja.tools.fire_mutation_event(); });
     }

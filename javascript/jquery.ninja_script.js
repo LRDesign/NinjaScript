@@ -636,7 +636,7 @@
     ninja: Ninja,
     behavior: function(dispatching) 
     {
-      var collection = Ninja.get_root_collection()
+      var collection = Ninja.tools.get_root_collection()
       for(var selector in dispatching) 
       {
         if(typeof dispatching[selector] == "undefined") {

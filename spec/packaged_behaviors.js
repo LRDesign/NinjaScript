@@ -1,6 +1,7 @@
 describe("Packaged Behaviors:", function() {
   describe("becomes_ajax_link()", function() {
     beforeEach(function() {
+      $.ninja.tools.clear_root_collection()
       $.behavior({
         "#simple-form": $.ninja.becomes_ajax_link()
       })

@@ -248,6 +248,9 @@
           $(document.firstChild).trigger("NinjaChangedDOM")
         }
       },
+      clear_root_collection: function() {
+        $("html").data("ninja-behavior", null)
+      },
       get_root_collection: function() {
         if($("html").data("ninja-behavior") instanceof BehaviorCollection) {
           return $("html").data("ninja-behavior")
@@ -539,13 +542,13 @@
       overlay.width(hideMe.outerWidth())
       overlay.height(hideMe.outerHeight())
       overlay.css("zIndex", "2")
-      return overlay
+      return overlay[0]
     },
     affix: function() {
       this.set.appendTo($("body"))
     },
     remove: function() {
-      this.set.each(function(i, elem){elem.remove()})
+      this.set.remove()
     }
   }
 

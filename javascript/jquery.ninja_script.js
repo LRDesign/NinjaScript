@@ -228,7 +228,8 @@
         return "<div class='flash " + classes +"'><p>" + text + "</p></div>"
       },
       message_list: "#messages",
-      use_jquery_live: true
+      use_jquery_live: true,
+      busy_laziness: 200
     },
     mutation_targets: [],
     tools: {
@@ -540,10 +541,12 @@
       overlay.width(hideMe.outerWidth())
       overlay.height(hideMe.outerHeight())
       overlay.css("zIndex", "2")
+      overlay.css("display", "none")
       return overlay[0]
     },
     affix: function() {
       this.set.appendTo($("body"))
+      this.set.delay(Ninja.config.busy_laziness).css("display", "block")
     },
     remove: function() {
       this.set.remove()

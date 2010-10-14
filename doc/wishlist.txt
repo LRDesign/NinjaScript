@@ -38,7 +38,7 @@ TRANSFORM / EVENT COMBOS
       blur: replace watermork if no entry
       submit: clear watermark, submits nothing
 
-  - decaying blocks                       [ decays ]
+  x decaying blocks                       [ decays ]
       click: clear block immediately
       
   - on-page table sorting                 [ sortable ]

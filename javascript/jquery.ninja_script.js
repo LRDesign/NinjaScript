@@ -3,6 +3,21 @@
   // START READING HERE
   var Ninja = {
     //Stock behaviors
+
+
+    submits_as_ajax: function(configs) {
+      return new Metabehavior(function(meta) {
+        meta.as_link = Ninja.submits_as_ajax_link(configs),
+        meta.as_form = Ninja.submits_as_ajax_form(configs)
+      },
+      function(elem) {
+        switch(elem.tagName.toLowerCase()) {
+          case "a": return this.as_link.apply(elem)
+          case "form": return this.as_form.apply(elem)
+        }
+      })
+    },
+
     //Converts a link to send its GET request via Ajax - we assume that we get
     //Javascript back, which is eval'd.  While we're waiting, we'll throw up a
     //busy overlay if configured to do so.  By default, we don't use a busy overlay.
@@ -330,6 +345,7 @@
     return this
   }
 
+
   Behavior.prototype = {   
     //XXX apply_to?
     apply: function(elem) {
@@ -382,6 +398,20 @@
   }
 
   Ninja.behavior = Behavior
+
+  function Metabehavior(setup, callback) {
+    setup(this)
+    this.application = callback
+  }
+
+  Metabehavior.prototype = {
+    apply: function(elem) {
+      if (!$(elem).data("ninja-visited")) {
+        this.application(elem)
+        $(elem).data("ninja-visited", true)
+      }
+    }
+  }
 
   function BehaviorCollection() {
     this.event_queue = []
@@ -526,18 +556,17 @@
       var selector
       for(selector in dispatching) 
       {
-        if(typeof dispatching[selector] == "undefined") 
-        {
+        if(typeof dispatching[selector] == "undefined") {
           console.log("Selector " + selector + " not properly defined - ignoring")
         } 
-        else 
-        {
-          if(dispatching[selector] instanceof Behavior) 
-          {
+        else {
+          if(dispatching[selector] instanceof Behavior) {
             collection.add_behavior(selector, dispatching[selector])
           } 
-          else 
-          {
+          else if(dispatching[selector] instanceof Metabehavior) {
+            collection.add_behavior(selector, dispatching[selector])
+          }
+          else {
             var behavior = new Behavior(dispatching[selector])
             collection.add_behavior(selector, behavior)
           }

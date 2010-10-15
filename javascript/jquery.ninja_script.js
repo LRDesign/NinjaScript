@@ -540,7 +540,9 @@
     },
     affix: function() {
       this.set.appendTo($("body"))
-      this.set.delay(this.laziness).css("display", "block")
+      setTimeout(this.laziness, function() {
+        this.set.css("display", "block")
+      })
     },
     remove: function() {
       this.set.remove()

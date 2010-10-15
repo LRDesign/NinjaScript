@@ -540,9 +540,10 @@
     },
     affix: function() {
       this.set.appendTo($("body"))
-      setTimeout(this.laziness, function() {
-        this.set.css("display", "block")
-      })
+      overlay_set = this.set
+      window.setTimeout(function() {
+        overlay_set.css("display", "block")
+      }, this.laziness)
     },
     remove: function() {
       this.set.remove()

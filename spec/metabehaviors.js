@@ -1,10 +1,10 @@
 describe("Metabehaviors", function() {
   var response
   beforeEach(function() {
-    $.ninja.tools.clear_root_collection()
-    $.behavior({
-      "#simple-form": $.ninja.submits_as_ajax(),
-      "#simple-link": $.ninja.submits_as_ajax()
+    Ninja.tools.clear_root_collection()
+    Ninja.behavior({
+      "#simple-form": Ninja.submits_as_ajax(),
+      "#simple-link": Ninja.submits_as_ajax()
     })
     setFixtures(fixtures.simple_form + fixtures.simple_link + fixtures.ajax_target)
     response = {

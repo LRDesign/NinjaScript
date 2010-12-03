@@ -6,7 +6,7 @@ describe("AjaxSubmitter", function() {
   describe("applied to a link", function() {
     beforeEach(function() {
       setFixtures(fixtures.simple_link + fixtures.ajax_target)
-      submitter = $.ninja.tools.ajax_submitter($('#simple-link')[0])
+      submitter = Ninja.tools.ajax_submitter($('#simple-link')[0])
     })
 
     it("should send an ajax request on .submit()", function() {
@@ -30,7 +30,7 @@ describe("AjaxSubmitter", function() {
   describe("applied to a form", function() {
     beforeEach(function() {
       setFixtures(fixtures.simple_form + fixtures.ajax_target)
-      submitter = $.ninja.tools.ajax_submitter($('#simple-form')[0])
+      submitter = Ninja.tools.ajax_submitter($('#simple-form')[0])
     })
 
     it("should send an ajax request on .submit()", function() {

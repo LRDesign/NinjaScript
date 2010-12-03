@@ -4,7 +4,7 @@ describe("Overlays", function() {
   })
 
   it("should target undefined", function() {
-    var overlay = $.ninja.tools.overlay(undefined)
+    var overlay = Ninja.tools.overlay(undefined)
     overlay.set.each(function(idx, elem){elem.addClass("testing")})
     overlay.affix()
     expect($("div.testing")).not.toExist()
@@ -12,7 +12,7 @@ describe("Overlays", function() {
   })
   
   it("should target an empty list", function() {
-    var overlay = $.ninja.tools.overlay()
+    var overlay = Ninja.tools.overlay()
     overlay.set.each(function(idx, elem){elem.addClass("testing")})
     overlay.affix()
     expect($("div.testing")).not.toExist()
@@ -21,7 +21,7 @@ describe("Overlays", function() {
 
   it("should target a single element", function() {
     expect($("#simple-link").length).toEqual(1)
-    var overlay = $.ninja.tools.overlay($("#simple-link"))
+    var overlay = Ninja.tools.overlay($("#simple-link"))
     overlay.set.addClass("testing")
     overlay.affix()
     expect($("div.testing")).toExist()
@@ -32,7 +32,7 @@ describe("Overlays", function() {
 
   it("should target multiple elements", function() {
     expect($("form").length).toEqual(2)
-    var overlay = $.ninja.tools.overlay($("form"))
+    var overlay = Ninja.tools.overlay($("form"))
     overlay.set.addClass("testing")
     overlay.affix()
     expect($("div.testing")).toExist()
@@ -40,9 +40,6 @@ describe("Overlays", function() {
     overlay.remove()
     expect($("div.testing")).not.toExist()
   })
-  
-  
-  
   
 })
 

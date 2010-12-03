@@ -1,9 +1,9 @@
 describe("Packaged Behaviors:", function() {
   describe("becomes_ajax_link()", function() {
     beforeEach(function() {
-      $.ninja.tools.clear_root_collection()
-      $.behavior({
-        "#simple-form": $.ninja.becomes_ajax_link()
+      Ninja.tools.clear_root_collection()
+      Ninja.behavior({
+        "#simple-form": Ninja.becomes_ajax_link()
       })
       setFixtures(fixtures.simple_form + fixtures.ajax_target)
     })
@@ -34,7 +34,7 @@ describe("Packaged Behaviors:", function() {
         expect(ajaxRequests.length).toEqual(0)
         $("a#simple-form").trigger("click")
         expect(ajaxRequests.length).toEqual(1)
-        expect(ajaxRequests[0].method).toEqual("POST")
+        expect(ajaxRequests[0].method).toEqual("PUT")
       })
 
       it("should put up an overlay", function() {

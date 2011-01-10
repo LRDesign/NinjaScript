@@ -6,12 +6,13 @@ describe("Metabehaviors", function() {
       "#simple-form": Ninja.submits_as_ajax(),
       "#simple-link": Ninja.submits_as_ajax()
     })
-    setFixtures(fixtures.simple_form + fixtures.simple_link + fixtures.ajax_target)
+    setFixtures(fixtures.simple_form('metabehaviors') + fixtures.simple_link + fixtures.ajax_target)
     response = {
       status: 200,
       contentType: "text/javascript",
       responseText: fixtures.script_response
     }
+    mockAjax()
   })
 
   afterEach(function() { 
@@ -28,7 +29,7 @@ describe("Metabehaviors", function() {
 
   it("should handle submit", function() {
     expect(ajaxRequests.length).toEqual(0)
-    $("form#simple-form").trigger("submit")
+    //$("form#simple-form").trigger("submit")
     expect(ajaxRequests.length).toEqual(1)
   })
 })

@@ -238,8 +238,7 @@ function buildNinja() {
         }
       }
       $(function(){ Ninja.tools.fire_mutation_event(); });
-    },
-
+    }
   }
 
 
@@ -304,7 +303,11 @@ function buildNinja() {
       return new AjaxSubmitter(form)
     },
     overlay: function() {
-      return new Overlay([].map.apply(arguments,[function(i) {return i}]))
+      // I really liked using 
+      //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
+      //but IE8 doesn't implement ECMA 2.6.2 5th ed.
+      
+      return new Overlay(jQuery.makeArray(arguments))
     },
     busy_overlay: function(elem) {
       var overlay = this.overlay(elem)
@@ -395,7 +398,7 @@ function buildNinja() {
         type: this.method,
         complete: this.response_handler(),
         success: this.success_handler(),
-        error: this.on_error,
+        error: this.on_error
       }
     },
 
@@ -426,9 +429,10 @@ function buildNinja() {
   function Overlay(list) {
     var elements = this.convert_to_element_array(list)
     this.laziness = 0
-    this.set = $(elements.map(function(element, idx, list) {
-          return this.build_overlay_for(element)
-        }, this))
+    var ov = this
+    this.set = $(jQuery.map(elements, function(element, idx) {
+          return ov.build_overlay_for(element)
+        }))
   }
 
   Overlay.prototype = {
@@ -440,13 +444,15 @@ function buildNinja() {
       case 'string': return h.convert_to_element_array($(list))
       case 'function': return h.convert_to_element_array(list())
       case 'object': {
-          if(list instanceof Element) {
+          //IE8 barfs on 'list instanceof Element'
+          if("focus" in list && "blur" in list && !("jquery" in list)) {
             return [list]
           }
           else if("length" in list && "0" in list) {
-            var result = Array.prototype.reduce.apply(list, [function(newlist, element, idx, list) {
-                  return newlist.concat(h.convert_to_element_array(element))
-                }, []])
+            var result = []
+            jQuery.each(list, function(idx, element) {
+                  result = result.concat(h.convert_to_element_array(element))
+                })
             return result
           }
           else {
@@ -672,7 +678,7 @@ if(typeof(console) === 'undefined') {
   }
 }
 
-var Ninja = buildNinja();
+Ninja = buildNinja();
 
 //This exists to carry over interfaces from earlier versions of Ninjascript.  Likely, it will be removed from future versions of NinjaScript
 ( function($) {

@@ -1,6 +1,6 @@
 describe("Overlays", function() {
   beforeEach(function() {
-    setFixtures(fixtures.simple_form + fixtures.simple_form + fixtures.simple_link)
+      setFixtures(fixtures.simple_form('overlays') + fixtures.simple_form('overlays') + fixtures.simple_link)
   })
 
   it("should target undefined", function() {

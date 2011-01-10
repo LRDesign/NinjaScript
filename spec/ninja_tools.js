@@ -2,7 +2,12 @@ describe("Ninja.tools: ", function() {
   describe("derive elements from", function() {
     var start_element
     beforeEach(function() {
-      setFixtures(fixtures.simple_form + fixtures.simple_link + fixtures.ajax_target)
+      setFixtures( '<form id="simple-form" action="/testing-ajax-link-tools" method="post">\
+  <input type="hidden" name="_method" value="put"></input>\
+  <input type="hidden" name="thing" value="16"></input>\
+  <input type="submit" name="Submit!" value="To the Zod">\
+</form>'+ fixtures.simple_link + fixtures.ajax_target)
+      //setFixtures(fixtures.simple_form + fixtures.simple_link + fixtures.ajax_target)
       start_element = $("html")
     })
     

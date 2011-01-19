@@ -29,7 +29,7 @@ describe("Metabehaviors", function() {
 
   it("should handle submit", function() {
     expect(ajaxRequests.length).toEqual(0)
-    //$("form#simple-form").trigger("submit")
+    $("form#simple-form").trigger("submit")
     expect(ajaxRequests.length).toEqual(1)
   })
 })

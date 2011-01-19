@@ -1,0 +1,19 @@
+NinjaScript docco is divided into levels ala Go or Kendo:
+
+* Use selectors to apply pre-packaged behaviors
+* More complex pre-packaged behaviors - configs especially
+* How selectors apply (the "View Source" model)
+* Using 3rd-party behaviors
+* Ad hoc behaviors: events
+* Ad hoc behaviors: transforms
+* Ad hoc behaviors: context-shared data
+* Prepackaged behaviors and compositing
+1 kyu
+
+1 dan:
+* Packaging behaviors
+* Metabehaviors
+* Distributing packaged behaviors
+* The behavior composition flow
+* Working with behavior composition: transforms
+* Behavior composition: handler clobbering

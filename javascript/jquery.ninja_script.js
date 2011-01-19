@@ -1,6 +1,26 @@
 // vim: sw=2 ft=javascript
 
 function buildNinja() {
+  function log(message) {
+    console.log(message)
+  }
+
+  if(console === undefined) {
+    log = function(){}
+  }
+
+  if(typeof Array.prototype.forEach == "undefined") {
+    //Trying to cover for IE - adapted from ECMA 2.6.2 5th Ed.
+    Array.prototype.forEach = function(callback, thisArg) {
+      var len = Number(this.length)
+      for(var k = 0; k < len; k+=1) {
+        if(typeof this[k] != "undefined") {
+          callback.call(thisArg, this[k], k, this)
+        }
+      }
+    }
+  }
+
   function NinjaScript() {
     //NinjaScript-wide configurations.  Currently, not very many
     this.config = {
@@ -34,8 +54,8 @@ function buildNinja() {
         },
         function(elem) {
           switch(elem.tagName.toLowerCase()) {
-          case "a": return this.as_link.apply(elem)
-          case "form": return this.as_form.apply(elem)
+          case "a": return this.as_link
+          case "form": return this.as_form
           }
         })
     },
@@ -60,7 +80,7 @@ function buildNinja() {
           },
           events: {
             click:  function(evnt) {
-              var overlay = Ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+              var overlay = Ninja.tools.busy_overlay(this.find_overlay(evnt.target))
               var submitter = Ninja.tools.ajax_submitter(evnt.target)
 
               submitter.on_response = function(xhr, statusTxt) {
@@ -96,7 +116,7 @@ function buildNinja() {
           },
           events: {
             submit: function(evnt) {
-              var overlay = Ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+              var overlay = Ninja.tools.busy_overlay(this.find_overlay(evnt.target))
               var submitter = Ninja.tools.ajax_submitter(evnt.target)
 
               submitter.on_response = function(xhr, statusTxt) {
@@ -109,11 +129,63 @@ function buildNinja() {
         })
     },
 
+    //Replaces a form with a link - the text of the link is based on the Submit
+    //input of the form.  The form itself is pulled out of the document until
+    //the link is clicked, at which point, it gets stuffed back into the
+    //document and submitted, so the link behaves exactly link submitting the
+    //form with its default inputs.  The motivation is to use hidden-input-only
+    //forms for POST interactions, which Javascript can convert into links if
+    //you want.
+    becomes_link: function() {
+      return new Behavior({
+          transform: function(form){
+            var link_text
+            if ((images = $('input[type=image]', form)).size() > 0){
+              image = images[0]
+              link_text = "<img src='" + image.src + "' alt='" + image.alt +"'";
+            } 
+            else if((submits = $('input[type=submit]', form)).size() > 0) {
+              submit = submits[0]
+              link_text = submit.value
+            } 
+            else {
+              log("Couldn't find a submit input in form");
+            }
+
+            var link = $("<a href='#'>" + link_text + "</a>")
+            var jq_form = $(form)
+            var attrs= ["id", "class", "lang", "dir", "title"].reduce(
+              function(atts, att, idx, arry) {
+                var att_val = jq_form.attr(att)
+                if(typeof att_val !== "undefined" && att_val.length > 0) {
+                  atts[att] = att_val
+                }
+                return atts
+              }, {})
+            link.attr(attrs)
+
+            this.baseForm = form
+
+            jq_form.replaceWith(link) // I think this'll nix baseForm
+            return link
+          },
+          events: {
+            click: function(evnt, elem){
+              //This is a messy step up from pseudocode
+              var formDiv = new Element('div').insert(this.baseForm).hidden()
+              document.insert(formDiv)
+              this.baseForm.trigger("submit")
+            }
+          }
+        })
+
+    },
+
     //Converts a whole form into a link that submits via AJAX.  The intention
     //is that you create a <form> elements with hidden inputs and a single
     //submit button - then when we transform it, you don't lose anything in
     //terms of user interface.  Like submits_as_ajax_form, it will put up a
-    //busy overlay - by default we use the element
+    //busy overlay - by default we overlay the element itself
     //
     //this.becomes_ajax_link({
     //  busy_element: function(elem) { $("#user-notification") }
@@ -139,7 +211,7 @@ function buildNinja() {
               link_text = submit.value
             } 
             else {
-              console.log("Couldn't find a submit input in form");
+              log("Couldn't find a submit input in form");
             }
 
             var link = $("<a href='#'>" + link_text + "</a>")
@@ -164,7 +236,7 @@ function buildNinja() {
           },
           events: {
             click: function(evnt, elem){
-              var overlay = Ninja.tools.busy_overlay(this.helpers.find_overlay(evnt.target))
+              var overlay = Ninja.tools.busy_overlay(this.find_overlay(evnt.target))
               this.submitter.overlay = overlay
               overlay.affix()
               this.submitter.submit()
@@ -222,19 +294,11 @@ function buildNinja() {
       for(var selector in dispatching) 
       {
         if(typeof dispatching[selector] == "undefined") {
-          console.log("Selector " + selector + " not properly defined - ignoring")
+          log("Selector " + selector + " not properly defined - ignoring")
         } 
         else {
-          if(dispatching[selector] instanceof Behavior) {
-            collection.add_behavior(selector, dispatching[selector])
-          } 
-          else if(dispatching[selector] instanceof Metabehavior) {
-            collection.add_behavior(selector, dispatching[selector])
-          }
-          else {
-            var behavior = new Behavior(dispatching[selector])
-            collection.add_behavior(selector, behavior)
-          }
+          collection.addBehavior(selector, dispatching[selector])
+
         }
       }
       $(function(){ Ninja.tools.fire_mutation_event(); });
@@ -251,7 +315,9 @@ function buildNinja() {
     add_mutation_targets: function(targets) {
       this.mutation_targets = this.mutation_targets.concat(target)
     },
-
+    get_root_of_document: function() {
+      return $("html") //document.firstChild)
+    },
     fire_mutation_event: function() {
       var targets = this.mutation_targets
       if (targets.length > 0 ) {
@@ -262,23 +328,25 @@ function buildNinja() {
         }
       }
       else {
-        $(document.firstChild).trigger("thisChangedDOM")
+        this.get_root_of_document().trigger("thisChangedDOM")
+        //$("html").trigger("thisChangedDOM")
       }
     },
     clear_root_collection: function() {
-      $("html").data("ninja-behavior", null)
+      this.get_root_of_document().data("ninja-behavior", null)
     },
     get_root_collection: function() {
-      if($("html").data("ninja-behavior") instanceof BehaviorCollection) {
-        return $("html").data("ninja-behavior")
+      var rootOfDocument = this.get_root_of_document()
+      if(rootOfDocument.data("ninja-behavior") instanceof BehaviorCollection) {
+        return rootOfDocument.data("ninja-behavior")
       }
 
       var collection = new BehaviorCollection()
-      $("html").data("ninja-behavior", collection);
-      $("html").bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
+      rootOfDocument.data("ninja-behavior", collection);
+      rootOfDocument.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
       //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
       //hack, so nerf it
-      $("html").one("DOMSubtreeModified DOMNodeInserted", function(){
+      rootOfDocument.one("DOMSubtreeModified DOMNodeInserted", function(){
           this.fire_mutation_event = function(){}
           this.add_mutation_targets = function(t){}
         })
@@ -355,7 +423,7 @@ function buildNinja() {
       this.form_data = $(element).serializeArray()
       this.action = element.action
       this.method = element.method
-      console.log("Element method: " + element.method)
+      log("Element method: " + element.method)
     }
 
     this.dataType = 'script'
@@ -363,18 +431,18 @@ function buildNinja() {
     if(element.dataset !== undefined && 
       element.dataset["method"] !== undefined && 
       element.dataset["method"].length > 0) {
-      console.log("Override via dataset: " + element.dataset["method"])
+      log("Override via dataset: " + element.dataset["method"])
       this.method = element.dataset["method"]
     }
     else if(element.dataset === undefined && 
       $(element).attr("data-method") !== undefined) {
-      console.log("Override via data-method: " + $(element).attr("data-method"))
+      log("Override via data-method: " + $(element).attr("data-method"))
       this.method = $(element).attr("data-method")
     }
     else {
       for(var i=0, len = this.form_data.length; i<len; i++) {
         if(this.form_data[i].name == "_method") {
-          console.log("Override via _method: " + this.form_data[i].value)
+          log("Override via _method: " + this.form_data[i].value)
           this.method = this.form_data[i].value
           break
         }
@@ -386,7 +454,7 @@ function buildNinja() {
 
   AjaxSubmitter.prototype = {
     submit: function() {
-      console.log("Computed method: " + this.method)
+      log("Computed method: " + this.method)
       $.ajax(this.ajax_data())
     },
 
@@ -421,7 +489,7 @@ function buildNinja() {
     on_success: function(xhr, statusTxt, data) {
     },
     on_error: function(xhr, statusTxt, errorThrown) {
-      console.log(xhr.responseText)
+      log(xhr.responseText)
       Ninja.tools.message("Server error: " + xhr.statusText, "error")
     }
   }
@@ -450,7 +518,7 @@ function buildNinja() {
           }
           else if("length" in list && "0" in list) {
             var result = []
-            jQuery.each(list, function(idx, element) {
+            Array.prototype.forEach.call(list, function(element) {
                   result = result.concat(h.convert_to_element_array(element))
                 })
             return result
@@ -488,33 +556,89 @@ function buildNinja() {
   }
 
   function BehaviorCollection() {
+    this.lexicalCount = 0
     this.event_queue = []
-    this.behaviors = []
+    this.behaviors = {}
+    this.selectors = []
     return this
   }
 
-  BehaviorCollection.prototype = {
-    add_behavior: function(selector, behavior) {
-      this.behaviors.push([selector, behavior])
-    },
+  function EventScribe() {
+    this.handlers = {}
+  }
 
+  EventScribe.prototype = {
+    recordHandler: function(behavior, event_name, callback) {
+      var oldHandler = this.handlers[event_name]
+      if(typeof oldHandler == "undefined") {
+        oldHandler = function(){}
+      }
+      this.handlers[event_name] = callback.call(behavior, oldHandler)
+    },
+    applyEventHandlers: function(element) {
+      for(event_name in this.handlers) {
+        $(element).bind(event_name, this.handlers[event_name])
+      }
+    }
+  }
+
+  TRANSFORM_FAILED = {}
+
+  BehaviorCollection.prototype = {
+    addBehavior: function(selector, behavior) {
+      if(Array.isArray(behavior)) {
+        behavior.forEach(function(behaves){
+            this.addBehavior(selector, behaves)
+          })
+      }
+      else if(behavior instanceof Behavior) {
+        this.insertBehavior(selector, behavior)
+      } 
+      else if(behavior instanceof Selectabehavior) {
+        this.insertBehavior(selector, behavior)
+      }
+      else if(behavior instanceof Metabehavior) {
+        this.insertBehavior(selector, behavior)
+      }
+      else if(typeof behavior == "function"){
+        this.addBehavior(selector, behavior())
+      }
+      else {
+        var behavior = new Behavior(behavior)
+        this.addBehavior(selector, behavior)
+      }
+    },
+    insertBehavior: function(selector, behavior) {
+      behavior.lexicalOrder = this.lexicalCount
+      this.lexicalCount += 1
+      if(this.behaviors[selector] === undefined) {
+        this.selectors.push(selector)
+        this.behaviors[selector] = [behavior]
+      }
+      else {
+        this.behaviors[selector].push(behavior)
+      }
+    },
 
     mutation_event_triggered: function(evnt){
       if(this.event_queue.length == 0){
-        //console.log("mutation event - first")
+        log("mutation event - first")
         this.enqueue_event(evnt)
         this.handle_queue()
       }
       else {
-        //console.log("mutation event - queueing")
+        log("mutation event - queueing")
         this.enqueue_event(evnt)
       }
     },
     enqueue_event: function(evnt) {
       var event_covered = false
-      var uncovered = this.event_queue.filter(function(val, idx, queue) {
+      var uncovered = []
+      this.event_queue.forEach(function(val) {
           event_covered = event_covered || $.contains(val.target, evnt.target)
-          return !($.contains(evnt.target, val.target))
+          if (!($.contains(evnt.target, val.target))) {
+            uncovered.push(val)
+          }
         })
       if(!event_covered) {
         uncovered.unshift(evnt)
@@ -523,38 +647,107 @@ function buildNinja() {
     },
     handle_queue: function(){
       while (this.event_queue.length != 0){
-        this.apply(this.event_queue[0].target)
+        this.applyAll(this.event_queue[0].target)
         this.event_queue.shift()
       }
     },
+    applyBehaviorsTo: function(element, behaviors) {
+      var curContext, context = {}, applyList = [], scribe = new EventScribe
 
-    apply: function(root){
-      var i
-      var len = this.behaviors.length
-      for(i = 0; i < len; i++) {
+      behaviors = behaviors.sort(function(left, right) {
+          if(left.priority != right.priority) {
+            return left.priority - right.priority
+          }
+          else {
+            return left.lexicalOrder - right.lexicalOrder
+          }
+        }
+      )
+
+      behaviors.forEach(
+        function(behavior){
+//          try {
+            curContext = behavior.inContext(context)
+            element = behavior.applyTransform(curContext, element)
+            context = curContext
+            behavior.recordEventHandlers(scribe, context)
+//          }
+//          catch(ex) {
+//            if(ex === TRANSFORM_FAILED) {
+//              log("!!! Transform failed")
+//            }
+//            else {
+//              throw ex
+//            }
+//          }
+        }
+      )
+      $(element).data("ninja-visited", true)
+
+      scribe.applyEventHandlers(element)
+
+      return element
+    },
+    collectBehaviors: function(element, collection, behaviors) {
+      behaviors.forEach(function(val, idx, l) {
+          collection.push(val.choose(element))
+        })
+    },
+    //XXX Still doesn't quite handle the sub-behavior case - order of application
+    apply: function(element, startBehaviors, selectorIndex) {
+      if (!$(element).data("ninja-visited")) {
+        if(typeof selectorIndex == "undefined") {
+          selectorIndex = 0
+        }
+        var applicableBehaviors = [], len = this.selectors.length
+        this.collectBehaviors(element, applicableBehaviors, startBehaviors)
+        for(var j = selectorIndex; j < len; j++) {
+          if($(element).is(this.selectors[j])) {
+            this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
+          }
+        }
+        this.applyBehaviorsTo(element, applicableBehaviors)
+      }
+    },
+    applyAll: function(root){
+      var len = this.selectors.length
+      for(var i = 0; i < len; i++) {
         var pair = this.behaviors[i]
-        var selector = pair[0]
-        var behavior = pair[1]
-        $(root).find(selector).each( function(index, elem){
-            if (!$(elem).data("ninja-behaviors")) {
-              behavior.apply(elem)
-            }
-          })
+        var collection = this
+        $(root).find(this.selectors[i]).each( 
+          function(index, elem){
+            collection.apply(elem, collection.behaviors[collection.selectors[i]], i+1)
+          }
+        )
       }
     }
   }
 
   function Metabehavior(setup, callback) {
     setup(this)
-    this.application = callback
+    this.chooser = callback
   }
 
   Metabehavior.prototype = {
-    apply: function(elem) {
-      if (!$(elem).data("ninja-visited")) {
-        this.application(elem)
-        $(elem).data("ninja-visited", true)
+    choose: function(element) {
+      return this.chooser(element).choose(element)
+    }
+  }
+
+  //For these to be acceptable, I need to fit them into the pattern that
+  //Ninja.behavior accepts...
+  function Selectabehavior(menu) {
+    this.menu = menu
+  }
+
+  Selectabehavior.prototype = {
+    choose: function(element) {
+      for(selector in this.menu) {
+        if($(element).is(selector)) {
+          return this.menu[selector].choose(element)
+        }
       }
+      return null //XXX Should raise exception
     }
   }
 
@@ -562,6 +755,8 @@ function buildNinja() {
     this.helpers = {}
     this.event_handlers = []
     this.use_live = this.use_jquery_live
+    this.lexicalOrder = 0
+    this.priority = 0
 
     if (typeof handlers.transform == "function") {
       this.transform = handlers.transform
@@ -575,6 +770,10 @@ function buildNinja() {
       this.use_live = handlers.use_live
       delete handlers.use_live
     }
+    if (typeof handlers.priority != "undefined"){
+      this.priority = handlers.priority
+      delete handlers.priority
+    }
 
     if (typeof handlers.events != "undefined") {
       this.event_handlers = handlers.events
@@ -583,49 +782,55 @@ function buildNinja() {
       this.event_handlers = handlers
     }
 
-    var applier = function() {
-      this.apply = function(element) {
-        var elem = this.transform(element)
-
-        $(elem).data("ninja-visited", true)
-
-        var len = this.handlers.length
-        for(var i = 0; i < len; i++) {
-          var event_name = this.handlers[i][0]
-          var handler = this.handlers[i][1]
-          $(elem).bind(event_name, handler)
-        }
-        delete this.handlers
-      }
-    }
-    applier.prototype = this
-
-    this.in_context = function(elem) {
-      var element = elem
-      this.handlers = []
-
-      // If this can make it's way to Behavior(instead of two deep) we
-      // can make huge mem savings
-      for(var event_name in this.event_handlers) {
-        var handler = this.event_handlers[event_name]
-        this.handlers.push([event_name, this.make_handler(handler)])
-      }
-
-      return this
-    }
-    this.in_context.prototype = new applier()
-
     return this
   }
   Behavior.prototype = {   
     //XXX apply_to?
     apply: function(elem) {
-      if (!$(elem).data("ninja-visited")) {
-        new this.in_context(elem).apply(elem)
+      var context = this.inContext({})
+
+      elem = this.applyTransform(context, elem)
+      $(elem).data("ninja-visited", true)
+
+      this.applyEventHandlers(context, elem)
+
+      return elem
+    },
+    priority: function(value) {
+      this.priority = value
+      return this
+    },
+    choose: function(element) {
+      return this
+    },
+    inContext: function(based_on) {
+      function Context() {}
+      Context.prototype = based_on
+      return this.enrich(new Context, this.helpers)
+    },
+    enrich: function(left, right) {
+      return $.extend(left, right)
+    },
+    applyTransform: function(context, elem) {
+      return this.transform.call(context, elem)
+    },
+    applyEventHandlers: function(context, elem) {
+      for(var event_name in this.event_handlers) {
+        var handler = this.event_handlers[event_name]
+        $(elem).bind(event_name, this.make_handler.call(context, handler))
+      }
+      return elem
+    },
+    recordEventHandlers: function(scribe, context) {
+      for(var event_name in this.event_handlers) {
+        scribe.recordHandler(this, event_name, function(oldHandler){
+            return this.make_handler.call(context, this.event_handlers[event_name], oldHandler)
+          }
+        )
       }
     },
-    make_handler: function(config) {
-      var behavior = this
+    make_handler: function(config, previousHandler) {
+      var context = this
       var handle
       var stop_default = true
       var stop_propagate = true
@@ -659,7 +864,7 @@ function buildNinja() {
         if (stop_immediate) {
           event_record.stopImmediatePropagation()
         }
-        handle.apply(behavior, [event_record, this])
+        handle.call(context, event_record, this, previousHandler)
         return !stop_default
       }
     },
@@ -670,13 +875,6 @@ function buildNinja() {
 
   return Ninja;  
 };
-
-//More than a bit of a hack
-if(typeof(console) === 'undefined') {
-  console = {
-    log: function(){}
-  }
-}
 
 Ninja = buildNinja();
 

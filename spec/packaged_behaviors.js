@@ -5,11 +5,7 @@ describe("Packaged Behaviors:", function() {
       Ninja.behavior({
         "#simple-form": Ninja.becomes_ajax_link()
       })
-      setFixtures( '<form id="simple-form" action="/testing-ajax-link-packaged" method="post">\
-  <input type="hidden" name="_method" value="put"></input>\
-  <input type="hidden" name="thing" value="16"></input>\
-  <input type="submit" name="Submit!" value="To the Zod">\
-</form>'+ fixtures.ajax_target)
+      setFixtures( fixtures.simple_form('packaged') + fixtures.ajax_target)
       mockAjax()
     })
 

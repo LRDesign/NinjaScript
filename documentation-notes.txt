@@ -4,6 +4,7 @@ NinjaScript docco is divided into levels ala Go or Kendo:
 * More complex pre-packaged behaviors - configs especially
 * How selectors apply (the "View Source" model)
 * Using 3rd-party behaviors
+* Variants of behavior def: functions, objects, arrays
 * Ad hoc behaviors: events
 * Ad hoc behaviors: transforms
 * Ad hoc behaviors: context-shared data
@@ -12,8 +13,10 @@ NinjaScript docco is divided into levels ala Go or Kendo:
 
 1 dan:
 * Packaging behaviors
+* Ninja Tools
 * Metabehaviors
 * Distributing packaged behaviors
 * The behavior composition flow
 * Working with behavior composition: transforms
 * Behavior composition: handler clobbering
+* Behavior composition: context conventions

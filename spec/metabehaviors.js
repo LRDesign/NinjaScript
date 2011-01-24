@@ -2,11 +2,12 @@ describe("Metabehaviors", function() {
   var response
   beforeEach(function() {
     Ninja.tools.clear_root_collection()
+    setFixtures(fixtures.simple_form('metabehaviors') + fixtures.simple_link + fixtures.ajax_target)
+    $('#simple-form').bind("submit", function(){return false})
     Ninja.behavior({
       "#simple-form": Ninja.submits_as_ajax(),
       "#simple-link": Ninja.submits_as_ajax()
     })
-    setFixtures(fixtures.simple_form('metabehaviors') + fixtures.simple_link + fixtures.ajax_target)
     response = {
       status: 200,
       contentType: "text/javascript",

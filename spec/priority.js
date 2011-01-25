@@ -5,7 +5,6 @@ describe("Priorities:", function() {
               transform: function(element) {
                 $(element).attr("data-list", $(element).attr("data-list") + string)
                 //TODO removing this tests the default tranform value
-                return element
               },
               priority: prio
             }

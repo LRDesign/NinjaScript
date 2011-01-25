@@ -811,8 +811,8 @@ function buildNinja() {
     }
     if (typeof handlers.priority != "undefined"){
       this.priority = handlers.priority
-      delete handlers.priority
     }
+    delete handlers.priority
     if (typeof handlers.events != "undefined") {
       this.event_handlers = handlers.events
     } 

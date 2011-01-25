@@ -581,7 +581,8 @@ function buildNinja() {
     }
   }
 
-  TRANSFORM_FAILED = {}
+  function TransformFailedException(){}
+  function CouldntChooseException() { }
 
   function RootContext() {
     this.stashedElements = []
@@ -615,6 +616,7 @@ function buildNinja() {
             this.addBehavior(selector, behaves)
           }, this)
       }
+      //TODO IE: instanceof is suspect
       else if(behavior instanceof Behavior) {
         this.insertBehavior(selector, behavior)
       } 
@@ -702,7 +704,7 @@ function buildNinja() {
       forEach(behaviors,
         function(behavior){
           //XXX This needs to have exception handling back
-          //try {
+          try {
             curContext = behavior.inContext(context)
             element = behavior.applyTransform(curContext, element)
 
@@ -710,16 +712,16 @@ function buildNinja() {
             context.element = element
 
             scribe.recordEventHandlers(context, behavior)
-//          }
-//          catch(ex) {
-//            if(ex === TRANSFORM_FAILED) {
-//              log("!!! Transform failed")
-//            }
-//            else {
-//              log(ex)
-//              throw ex
-//            }
-//          }
+          }
+          catch(ex) {
+            if(ex instanceof TransformationFailedException) {
+              log("!!! Transform failed")
+            }
+            else {
+              log(ex)
+              throw ex
+            }
+          }
         }
       )
       $(element).data("ninja-visited", true)
@@ -729,8 +731,19 @@ function buildNinja() {
       return element
     },
     collectBehaviors: function(element, collection, behaviors) {
-      forEach(behaviors, function(val, idx, l) {
-          collection.push(val.choose(element))
+      forEach(behaviors, function(val) {
+          try {
+            collection.push(val.choose(element))
+          }
+          catch(ex) {
+            if(ex instanceof CouldntChooseException) {
+              log("!!! couldn't choose")
+            }
+            else {
+              log(ex)
+              throw(ex)
+            }
+          }
         })
     },
     //XXX Still doesn't quite handle the sub-behavior case - order of application
@@ -774,7 +787,13 @@ function buildNinja() {
 
   Metabehavior.prototype = {
     choose: function(element) {
-      return this.chooser(element).choose(element)
+      var chosen = this.chooser(element)
+      if(chosen !== undefined) {
+        return chosen.choose(element)
+      }
+      else {
+        throw new CouldntChooseException
+      }
     }
   }
 
@@ -850,7 +869,14 @@ function buildNinja() {
       return $.extend(left, right)
     },
     applyTransform: function(context, elem) {
-      return this.transform.call(context, elem)
+      var previousElem = elem
+      var newElem = this.transform.call(context, elem)
+      if(newElem === undefined) {
+        return previousElem
+      }
+      else {
+        return newElem
+      }
     },
     applyEventHandlers: function(context, elem) {
       for(var event_name in this.event_handlers) {

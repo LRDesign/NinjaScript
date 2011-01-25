@@ -1,19 +1,19 @@
 describe("Metabehaviors", function() {
     var response
     beforeEach(function() {
-        Ninja.tools.clear_root_collection()
-        setFixtures(fixtures.simple_form('metabehaviors') + fixtures.simple_link + fixtures.ajax_target + "<table><tr><td id='shouldnt-ajax'</td></tr></table>")
+        Ninja.tools.clearRootCollection()
+        setFixtures(fixtures.simpleForm('metabehaviors') + fixtures.simpleLink + fixtures.ajaxTarget + "<table><tr><td id='shouldnt-ajax'</td></tr></table>")
         $('#simple-form').bind("submit", function(){return false})
         Ninja.behavior({
-            "#simple-form": Ninja.submits_as_ajax(),
-            "#simple-link": Ninja.submits_as_ajax(),
-            '#shouldnt-ajax': Ninja.submits_as_ajax()
+            "#simple-form": Ninja.submitsAsAjax(),
+            "#simple-link": Ninja.submitsAsAjax(),
+            '#shouldnt-ajax': Ninja.submitsAsAjax()
           })
         Ninja.go()
         response = {
           status: 200,
           contentType: "text/javascript",
-          responseText: fixtures.script_response
+          responseText: fixtures.scriptResponse
         }
         mockAjax()
       })

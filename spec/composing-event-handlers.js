@@ -2,7 +2,7 @@ describe("Composed Event Handlers", function() {
     var triggeredEvidence = []
     beforeEach(function() {
         triggeredEvidence = []
-        Ninja.tools.clear_root_collection()
+        Ninja.tools.clearRootCollection()
 
 
         Ninja.behavior({
@@ -23,7 +23,7 @@ describe("Composed Event Handlers", function() {
         Ninja.go()
         setFixtures("<div id='test-target'></div>")
 
-        Ninja.tools.fire_mutation_event()
+        Ninja.tools.fireMutationEvent()
       })
 
     it("should be able to trigger all event handlers", function() {

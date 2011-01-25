@@ -7,8 +7,8 @@ describe("AjaxSubmitter", function() {
   describe("applied to a link", function() {
     beforeEach(function() {
 
-      setFixtures(fixtures.simple_link + fixtures.ajax_target)
-      submitter = Ninja.tools.ajax_submitter($('#simple-link')[0])
+      setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
+      submitter = Ninja.tools.ajaxSubmitter($('#simple-link')[0])
 
       mockAjax()
 
@@ -26,7 +26,7 @@ describe("AjaxSubmitter", function() {
       ajaxRequests[0].response({
         status: 200, 
         contentType: "text/javascript", 
-        responseText: fixtures.script_response
+        responseText: fixtures.scriptResponse
       })
       expect($("#ajax-target > *").length).toEqual(3)
     })
@@ -35,11 +35,11 @@ describe("AjaxSubmitter", function() {
   describe("applied to a form", function() {
     beforeEach(function() {
       setFixtures( '<form id="simple-form" action="/testing-ajax-link-submitter" method="post">\
-  <input type="hidden" name="_method" value="put"></input>\
+  <input type="hidden" name="Method" value="put"></input>\
   <input type="hidden" name="thing" value="16"></input>\
   <input type="submit" name="Submit!" value="To the Zod">\
-</form>'+ fixtures.ajax_target)
-      submitter = Ninja.tools.ajax_submitter($('#simple-form')[0])
+</form>'+ fixtures.ajaxTarget)
+      submitter = Ninja.tools.ajaxSubmitter($('#simple-form')[0])
       mockAjax()
     })
 
@@ -55,7 +55,7 @@ describe("AjaxSubmitter", function() {
       ajaxRequests[0].response({
         status: 200, 
         contentType: "text/javascript", 
-        responseText: fixtures.script_response
+        responseText: fixtures.scriptResponse
       })
       expect($("#ajax-target > *").length).toEqual(3)
     })

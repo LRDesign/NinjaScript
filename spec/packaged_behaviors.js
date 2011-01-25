@@ -1,14 +1,14 @@
 describe("Packaged Behaviors:", function() {
-    describe("becomes_ajax_link()", function() {
+    describe("becomesAjaxLink()", function() {
         beforeEach(function() {
-            Ninja.tools.clear_root_collection()
+            Ninja.tools.clearRootCollection()
             Ninja.behavior({
-                "#simple-form": Ninja.becomes_ajax_link()
+                "#simple-form": Ninja.becomesAjaxLink()
               })
             Ninja.go()
-            setFixtures( fixtures.simple_form('packaged') + fixtures.ajax_target)
+            setFixtures( fixtures.simpleForm('packaged') + fixtures.ajaxTarget)
             mockAjax()
-            Ninja.tools.fire_mutation_event()
+            Ninja.tools.fireMutationEvent()
           })
 
         it("should transform the form into a link", function() {
@@ -22,7 +22,7 @@ describe("Packaged Behaviors:", function() {
                 response = {
                   status: 200,
                   contentType: "text/javascript",
-                  responseText: fixtures.script_response
+                  responseText: fixtures.scriptResponse
                 }
               })
 

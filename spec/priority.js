@@ -1,5 +1,5 @@
 describe("Priorities:", function() {
-    describe("becomes_ajax_link()", function() {
+    describe("becomesAjaxLink()", function() {
         function appendData(string, prio) {
           return {
               transform: function(element) {
@@ -10,7 +10,7 @@ describe("Priorities:", function() {
             }
         }
         beforeEach(function() {
-            Ninja.tools.clear_root_collection()
+            Ninja.tools.clearRootCollection()
             setFixtures( "<div id='priority-target' data-list='x='></div>" )
           })
 

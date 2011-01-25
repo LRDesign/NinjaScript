@@ -207,15 +207,12 @@ function buildNinja() {
               }, {})
             link.attr(attrs)
 
-            this.baseForm = jq_form.replaceWith(link) // I think this'll nix baseForm
+            this.stash(jq_form.replaceWith(link)) // I think this'll nix baseForm
             return link
           },
           events: {
             click: function(evnt, elem){
-              var formDiv = Ninja.tools.hiddenDiv()
-              $(this.baseForm).data("ninja-visited", true)
-              $(formDiv).append(this.baseForm)
-              this.baseForm.trigger("submit")
+              this.cascadeEvent("submit")
             }
           }
         })
@@ -586,6 +583,30 @@ function buildNinja() {
 
   TRANSFORM_FAILED = {}
 
+  function RootContext() {
+    this.stashedElements = []
+  }
+
+  RootContext.prototype = {
+    stash: function(element) {
+      this.stashedElements.unshift(element)
+    },
+    clearStash: function() {
+      this.stashedElements = []
+    },
+    //XXX Of concern: how do cascading events work out?
+    //Should there be a first catch?  Or a "doesn't cascade" or something?
+    cascadeEvent: function(event) {
+      var formDiv = Ninja.tools.hiddenDiv()
+      forEach(this.stashedElements, function(element) {
+          var elem = $(element)
+          elem.data("ninja-visited", true)
+          $(formDiv).append(elem)
+          elem.trigger(event)
+        })
+    }
+  }
+
   BehaviorCollection.prototype = {
     //XXX: check if this is source of new slowdown
     addBehavior: function(selector, behavior) {
@@ -655,7 +676,10 @@ function buildNinja() {
       }
     },
     applyBehaviorsTo: function(element, behaviors) {
-      var curContext, context = {}, applyList = [], scribe = new EventScribe
+      var curContext, 
+      context = new RootContext, 
+      applyList = [], 
+      scribe = new EventScribe
 
       behaviors = behaviors.sort(function(left, right) {
           if(left.priority != right.priority) {

@@ -264,7 +264,7 @@ function buildNinja() {
     //  autocomplete    
     //  observe_form / observe_field
 
-    behavior: function(dispatching) {
+    goodBehavior: function(dispatching) {
       var collection = this.tools.get_root_collection()
       for(var selector in dispatching) 
       {
@@ -275,7 +275,25 @@ function buildNinja() {
           collection.addBehavior(selector, dispatching[selector])
         }
       }
-      $(function(){ Ninja.tools.fire_mutation_event(); });
+      $(window).load( function(){ Ninja.go() } )
+    },
+    misbehavior: function(nonsense) {
+      throw new Error("Called Ninja.behavior() after Ninja.go() - don't do that.  'Go' means 'I'm done, please proceed'")
+    },
+    behavior: this.goodBehavior,
+    go: function() {
+      if(this.behavior != this.misbehavior) {
+        var rootOfDocument = this.tools.get_root_of_document()
+        rootOfDocument.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
+        //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
+        //hack, so nerf it
+        rootOfDocument.one("DOMSubtreeModified DOMNodeInserted", function(){
+            this.fire_mutation_event = function(){}
+            this.add_mutation_targets = function(t){}
+          })
+        this.behavior = this.misbehavior
+        this.tools.fire_mutation_event()
+      }
     }
   }
 
@@ -307,6 +325,7 @@ function buildNinja() {
       }
     },
     clear_root_collection: function() {
+      Ninja.behavior = Ninja.goodBehavior
       this.get_root_of_document().data("ninja-behavior", null)
     },
     get_root_collection: function() {
@@ -317,13 +336,6 @@ function buildNinja() {
 
       var collection = new BehaviorCollection()
       rootOfDocument.data("ninja-behavior", collection);
-      rootOfDocument.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
-      //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
-      //hack, so nerf it
-      rootOfDocument.one("DOMSubtreeModified DOMNodeInserted", function(){
-          this.fire_mutation_event = function(){}
-          this.add_mutation_targets = function(t){}
-        })
       return collection
     },
     derive_elements_from: function(element, means){

@@ -21,6 +21,7 @@ describe("Priorities:", function() {
                   appendData("1", 1)
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=12")
           })
         it("-1 before 1", function() {
@@ -30,6 +31,7 @@ describe("Priorities:", function() {
                   appendData("1", -1)
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=12")
           })
         it("-10 before -1", function() {
@@ -39,6 +41,7 @@ describe("Priorities:", function() {
                   appendData("1", -10)
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=12")
           })
 
@@ -49,6 +52,7 @@ describe("Priorities:", function() {
                   appendData("1")
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=12")
           })
         it("-1 before undefined", function() {
@@ -58,6 +62,7 @@ describe("Priorities:", function() {
                   appendData("1", -1)
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=12")
           })
         it("same prio: lexical order", function() {
@@ -67,6 +72,7 @@ describe("Priorities:", function() {
                   appendData("1", 17)
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=21")
           })
         it("both undefined: lexical order", function() {
@@ -76,6 +82,7 @@ describe("Priorities:", function() {
                   appendData("1")
                   ]
               })
+            Ninja.go()
             expect($("#priority-target").attr("data-list")).toEqual("x=21")
           })
       })

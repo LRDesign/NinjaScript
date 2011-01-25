@@ -3,7 +3,8 @@ describe("Priorities:", function() {
         function appendData(string, prio) {
           return {
               transform: function(element) {
-                element.dataset["list"] += string
+                $(element).attr("data-list", $(element).attr("data-list") + string)
+                //TODO removing this tests the default tranform value
                 return element
               },
               priority: prio

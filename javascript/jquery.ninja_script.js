@@ -23,6 +23,10 @@ function buildNinja() {
   }
   */
 
+  function isArray(candidate) {
+    return (candidate.constructor == Array)
+  }
+
   function forEach(list, callback, thisArg) {
     if(typeof list.forEach == "function") {
       list.forEach(callback, thisArg)
@@ -197,14 +201,13 @@ function buildNinja() {
 
             var link = $("<a href='#'>" + link_text + "</a>")
             var jq_form = $(form)
-            var attrs= ["id", "class", "lang", "dir", "title"].reduce(
-              function(atts, att, idx, arry) {
+            var attrs = []
+            forEach(["id", "class", "lang", "dir", "title"], function(att) {
                 var att_val = jq_form.attr(att)
                 if(typeof att_val !== "undefined" && att_val.length > 0) {
-                  atts[att] = att_val
+                  attrs[att] = att_val
                 }
-                return atts
-              }, {})
+              })
             link.attr(attrs)
 
             this.stash(jq_form.replaceWith(link)) // I think this'll nix baseForm
@@ -623,12 +626,11 @@ function buildNinja() {
   BehaviorCollection.prototype = {
     //XXX: check if this is source of new slowdown
     addBehavior: function(selector, behavior) {
-      if(Array.isArray(behavior)) {
+      if(isArray(behavior)) {
         forEach(behavior, function(behaves){
             this.addBehavior(selector, behaves)
           }, this)
       }
-      //TODO IE: instanceof is suspect
       else if(behavior instanceof Behavior) {
         this.insertBehavior(selector, behavior)
       } 
@@ -726,7 +728,7 @@ function buildNinja() {
             scribe.recordEventHandlers(context, behavior)
           }
           catch(ex) {
-            if(ex instanceof TransformationFailedException) {
+            if(ex instanceof TransformFailedException) {
               log("!!! Transform failed")
             }
             else {
@@ -777,7 +779,6 @@ function buildNinja() {
     applyAll: function(root){
       var len = this.selectors.length
       for(var i = 0; i < len; i++) {
-        var pair = this.behaviors[i]
         var collection = this
 
         //Sizzle?

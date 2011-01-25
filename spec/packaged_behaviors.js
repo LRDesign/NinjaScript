@@ -8,6 +8,7 @@ describe("Packaged Behaviors:", function() {
             Ninja.go()
             setFixtures( fixtures.simple_form('packaged') + fixtures.ajax_target)
             mockAjax()
+            Ninja.tools.fire_mutation_event()
           })
 
         it("should transform the form into a link", function() {

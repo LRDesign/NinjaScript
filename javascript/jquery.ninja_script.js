@@ -1,27 +1,12 @@
 // vim: sw=2 ft=javascript
 
-function buildNinja() {
+Ninja = (function() {
   function log(message) {
     try {
       console.log(message)
     }
     catch(e) {} //we're in IE or FF w/o Firebug or something
   }
-
-  /*
-  //Still trying to decide if I want to do this, or wrap a global function
-  if(typeof Array.prototype.forEach == "undefined") {
-    //Trying to cover for IE - adapted from ECMA 2.6.2 5th Ed.
-    Array.prototype.forEach = function(callback, thisArg) {
-      var len = Number(this.length)
-      for(var k = 0; k < len; k+=1) {
-        if(typeof this[k] != "undefined") {
-          callback.call(thisArg, this[k], k, this)
-        }
-      }
-    }
-  }
-  */
 
   function isArray(candidate) {
     return (candidate.constructor == Array)
@@ -57,215 +42,16 @@ function buildNinja() {
   }
 
   NinjaScript.prototype = {
-    // START READING HERE
-    //Stock behaviors
 
-    //Converts either a link or a form to send its requests via AJAX - we eval
-    //the Javascript we get back.  We get an busy overlay if configured to do
-    //so.
-    //
-    //This farms out the actual behavior to submitsAsAjaxLink and
-    //submitsAsAjaxForm, c.f.
-    submitsAsAjax: function(configs) {
-      return new Metabehavior(function(meta) {
-          meta.asLink = Ninja.submitsAsAjaxLink(configs),
-          meta.asForm = Ninja.submitsAsAjaxForm(configs)
-        },
-        function(elem) {
-          switch(elem.tagName.toLowerCase()) {
-          case "a": return this.asLink
-          case "form": return this.asForm
-          }
-        })
-    },
-
-
-    //Converts a link to send its GET request via Ajax - we assume that we get
-    //Javascript back, which is eval'd.  While we're waiting, we'll throw up a
-    //busy overlay if configured to do so.  By default, we don't use a busy
-    //overlay.
-    //
-    //Ninja.submitAsAjaxLink({
-    //  busyElement: function(elem) { elem.parent }
-    //})
-    //
-    submitsAsAjaxLink: function(configs) {
-      if(!(configs instanceof Object)) {
-        configs = { busyElement: undefined }
+    packageBehaviors: function(callback) {
+      var types = {
+        does: Behavior,
+        chooses: Metabehavior,
+        selects: Selectabehavior
       }
-      return new Behavior({
-          helpers: {
-            findOverlay: function(elem) {
-              return Ninja.tools.deriveElementsFrom(elem, configs.busyElement)
-            }
-          },
-          events: {
-            click:  function(evnt) {
-              var overlay = Ninja.tools.busyOverlay(this.findOverlay(evnt.target))
-              var submitter = Ninja.tools.ajaxSubmitter()
-              submitter.action = evnt.target.href
-              submitter.method = Ninja.tools.extractMethod(evnt.target)
-
-              submitter.onResponse = function(xhr, statusTxt) {
-                overlay.remove()
-              }
-              overlay.affix()
-              submitter.submit()						
-            }
-          }
-        })
+      result = callback(types)
+      this.tools.enrich(this, result)
     },
-
-    //Converts a form to send its request via Ajax - we assume that we get
-    //Javascript back, which is eval'd.  We pull the method from the form:
-    //either from the method attribute itself, a data-method attribute or a
-    //Method input. While we're waiting, we'll throw up a busy overlay if
-    //configured to do so.  By default, we use the form itself as the busy
-    //element.
-    //
-    //Ninja.submitAsAjaxForm({
-    //  busyElement: function(elem) { elem.parent }
-    //})
-    //
-    submitsAsAjaxForm: function(configs) {
-      if(!(configs instanceof Object)) {
-        configs = { busyElement: undefined }
-      }
-      return new Behavior({
-          helpers: {
-            findOverlay: function(elem) {
-              return Ninja.tools.deriveElementsFrom(elem, configs.busyElement)
-            }
-          },
-          events: {
-            submit: function(evnt) {
-              var overlay = Ninja.tools.busyOverlay(this.findOverlay(evnt.target))
-              var submitter = Ninja.tools.ajaxSubmitter()
-              submitter.formData = $(evnt.target).serializeArray()
-              submitter.action = evnt.target.action
-              submitter.method = Ninja.tools.extractMethod(evnt.target, submitter.formData)
-
-              submitter.onResponse = function(xhr, statusTxt) {
-                overlay.remove()
-              }
-              overlay.affix()
-              submitter.submit()
-            }
-          }
-        })
-    },
-
-
-    //Converts a whole form into a link that submits via AJAX.  The intention
-    //is that you create a <form> elements with hidden inputs and a single
-    //submit button - then when we transform it, you don't lose anything in
-    //terms of user interface.  Like submitsAsAjaxForm, it will put up a
-    //busy overlay - by default we overlay the element itself
-    //
-    //this.becomesAjaxLink({
-    //  busyElement: function(elem) { $("#user-notification") }
-    //})
-    becomesAjaxLink: function(configs) {
-      if(!(configs instanceof Object)) {
-        configs = { busyElement: undefined }
-      }
-
-      return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink() ]
-    },
-
-    //Replaces a form with a link - the text of the link is based on the Submit
-    //input of the form.  The form itself is pulled out of the document until
-    //the link is clicked, at which point, it gets stuffed back into the
-    //document and submitted, so the link behaves exactly link submitting the
-    //form with its default inputs.  The motivation is to use hidden-input-only
-    //forms for POST interactions, which Javascript can convert into links if
-    //you want.
-    becomesLink: function() {
-      return new Behavior({
-          transform: function(form){
-            var linkText
-            if ((images = $('input[type=image]', form)).size() > 0){
-              image = images[0]
-              linkText = "<img src='" + image.src + "' alt='" + image.alt +"'";
-            } 
-            else if((submits = $('input[type=submit]', form)).size() > 0) {
-              submit = submits[0]
-              if(submits.size() > 1) {
-                log("Multiple submits.  Using: " + submit)
-              }
-              linkText = submit.value
-            } 
-            else {
-              log("Couldn't find a submit input in form");
-            }
-
-            var link = $("<a href='#'>" + linkText + "</a>")
-            var jqForm = $(form)
-            var attrs = []
-            forEach(["id", "class", "lang", "dir", "title"], function(att) {
-                var attVal = jqForm.attr(att)
-                if(typeof attVal !== "undefined" && attVal.length > 0) {
-                  attrs[att] = attVal
-                }
-              })
-            link.attr(attrs)
-
-            this.stash(jqForm.replaceWith(link)) // I think this'll nix baseForm
-            return link
-          },
-          events: {
-            click: function(evnt, elem){
-              this.cascadeEvent("submit")
-            }
-          }
-        })
-
-    },
-
-    //Use for elements that should be transient.  For instance, the default
-    //behavior of failed AJAX calls is to insert a message into a
-    //div#messages with a "flash" class.  You can use this behavior to have
-    //those disappear after a few seconds.
-    //
-    //Configs:
-    //{ lifetime: 10000, diesFor: 600 }
-
-    decays: function(configs) {
-      if(typeof configs == "undefined") { configs = {} }
-
-      if(typeof configs.lifetime == "undefined") {
-        configs.lifetime = 10000
-      }
-
-      if(typeof configs.diesFor == "undefined") {
-        configs.diesFor = 600
-      }
-
-      return new Behavior({
-          transform: function(elem) {
-            $(elem).delay(configs.lifetime).slideUp(configs.diesFor, function(){
-                $(elem).remove()})
-          },
-          events: {
-            click:  function(evnt, elem) {
-              $(elem).remove();
-            }
-          }
-        })
-    },
-
-    //Wishlist:
-    //  tooltip
-    //  watermarking
-    //  rounded corners
-    //  block drop shadow
-    //  text -> image
-    //  image redboxing
-    //  table sorting
-    //  paginated table sorting (AJAX backend)
-    //  dynamic validation?
-    //  autocomplete    
-    //  observeForm / observeField
 
     goodBehavior: function(dispatching) {
       var collection = this.tools.getRootCollection()
@@ -280,10 +66,13 @@ function buildNinja() {
       }
       $(window).load( function(){ Ninja.go() } )
     },
+
     misbehavior: function(nonsense) {
       throw new Error("Called Ninja.behavior() after Ninja.go() - don't do that.  'Go' means 'I'm done, please proceed'")
     },
+
     behavior: this.goodBehavior,
+
     go: function() {
       if(this.behavior != this.misbehavior) {
         var rootOfDocument = this.tools.getRootOfDocument()
@@ -307,6 +96,10 @@ function buildNinja() {
   }
 
   Tools.prototype = {
+    forEach: forEach,
+    enrich: function(left, right) {
+      return $.extend(left, right)
+    },
     addMutationTargets: function(targets) {
       this.mutationTargets = this.mutationTargets.concat(target)
     },
@@ -374,7 +167,7 @@ function buildNinja() {
       // I really liked using 
       //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
       //but IE8 doesn't implement ECMA 2.6.2 5th ed.
-      
+
       return new Overlay(jQuery.makeArray(arguments))
     },
     busyOverlay: function(elem) {
@@ -876,10 +669,7 @@ function buildNinja() {
     inContext: function(basedOn) {
       function Context() {}
       Context.prototype = basedOn
-      return this.enrich(new Context, this.helpers)
-    },
-    enrich: function(left, right) {
-      return $.extend(left, right)
+      return Ninja.tools.enrich(new Context, this.helpers)
     },
     applyTransform: function(context, elem) {
       var previousElem = elem
@@ -966,9 +756,217 @@ function buildNinja() {
   }
 
   return Ninja;  
-};
+})();
 
-Ninja = buildNinja();
+(function() {
+  function standardBehaviors(ninja){
+    return {
+      // START READING HERE
+      //Stock behaviors
+
+      //Converts either a link or a form to send its requests via AJAX - we eval
+      //the Javascript we get back.  We get an busy overlay if configured to do
+      //so.
+      //
+      //This farms out the actual behavior to submitsAsAjaxLink and
+      //submitsAsAjaxForm, c.f.
+      submitsAsAjax: function(configs) {
+        return new ninja.chooses(function(meta) {
+            meta.asLink = Ninja.submitsAsAjaxLink(configs),
+            meta.asForm = Ninja.submitsAsAjaxForm(configs)
+          },
+          function(elem) {
+            switch(elem.tagName.toLowerCase()) {
+            case "a": return this.asLink
+            case "form": return this.asForm
+            }
+          })
+      },
+
+
+      //Converts a link to send its GET request via Ajax - we assume that we get
+      //Javascript back, which is eval'd.  While we're waiting, we'll throw up a
+      //busy overlay if configured to do so.  By default, we don't use a busy
+      //overlay.
+      //
+      //Ninja.submitAsAjaxLink({
+      //  busyElement: function(elem) { elem.parent }
+      //})
+      //
+      submitsAsAjaxLink: function(configs) {
+        if(!(configs instanceof Object)) {
+          configs = { busyElement: undefined }
+        }
+        return new ninja.does({
+            priority: 10,
+            helpers: {
+              findOverlay: function(elem) {
+                return Ninja.tools.deriveElementsFrom(elem, configs.busyElement)
+              }
+            },
+            events: {
+              click:  function(evnt) {
+                var overlay = Ninja.tools.busyOverlay(this.findOverlay(evnt.target))
+                var submitter = Ninja.tools.ajaxSubmitter()
+                submitter.action = evnt.target.href
+                submitter.method = Ninja.tools.extractMethod(evnt.target)
+
+                submitter.onResponse = function(xhr, statusTxt) {
+                  overlay.remove()
+                }
+                overlay.affix()
+                submitter.submit()						
+              }
+            }
+          })
+      },
+
+      //Converts a form to send its request via Ajax - we assume that we get
+      //Javascript back, which is eval'd.  We pull the method from the form:
+      //either from the method attribute itself, a data-method attribute or a
+      //Method input. While we're waiting, we'll throw up a busy overlay if
+      //configured to do so.  By default, we use the form itself as the busy
+      //element.
+      //
+      //Ninja.submitAsAjaxForm({
+      //  busyElement: function(elem) { elem.parent }
+      //})
+      //
+      submitsAsAjaxForm: function(configs) {
+        if(!(configs instanceof Object)) {
+          configs = { busyElement: undefined }
+        }
+        return new ninja.does({
+            priority: 20,
+            helpers: {
+              findOverlay: function(elem) {
+                return Ninja.tools.deriveElementsFrom(elem, configs.busyElement)
+              }
+            },
+            events: {
+              submit: function(evnt) {
+                var overlay = Ninja.tools.busyOverlay(this.findOverlay(evnt.target))
+                var submitter = Ninja.tools.ajaxSubmitter()
+                submitter.formData = $(evnt.target).serializeArray()
+                submitter.action = evnt.target.action
+                submitter.method = Ninja.tools.extractMethod(evnt.target, submitter.formData)
+
+                submitter.onResponse = function(xhr, statusTxt) {
+                  overlay.remove()
+                }
+                overlay.affix()
+                submitter.submit()
+              }
+            }
+          })
+      },
+
+
+      //Converts a whole form into a link that submits via AJAX.  The intention
+      //is that you create a <form> elements with hidden inputs and a single
+      //submit button - then when we transform it, you don't lose anything in
+      //terms of user interface.  Like submitsAsAjaxForm, it will put up a
+      //busy overlay - by default we overlay the element itself
+      //
+      //this.becomesAjaxLink({
+      //  busyElement: function(elem) { $("#user-notification") }
+      //})
+      becomesAjaxLink: function(configs) {
+        if(!(configs instanceof Object)) {
+          configs = { busyElement: undefined }
+        }
+
+        return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink() ]
+      },
+
+      //Replaces a form with a link - the text of the link is based on the Submit
+      //input of the form.  The form itself is pulled out of the document until
+      //the link is clicked, at which point, it gets stuffed back into the
+      //document and submitted, so the link behaves exactly link submitting the
+      //form with its default inputs.  The motivation is to use hidden-input-only
+      //forms for POST interactions, which Javascript can convert into links if
+      //you want.
+      becomesLink: function() {
+        return new ninja.does({
+            priority: 30,
+            transform: function(form){
+              var linkText
+              if ((images = $('input[type=image]', form)).size() > 0){
+                image = images[0]
+                linkText = "<img src='" + image.src + "' alt='" + image.alt +"'";
+              } 
+              else if((submits = $('input[type=submit]', form)).size() > 0) {
+                submit = submits[0]
+                if(submits.size() > 1) {
+                  log("Multiple submits.  Using: " + submit)
+                }
+                linkText = submit.value
+              } 
+              else {
+                log("Couldn't find a submit input in form");
+              }
+
+              var link = $("<a href='#'>" + linkText + "</a>")
+              var jqForm = $(form)
+              var attrs = []
+              Ninja.tools.forEach(["id", "class", "lang", "dir", "title"], function(att) {
+                  var attVal = jqForm.attr(att)
+                  if(typeof attVal !== "undefined" && attVal.length > 0) {
+                    attrs[att] = attVal
+                  }
+                })
+              link.attr(attrs)
+
+              this.stash(jqForm.replaceWith(link)) // I think this'll nix baseForm
+              return link
+            },
+            events: {
+              click: function(evnt, elem){
+                this.cascadeEvent("submit")
+              }
+            }
+          })
+
+      },
+
+      //Use for elements that should be transient.  For instance, the default
+      //behavior of failed AJAX calls is to insert a message into a
+      //div#messages with a "flash" class.  You can use this behavior to have
+      //those disappear after a few seconds.
+      //
+      //Configs:
+      //{ lifetime: 10000, diesFor: 600 }
+
+      decays: function(configs) {
+        if(typeof configs == "undefined") { configs = {} }
+
+        if(typeof configs.lifetime == "undefined") {
+          configs.lifetime = 10000
+        }
+
+        if(typeof configs.diesFor == "undefined") {
+          configs.diesFor = 600
+        }
+
+        return new ninja.does({
+            priority: 100,
+            transform: function(elem) {
+              $(elem).delay(configs.lifetime).slideUp(configs.diesFor, function(){
+                  $(elem).remove()})
+            },
+            events: {
+              click:  function(evnt, elem) {
+                $(elem).remove();
+              }
+            }
+          })
+      }
+    };
+  }
+
+  Ninja.packageBehaviors(standardBehaviors)
+})();
+
 
 //This exists to carry over interfaces from earlier versions of Ninjascript.  Likely, it will be removed from future versions of NinjaScript
 ( function($) {

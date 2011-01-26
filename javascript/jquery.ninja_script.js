@@ -38,6 +38,7 @@ Ninja = (function() {
     }
 
 
+    this.behavior = this.goodBehavior
     this.tools = new Tools(this)
   }
 
@@ -67,11 +68,9 @@ Ninja = (function() {
       $(window).load( function(){ Ninja.go() } )
     },
 
-    misbehavior: function(nonsense) {
+    badBehavior: function(nonsense) {
       throw new Error("Called Ninja.behavior() after Ninja.go() - don't do that.  'Go' means 'I'm done, please proceed'")
     },
-
-    behavior: this.goodBehavior,
 
     go: function() {
       if(this.behavior != this.misbehavior) {
@@ -83,7 +82,7 @@ Ninja = (function() {
             this.fireMutationEvent = function(){}
             this.addMutationTargets = function(t){}
           })
-        this.behavior = this.misbehavior
+        this.behavior = this.badBehavior
         this.tools.fireMutationEvent()
       }
     }
@@ -931,7 +930,7 @@ Ninja = (function() {
 
       //Use for elements that should be transient.  For instance, the default
       //behavior of failed AJAX calls is to insert a message into a
-      //div#messages with a "flash" class.  You can use this behavior to have
+      //div#messages with a "flash" class.  You can use this behavior to have3A2
       //those disappear after a few seconds.
       //
       //Configs:

@@ -2,7 +2,7 @@ var fixtures = {
   ajaxTarget: '<div id="ajax-target"></div>',
   simpleLink: '<a href="#" id="simple-link">Click on me!</a>',
   simpleForm: function(from) {
-    return '<form id="simple-form" action="/test-ajax-link-' + from +'" method="post">\
+    return '<form id="simple-form" action="/test-ajax-link-' + from +'" method="post" data-testing="yes">\
   <input type="hidden" name="Method" value="put"></input>\
   <input type="hidden" name="thing" value="16"></input>\
   <input type="submit" name="Submit!" value="To the Zod">\

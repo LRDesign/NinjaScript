@@ -14,7 +14,10 @@ Ninja = (function() {
 
   function forEach(list, callback, thisArg) {
     if(typeof list.forEach == "function") {
-      list.forEach(callback, thisArg)
+      return list.forEach(callback, thisArg)
+    }
+    else if(typeof Array.prototype.forEach == "function") {
+      return Array.prototype.forEach.call(list, callback, thisArg)
     }
     else {
       var len = Number(list.length)
@@ -23,6 +26,7 @@ Ninja = (function() {
           callback.call(thisArg, list[k], k, list)
         }
       }
+      return
     }
   }
 
@@ -98,6 +102,20 @@ Ninja = (function() {
     forEach: forEach,
     enrich: function(left, right) {
       return $.extend(left, right)
+    },
+    ensureDefaults: function(config, defaults) {
+      return this.enrich(defaults, config)
+    },
+    copyAttributes: function(from, to, which) {
+      var attributeList = []
+      var attrs = []
+      var match = new RegExp("^" + which.join("$|^") + "$")
+      to = $(to)
+      this.forEach(from.attributes, function(att) {
+          if(match.test(att.nodeName)) {
+            to.attr(att.nodeName, att.nodeValue)
+          }
+        })
     },
     addMutationTargets: function(targets) {
       this.mutationTargets = this.mutationTargets.concat(target)
@@ -875,7 +893,12 @@ Ninja = (function() {
           configs = { busyElement: undefined }
         }
 
-        return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink() ]
+        configs = Ninja.tools.ensureDefaults(configs, {
+            busyElement: undefined,
+            retainAttributes: ["id", "class", "lang", "dir", "title", "data-.*"]
+          })
+
+        return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink(configs) ]
       },
 
       //Replaces a form with a link - the text of the link is based on the Submit
@@ -885,7 +908,11 @@ Ninja = (function() {
       //form with its default inputs.  The motivation is to use hidden-input-only
       //forms for POST interactions, which Javascript can convert into links if
       //you want.
-      becomesLink: function() {
+      becomesLink: function(configs) {
+        configs = Ninja.tools.ensureDefaults(configs, {
+            retainAttributes: ["id", "class", "lang", "dir", "title", "data-.*"]
+          })
+
         return new ninja.does({
             priority: 30,
             transform: function(form){
@@ -906,17 +933,8 @@ Ninja = (function() {
               }
 
               var link = $("<a href='#'>" + linkText + "</a>")
-              var jqForm = $(form)
-              var attrs = []
-              Ninja.tools.forEach(["id", "class", "lang", "dir", "title"], function(att) {
-                  var attVal = jqForm.attr(att)
-                  if(typeof attVal !== "undefined" && attVal.length > 0) {
-                    attrs[att] = attVal
-                  }
-                })
-              link.attr(attrs)
-
-              this.stash(jqForm.replaceWith(link)) // I think this'll nix baseForm
+              Ninja.tools.copyAttributes(form, link, configs.retainAttributes)
+              this.stash($(form).replaceWith(link))
               return link
             },
             events: {

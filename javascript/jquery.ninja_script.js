@@ -910,7 +910,7 @@ Ninja = (function() {
       //you want.
       becomesLink: function(configs) {
         configs = Ninja.tools.ensureDefaults(configs, {
-            retainAttributes: ["id", "class", "lang", "dir", "title", "data-.*"]
+            retainAttributes: ["id", "class", "lang", "dir", "title", "rel", "data-.*"]
           })
 
         return new ninja.does({

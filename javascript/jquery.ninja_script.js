@@ -932,7 +932,7 @@ Ninja = (function() {
                 log("Couldn't find a submit input in form");
               }
 
-              var link = $("<a href='#'>" + linkText + "</a>")
+              var link = $("<a rel='nofollow' href='#'>" + linkText + "</a>")
               Ninja.tools.copyAttributes(form, link, configs.retainAttributes)
               this.stash($(form).replaceWith(link))
               return link

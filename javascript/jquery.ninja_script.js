@@ -1,5 +1,7 @@
-// vim: sw=2 ft=javascript
-
+/* 
+ * NinjaScript - written and copyright 2010-2011 Judson Lester and Logical Reality Design
+ * Licensed under the MIT license
+ */
 Ninja = (function() {
   function log(message) {
     try {

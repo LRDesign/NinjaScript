@@ -1,0 +1,80 @@
+Our bug report to jQuery:
+
+I've been building a library to make packaging behaviors simple. It works very
+well against jQuery 1.4.2. However, the Sizzle included in 1.4.3 and 1.4.4
+uses a technique to keep track of it's place in the DOM - it changes the id of
+nodes as it traverses. In 1.4.3, it's about line 3904 of the unmini'd version.
+
+When the id changes (at least in Chrome) a DOMSubtreeModified event gets
+thrown. The trouble is, I've attached a handler to the document for DSM events
+that needs to find the target Element - which triggers a DSM.
+
+Is it reasonable for $().find(selector) to trigger an event?
+
+---
+
+Their response:
+
+Thanks for reporting this, but jQuery cannot provide support to deprecated
+specs (the mutation events).
+
+---
+
+Okay:
+
+http://www.w3.org/TR/DOM-Level-3-Events/#events-mutationevents
+
+Warning! The MutationEvent interface was introduced in DOM Level 2 Events, but
+has not yet been completely and interoperably implemented across user agents.
+In addition, there have been critiques that the interface, as designed,
+introduces a performance and implementation challenge. A new specification is
+under development with the aim of addressing the use cases that mutation
+events solves, but in more performant manner. Thus, this specification
+describes mutation events for reference and completeness of legacy behavior,
+but deprecates the use of both the MutationEvent interface and the
+MutationNameEvent interface.
+
+and:
+
+From http://www.w3.org/TR/DOM-Level-3-Events/#glossary-deprecated
+
+deprecated
+Features marked as deprecated are included in the specification as reference
+to older implementations or specifications, but are optional and discouraged.
+Only features which have existing or in-progress replacements shall be
+deprecated in this specification. Implementations which do not already include
+support for the feature may implement deprecated features for reasons of
+backwards compatibility with existing content, but content authors creating
+content should not use deprecated features, unless there is no other way to
+solve a use case. Other specifications which reference this specification
+should not use deprecated features, but should point instead to the
+replacements of which the feature is deprecated in favor. Features marked as
+deprecated in this specification are expected to be dropped from future
+specifications.
+
+But: 
+
+http://www.w3.org/2008/webapps/wiki/MutationReplacement#Widgetify_dynamically_created_markup
+(being the closest use case to NinjaScript)
+
+---
+
+there's no replacement.  There are suggested replacements, but nothing
+implemented.  Firefox and Webkit both support parts of the MutationEvent
+interface, but no one supports watchSelector (even Microsoft, who suggested
+it) or XBL2 (even Mozilla who implemented XBL1 and submitted it to the W3C).
+So, if you want to know when elements are added or changed in the DOM, you
+have 3 options:
+
+1. Use the deprecated, implemented DOM3 events
+2. Notify yourself every time you change the DOM - just don't forget. (This is
+how we cope in IE.)
+3. Poll the document with querySelectorAll() - which also won't work in <=IE8
+
+
+Q: Why not just use $().live()?
+A: Can't do transforms
+
+Q: Is NinjaScript quixotic?  Do we need this?
+A: I think there's a benefit.
+

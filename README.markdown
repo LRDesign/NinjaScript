@@ -47,13 +47,13 @@ A more complex example, showing how you can define your own behaviors:
               $(elem).delay(5000).slideUp(600, function(){$(elem).remove()})
             }
             events: {
-              click: function(event, elem) {
+              click: function(event) {
                 $(elem).remove()
               }
             }
           }
           ".has_tooltip': {
-            mouseover: function(event, elem){
+            mouseover: function(event){
               myCreateMouseoverTip(elem)
             }
           }
@@ -79,20 +79,20 @@ NinjaScript applies "behaviors" to elements selected using jQuery's CSS-like sel
 0. A transformer: a function called "transform" that take the element as its argument, and changes it in ways that are appropriate to the behavior.  One prepackaged behavior "make_ajax_link" takes a form consisting of a single submit button and converts it into an anchor tag with appropriate attributes.
 0. A list of event handlers - functions in two arguments that take action based on the event and the element.  By default, NinjaScript event handlers swallow the event, preventing the default behavior and preventing the event from bubbling back up the DOM.  You can use an array of [handler_function, *strings] to have NinjaScript allow "default" behavior, allow the event to "propagate", or allow the "immediate" propagation of the event (to other handlers on the same element).
 
-Note  that for simplicity of syntax,  NinjaScript allows you to omit the 'events' wrapper when defining events, though in complex behaviors including multiple event handlers and a transform we encourage you to include it for clarity.   This code:
+### Shorthand form for events
+
+For simplicity of syntax,  NinjaScript allows you to omit the 'events' wrapper when defining events, though in complex behaviors including multiple event handlers and a transform we encourage you to include it for clarity.   This code:
 
         Ninja.behavior({
           '.some_class': { events: {
-            click: function(evnt, elem){ ... do something }
+            click: function(event){ ... do something }
           }}
         })
 
 May be rewritten more briefly as:
 
         Ninja.behavior({
-          '.some_class': {
-            click: function(evnt, elem){ ... do something }
-          }
+          '.some_class': { click: function(event){ ... do something } }
         })
 
 ## Mechanics

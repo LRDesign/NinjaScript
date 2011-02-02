@@ -30,7 +30,10 @@ A simple example, using some prepackaged behaviors:
         })
         </script>
 
-Nothing helps explain this like some examples.
+This converts forms with class 'login_form' to AJAX equivalents, and makes
+all elements with class 'alert_notice' disappear after five seconds.  All NinjaScript predefined behaviors have sensible defaults.  If you don't pass the options object to decays(), it will decay after 10 seconds instead of 5.
+
+A more complex example, showing how you can define your own behaviors:
 
         <script src="/js/jquery-1.4.js type="text/javascript" />
         <script src="/js/jquery.ninja_script.js" type="text/javascript" />
@@ -38,7 +41,7 @@ Nothing helps explain this like some examples.
         <script type="javascript">
 
         Ninja.behavior({
-          "#mail form.new_mail": $.ninja.ajax_submission,
+          "#mail form.new_mail": Ninja.ajax_submission,
           "#message_list .item": {
             transform: function(elem) {
               $(elem).delay(5000).slideUp(600, function(){$(elem).remove()})
@@ -59,13 +62,13 @@ Nothing helps explain this like some examples.
 
 That behavior block sets up three behaviors:
 
-1. It converts a normal form (could be a POST, GET, whatever) into an AJAX submission.  By default, we'll put a "busy" overlay over the form until we get a response, and add any error messages to a list of error messages.  This behavior is packaged as $.ninja.ajax_submission
+1. It converts a normal form (could be a POST, GET, whatever) into an AJAX submission.  By default, we'll put a "busy" overlay over the form until we get a response, and add any error messages to a list of error messages.  This behavior is packaged as Ninja.submitsAsAjax
 1. It adds a decay behavior to messages, using jQuery effects.
 1. It applies a tooltip mouseover effect to elements with a "tooltip" class.  We elide the details of what that effect is for the purposes of example.
 
 Notice that behaviors are defined in three different, intermixable styles:
 
-1. Prepackaged, in the form of a method on the Ninja object (available everywhere as $.ninja)
+1. Prepackaged, in the form of a method on the Ninja object (available everywhere as Ninja)
 1. With a "transform, events, helpers" syntax, which breaks out everything a behavior can do, completly explicitly.
 1. With an abbreviated events form, with the assumption that all we want to do is define a series of event handlers (and possibly a transformer)
 
@@ -74,7 +77,23 @@ Notice that behaviors are defined in three different, intermixable styles:
 NinjaScript applies "behaviors" to elements selected using jQuery's CSS-like selectors.  A behavior consists of two things:
 
 0. A transformer: a function called "transform" that take the element as its argument, and changes it in ways that are appropriate to the behavior.  One prepackaged behavior "make_ajax_link" takes a form consisting of a single submit button and converts it into an anchor tag with appropriate attributes.
-0. A list of event handlers - functions in two arguments that take action based on the event and thelement.  By default, NinjaScript event handlers swallow the event, preventing the default behavior and preventing the event from bubbling back up the DOM.  You can use an array of [handler_function, *strings] to have NinjaScript allow "default" behavior, allow the event to "propagate", or allow the "immediate" propagation of the event (to other handlers on the same element).
+0. A list of event handlers - functions in two arguments that take action based on the event and the element.  By default, NinjaScript event handlers swallow the event, preventing the default behavior and preventing the event from bubbling back up the DOM.  You can use an array of [handler_function, *strings] to have NinjaScript allow "default" behavior, allow the event to "propagate", or allow the "immediate" propagation of the event (to other handlers on the same element).
+
+Note  that for simplicity of syntax,  NinjaScript allows you to omit the 'events' wrapper when defining events, though in complex behaviors including multiple event handlers and a transform we encourage you to include it for clarity.   This code:
+
+        Ninja.behavior({
+          '.some_class': { events: {
+            click: function(evnt, elem){ ... do something }
+          }}
+        })
+
+May be rewritten more briefly as:
+
+        Ninja.behavior({
+          '.some_class': {
+            click: function(evnt, elem){ ... do something }
+          }
+        })
 
 ## Mechanics
 

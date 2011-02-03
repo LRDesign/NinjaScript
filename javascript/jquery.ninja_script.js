@@ -4,12 +4,14 @@
  * Licensed under the MIT license
  */
 Ninja = (function() {
-  function log(message) {
-    try {
-      console.log(message)
+    function log(message) {
+      if(false) { //LOGGING TURNED OFF IS 100% faster!
+        try {
+          console.log(message)
+        }
+        catch(e) {} //we're in IE or FF w/o Firebug or something
+      }
     }
-    catch(e) {} //we're in IE or FF w/o Firebug or something
-  }
 
   function isArray(candidate) {
     return (candidate.constructor == Array)
@@ -86,8 +88,7 @@ Ninja = (function() {
         //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
         //hack, so nerf it
         rootOfDocument.one("DOMSubtreeModified DOMNodeInserted", function(){
-            this.fireMutationEvent = function(){}
-            this.addMutationTargets = function(t){}
+            Ninja.tools.detachSyntheticMutationEvents()
           })
         this.behavior = this.badBehavior
         this.tools.fireMutationEvent()
@@ -140,6 +141,10 @@ Ninja = (function() {
     },
     fireMutationEvent: function() {
       this.getRootCollection().fireMutationEvent()
+    },
+    detachSyntheticMutationEvents: function() {
+      this.getRootCollection().fireMutationEvent = function(){}
+      this.getRootCollection().addMutationTargets = function(t){}
     },
     //HTML Utils
     copyAttributes: function(from, to, which) {
@@ -568,6 +573,8 @@ Ninja = (function() {
       jQuery(element).data("ninja-visited", true)
 
       scribe.applyEventHandlers(element)
+
+      this.fireMutationEvent()
 
       return element
     },

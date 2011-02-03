@@ -1,19 +1,39 @@
 ## NinjaScript
-NinjaScript is a jQuery library designed to allow unobstrusive scripting simply and easily.  Essentially, we use jQuery selectors to apply behavior the same way we use CSS stylesheets to apply stylings.  Additionally, NinjaScript makes it easy to package up useful behaviors and apply them quickly to disparate elements, or in different projects.
+NinjaScript is a jQuery library designed to allow unobstrusive scripting simply
+and easily.  Essentially, we use jQuery selectors to apply behavior the same
+way we use CSS stylesheets to apply stylings.  Additionally, NinjaScript makes
+it easy to package up useful behaviors and apply them quickly to disparate
+elements, or in different projects.
 
 ## The Unobtrusive Ideal
-Really, unobtrusive scripting is logical extension of the concept of Separation of Concerns.  We haven't put "style" attributes in our HTML since 1998, so why do we still use "onclick"?  Put all your behavior in one place, and you know where to look when you're trying to figure out why it doesn't work.  Plus, it makes it easier to build your site such that it'll work for those benighted souls who don't have Javascript enabled or available.  NinjaScript makes it reasonable to build a site that degrades gracefully.
+Really, unobtrusive scripting is logical extension of the concept of Separation
+of Concerns.  We haven't put "style" attributes in our HTML since 1998, so why
+do we still use "onclick"?  Put all your behavior in one place, and you know
+where to look when you're trying to figure out why it doesn't work.  Plus, it
+makes it easier to build your site such that it'll work for those benighted
+souls who don't have Javascript enabled or available.  NinjaScript makes it
+reasonable to build a site that degrades gracefully.
 
 ## Why is NinjaScript useful?   Why do I care?
 
-We take the awesomeness of CSS for granted.  In CSS, when you apply a style
-to a selector, it always works and always applies to matching DOM nodes - no matter when those nodes were created.   JS does not work this way: if you attach event handlers to nodes matching '.i_am_cool' now, future i_am_cool
-nodes won't necessarily get those handlers.  We can fix handlers with event delegation (as in jQuery), but it still won't work for transformations.  Suppose, for example, we want to unobtrusively add structure to some divs (i.e. rounded corners) or replace one element with another (convert forms to links or other behavior).  These transformations will get run once when our script executes, and won't happen automatically to future matching elements.
+We take the awesomeness of CSS for granted.  In CSS, when you apply a style to
+a selector, it always works and always applies to matching DOM nodes - no
+matter when those nodes were created.   JS does not work this way: if you
+attach event handlers to nodes matching '.i_am_cool' now, future i_am_cool
+nodes won't necessarily get those handlers.  We can fix handlers with event
+delegation (as in jQuery), but it still won't work for transformations.
+Suppose, for example, we want to unobtrusively add structure to some divs (i.e.
+rounded corners) or replace one element with another (convert forms to links or
+other behavior).  These transformations will get run once when our script
+executes, and won't happen automatically to future matching elements.
 
-NinjaScript allows you to specify behaviors - including transformations - and attach them to selectors once, and then count on them always applying to any future element that matches those selectors.
+NinjaScript allows you to specify behaviors - including transformations - and
+attach them to selectors once, and then count on them always applying to any
+future element that matches those selectors.
 
-It also lets you package up named behaviors for reuse, and NinjaScript includes a bunch of predefined packaged behaviors for common utilities like
-AJAX submission and handling graceful degradation cases.
+It also lets you package up named behaviors for reuse, and NinjaScript includes
+a bunch of predefined packaged behaviors for common utilities like AJAX
+submission and handling graceful degradation cases.
 
 ## Examples
 
@@ -30,8 +50,10 @@ A simple example, using some prepackaged behaviors:
         })
         </script>
 
-This converts forms with class 'login_form' to AJAX equivalents, and makes
-all elements with class 'alert_notice' disappear after five seconds.  All NinjaScript predefined behaviors have sensible defaults.  If you don't pass the options object to decays(), it will decay after 10 seconds instead of 5.
+This converts forms with class 'login_form' to AJAX equivalents, and makes all
+elements with class 'alert_notice' disappear after five seconds.  All
+NinjaScript predefined behaviors have sensible defaults.  If you don't pass the
+options object to decays(), it will decay after 10 seconds instead of 5.
 
 A more complex example, showing how you can define your own behaviors:
 

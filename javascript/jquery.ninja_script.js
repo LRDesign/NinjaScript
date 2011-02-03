@@ -191,6 +191,9 @@ Ninja = (function() {
       return "GET"
     },
     //Ninjascript utils
+    cantTranform: function() {
+      throw new TransformFailedException
+    },
     applyBehaviors: function(element, behaviors) {
       this.getRootCollection().apply(element, behaviors)
     },

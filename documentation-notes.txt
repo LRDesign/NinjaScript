@@ -6,6 +6,7 @@ NinjaScript docco is divided into levels ala Go or Kendo:
 * Using 3rd-party behaviors
 * Variants of behavior def: functions, objects, arrays
 * Ad hoc behaviors: events
+* Three brothers: event.target, handler( ,elem), this.element
 * Ad hoc behaviors: transforms
 * Ad hoc behaviors: context-shared data
 * Prepackaged behaviors and compositing

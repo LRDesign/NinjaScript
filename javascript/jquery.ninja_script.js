@@ -72,7 +72,7 @@ Ninja = (function() {
           collection.addBehavior(selector, dispatching[selector])
         }
       }
-      $(window).load( function(){ Ninja.go() } )
+      jQuery(window).load( function(){ Ninja.go() } )
     },
 
     badBehavior: function(nonsense) {
@@ -98,47 +98,20 @@ Ninja = (function() {
 
   function Tools(ninja) {
     this.ninja = ninja
-    this.mutationTargets = []
   }
 
   Tools.prototype = {
+    //Handy JS things
     forEach: forEach,
     enrich: function(left, right) {
-      return $.extend(left, right)
+      return jQuery.extend(left, right)
     },
     ensureDefaults: function(config, defaults) {
       return this.enrich(defaults, config)
     },
-    copyAttributes: function(from, to, which) {
-      var attributeList = []
-      var attrs = []
-      var match = new RegExp("^" + which.join("$|^") + "$")
-      to = $(to)
-      this.forEach(from.attributes, function(att) {
-          if(match.test(att.nodeName)) {
-            to.attr(att.nodeName, att.nodeValue)
-          }
-        })
-    },
-    addMutationTargets: function(targets) {
-      this.mutationTargets = this.mutationTargets.concat(target)
-    },
+    //DOM and Events
     getRootOfDocument: function() {
-      return $("html") //document.firstChild)
-    },
-    fireMutationEvent: function() {
-      var targets = this.mutationTargets
-      if (targets.length > 0 ) {
-        for(var target = targets.shift(); 
-          targets.length > 0; 
-          target = targets.shift()) {
-          $(target).trigger("thisChangedDOM")
-        }
-      }
-      else {
-        this.getRootOfDocument().trigger("thisChangedDOM")
-        //$("html").trigger("thisChangedDOM")
-      }
+      return jQuery("html") //document.firstChild)
     },
     clearRootCollection: function() {
       Ninja.behavior = Ninja.goodBehavior
@@ -154,13 +127,6 @@ Ninja = (function() {
       rootOfDocument.data("ninja-behavior", collection);
       return collection
     },
-    deriveElementsFrom: function(element, means){
-      switch(typeof means){
-      case 'undefined': return element
-      case 'string': return $(means)
-      case 'function': return means(element)
-      }
-    },
     suppressChangeEvents: function() {
       return new Behavior({
           events: {
@@ -169,14 +135,72 @@ Ninja = (function() {
           }
         })
     },
+    addMutationTargets: function(targets) {
+      this.getRootCollection().addMutationTargets(targets)
+    },
+    fireMutationEvent: function() {
+      this.getRootCollection().fireMutationEvent()
+    },
+    //HTML Utils
+    copyAttributes: function(from, to, which) {
+      var attributeList = []
+      var attrs = []
+      var match = new RegExp("^" + which.join("$|^") + "$")
+      to = jQuery(to)
+      this.forEach(from.attributes, function(att) {
+          if(match.test(att.nodeName)) {
+            to.attr(att.nodeName, att.nodeValue)
+          }
+        })
+    },
+    deriveElementsFrom: function(element, means){
+      switch(typeof means){
+      case 'undefined': return element
+      case 'string': return jQuery(means)
+      case 'function': return means(element)
+      }
+    },
+    extractMethod: function(element, formData) {
+      if(element.dataset !== undefined && 
+        element.dataset["method"] !== undefined && 
+        element.dataset["method"].length > 0) {
+        log("Override via dataset: " + element.dataset["method"])
+        return element.dataset["method"]
+      }
+      if(element.dataset === undefined && 
+        jQuery(element).attr("data-method") !== undefined) {
+        log("Override via data-method: " + jQuery(element).attr("data-method"))
+        return jQuery(element).attr("data-method")
+      }
+      if(typeof formData !== "undefined") {
+        for(var i=0, len = formData.length; i<len; i++) {
+          if(formData[i].name == "Method") {
+            log("Override via Method: " + formData[i].value)
+            return formData[i].value
+          }
+        }
+      }
+      if(typeof element.method !== "undefined") {
+        return element.method
+      } 
+      return "GET"
+    },
+    //Ninjascript utils
+    applyBehaviors: function(element, behaviors) {
+      this.getRootCollection().apply(element, behaviors)
+    },
+    message: function(text, classes) {
+      var addingMessage = this.ninja.config.messageWrapping(text, classes)
+      jQuery(this.ninja.config.messageList).append(addingMessage)
+    },
     hiddenDiv: function() {
-      var existing = $("div#ninja-hide")
+      var existing = jQuery("div#ninja-hide")
       if(existing.length > 0) {
         return existing[0]
       }
 
-      var hide = $("<div id='ninja-hide'></div>").css("display", "none")
-      $("body").append(hide)
+      var hide = jQuery("<div id='ninja-hide'></div>").css("display", "none")
+      jQuery("body").append(hide)
       Ninja.tools.getRootCollection().applyBehaviorsTo(hide, [Ninja.tools.suppressChangeEvents()])
       return hide
     },
@@ -196,35 +220,11 @@ Ninja = (function() {
       overlay.laziness = this.ninja.config.busyLaziness
       return overlay
     },
-    extractMethod: function(element, formData) {
-      if(element.dataset !== undefined && 
-        element.dataset["method"] !== undefined && 
-        element.dataset["method"].length > 0) {
-        log("Override via dataset: " + element.dataset["method"])
-        return element.dataset["method"]
-      }
-      if(element.dataset === undefined && 
-        $(element).attr("data-method") !== undefined) {
-        log("Override via data-method: " + $(element).attr("data-method"))
-        return $(element).attr("data-method")
-      }
-      if(typeof formData !== "undefined") {
-        for(var i=0, len = formData.length; i<len; i++) {
-          if(formData[i].name == "Method") {
-            log("Override via Method: " + formData[i].value)
-            return formData[i].value
-          }
-        }
-      }
-      if(typeof element.method !== "undefined") {
-        return element.method
-      } 
-      return "GET"
-    },
     //Currently, this doesn't respect changes to the original block...
+    //There should be an "Overlay behavior" that gets applied
     buildOverlayFor: function(elem) {
-      var overlay = $(document.createElement("div"))
-      var hideMe = $(elem)
+      var overlay = jQuery(document.createElement("div"))
+      var hideMe = jQuery(elem)
       var offset = hideMe.offset()
       overlay.css("position", "absolute")
       overlay.css("top", offset.top)
@@ -233,10 +233,6 @@ Ninja = (function() {
       overlay.height(hideMe.outerHeight())
       overlay.css("zIndex", "2")
       return overlay
-    },
-    message: function(text, classes) {
-      var addingMessage = this.ninja.config.messageWrapping(text, classes)
-      $(this.ninja.config.messageList).append(addingMessage)
     }
   }
 
@@ -262,7 +258,7 @@ Ninja = (function() {
   AjaxSubmitter.prototype = {
     submit: function() {
       log("Computed method: " + this.method)
-      $.ajax(this.ajaxData())
+      jQuery.ajax(this.ajaxData())
     },
 
     ajaxData: function() {
@@ -305,7 +301,7 @@ Ninja = (function() {
     var elements = this.convertToElementArray(list)
     this.laziness = 0
     var ov = this
-    this.set = $(jQuery.map(elements, function(element, idx) {
+    this.set = jQuery(jQuery.map(elements, function(element, idx) {
           return ov.buildOverlayFor(element)
         }))
   }
@@ -316,7 +312,7 @@ Ninja = (function() {
       switch(typeof list) {
       case 'undefined': return []
       case 'boolean': return []
-      case 'string': return h.convertToElementArray($(list))
+      case 'string': return h.convertToElementArray(jQuery(list))
       case 'function': return h.convertToElementArray(list())
       case 'object': {
           //IE8 barfs on 'list instanceof Element'
@@ -338,8 +334,8 @@ Ninja = (function() {
     },
 
     buildOverlayFor: function(elem) {
-      var overlay = $(document.createElement("div"))
-      var hideMe = $(elem)
+      var overlay = jQuery(document.createElement("div"))
+      var hideMe = jQuery(elem)
       var offset = hideMe.offset()
       overlay.css("position", "absolute")
       overlay.css("top", offset.top)
@@ -351,7 +347,7 @@ Ninja = (function() {
       return overlay[0]
     },
     affix: function() {
-      this.set.appendTo($("body"))
+      this.set.appendTo(jQuery("body"))
       overlaySet = this.set
       window.setTimeout(function() {
           overlaySet.css("display", "block")
@@ -360,14 +356,6 @@ Ninja = (function() {
     remove: function() {
       this.set.remove()
     }
-  }
-
-  function BehaviorCollection() {
-    this.lexicalCount = 0
-    this.eventQueue = []
-    this.behaviors = {}
-    this.selectors = []
-    return this
   }
 
   function EventScribe() {
@@ -380,8 +368,8 @@ Ninja = (function() {
       for(var eventName in this.handlers) {
         var handler = this.handlers[eventName]
         this.handlers[eventName] = function(eventRecord) {
-          handler(eventRecord)
-          $(element).remove()
+          handler.call(this, eventRecord)
+          jQuery(element).remove()
         }
       }
     },
@@ -404,7 +392,7 @@ Ninja = (function() {
     },
     applyEventHandlers: function(element) {
       for(var eventName in this.handlers) {
-        $(element).bind(eventName, this.handlers[eventName])
+        jQuery(element).bind(eventName, this.handlers[eventName])
       }
     }
   }
@@ -416,24 +404,35 @@ Ninja = (function() {
     this.stashedElements = []
   }
 
-  RootContext.prototype = {
-    stash: function(element) {
-      this.stashedElements.unshift(element)
-    },
-    clearStash: function() {
-      this.stashedElements = []
-    },
-    //XXX Of concern: how do cascading events work out?
-    //Should there be a first catch?  Or a "doesn't cascade" or something?
-    cascadeEvent: function(event) {
-      var formDiv = Ninja.tools.hiddenDiv()
-      forEach(this.stashedElements, function(element) {
-          var elem = $(element)
-          elem.data("ninja-visited", true)
-          $(formDiv).append(elem)
-          elem.trigger(event)
-        })
-    }
+  RootContext.prototype = Ninja.tools.enrich(
+    new Tools(Ninja),
+    {
+      stash: function(element) {
+        this.stashedElements.unshift(element)
+      },
+      clearStash: function() {
+        this.stashedElements = []
+      },
+      //XXX Of concern: how do cascading events work out?
+      //Should there be a first catch?  Or a "doesn't cascade" or something?
+      cascadeEvent: function(event) {
+        var formDiv = Ninja.tools.hiddenDiv()
+        forEach(this.stashedElements, function(element) {
+            var elem = jQuery(element)
+            elem.data("ninja-visited", true)
+            jQuery(formDiv).append(elem)
+            elem.trigger(event)
+          })
+      }
+  })
+
+  function BehaviorCollection() {
+    this.lexicalCount = 0
+    this.eventQueue = []
+    this.behaviors = {}
+    this.selectors = []
+    this.mutationTargets = []
+    return this
   }
 
   BehaviorCollection.prototype = {
@@ -472,7 +471,22 @@ Ninja = (function() {
         this.behaviors[selector].push(behavior)
       }
     },
-
+    addMutationTargets: function(targets) {
+      this.mutationTargets = this.mutationTargets.concat(target)
+    },
+    fireMutationEvent: function() {
+      var targets = this.mutationTargets
+      if (targets.length > 0 ) {
+        for(var target = targets.shift(); 
+          targets.length > 0; 
+          target = targets.shift()) {
+          jQuery(target).trigger("thisChangedDOM")
+        }
+      }
+      else {
+        Ninja.tools.getRootOfDocument().trigger("thisChangedDOM")
+      }
+    },
     mutationEventTriggered: function(evnt){
       if(this.eventQueue.length == 0){
         log("mutation event - first")
@@ -488,8 +502,8 @@ Ninja = (function() {
       var eventCovered = false
       var uncovered = []
       forEach(this.eventQueue, function(val) {
-          eventCovered = eventCovered || $.contains(val.target, evnt.target)
-          if (!($.contains(evnt.target, val.target))) {
+          eventCovered = eventCovered || jQuery.contains(val.target, evnt.target)
+          if (!(jQuery.contains(evnt.target, val.target))) {
             uncovered.push(val)
           }
         })
@@ -551,7 +565,7 @@ Ninja = (function() {
           }
         }
       )
-      $(element).data("ninja-visited", true)
+      jQuery(element).data("ninja-visited", true)
 
       scribe.applyEventHandlers(element)
 
@@ -577,12 +591,12 @@ Ninja = (function() {
     apply: function(element, startBehaviors, selectorIndex) {
       var applicableBehaviors = [], len = this.selectors.length
       this.collectBehaviors(element, applicableBehaviors, startBehaviors)
-      if (!$(element).data("ninja-visited")) {
+      if (!jQuery(element).data("ninja-visited")) {
         if(typeof selectorIndex == "undefined") {
           selectorIndex = 0
         }
         for(var j = selectorIndex; j < len; j++) {
-          if($(element).is(this.selectors[j])) {
+          if(jQuery(element).is(this.selectors[j])) {
             this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
           }
         }
@@ -595,9 +609,9 @@ Ninja = (function() {
         var collection = this
 
         //Sizzle?
-        $(root).find(this.selectors[i]).each( 
+        jQuery(root).find(this.selectors[i]).each( 
           function(index, elem){
-            if (!$(elem).data("ninja-visited")) { //Pure optimization
+            if (!jQuery(elem).data("ninja-visited")) { //Pure optimization
               collection.apply(elem, [], i)
             }
           }
@@ -632,7 +646,7 @@ Ninja = (function() {
   Selectabehavior.prototype = {
     choose: function(element) {
       for(var selector in this.menu) {
-        if($(element).is(selector)) {
+        if(jQuery(element).is(selector)) {
           return this.menu[selector].choose(element)
         }
       }
@@ -673,7 +687,7 @@ Ninja = (function() {
       var context = this.inContext({})
 
       elem = this.applyTransform(context, elem)
-      $(elem).data("ninja-visited", true)
+      jQuery(elem).data("ninja-visited", true)
 
       this.applyEventHandlers(context, elem)
 
@@ -704,7 +718,7 @@ Ninja = (function() {
     applyEventHandlers: function(context, elem) {
       for(var eventName in this.eventHandlers) {
         var handler = this.eventHandlers[eventName]
-        $(elem).bind(eventName, this.makeHandler.call(context, handler))
+        jQuery(elem).bind(eventName, this.makeHandler.call(context, handler))
       }
       return elem
     },
@@ -721,6 +735,7 @@ Ninja = (function() {
       var stopDefault = true
       var stopPropagate = true
       var stopImmediate = false
+      var fireMutation = false
       var config = this.eventHandlers[eventName]
 
       if (typeof config == "function") {
@@ -731,14 +746,18 @@ Ninja = (function() {
         config = config.slice(1,config.length)
         var len = config.length
         for(var i = 0; i < len; i++) {
-          if (config[i] == "default") {
+          if (config[i] == "andDoDefault" || config[i] == "allowDefault") {
             stopDefault = false
           }
-          if (config[i] == "propagate") {
+          if (config[i] == "allowPropagate" || config[i] == "dontStopPropagation") {
             stopPropagate = false
           }
-          if (config[i] == "immediate" || config[i] == "other") {
+          //stopImmediatePropagation is a jQuery thing
+          if (config[i] == "andDoOthers") {
             stopImmediate = false
+          }
+          if (config[i] == "changesDOM") {
+            fireMutation = true
           }
         }
       }
@@ -761,13 +780,24 @@ Ninja = (function() {
             eventRecord.stopImmediatePropagation()
           })
       }
+      if (fireMutation) {
+        handler = this.appendAction(handler, function(eventRecord) {
+            Ninja.tools.fireMutationEvent()
+          })
+      }
 
       return handler
     },
     prependAction: function(handler, doWhat) {
       return function(eventRecord) {
-        doWhat(eventRecord)
-        handler(eventRecord)
+        doWhat.call(this, eventRecord)
+        handler.call(this, eventRecord)
+      }
+    },
+    appendAction: function(handler, doWhat) {
+      return function(eventRecord) {
+        handler.call(this, eventRecord)
+        doWhat.call(this, eventRecord)
       }
     },
     transform: function(elem){ 
@@ -821,15 +851,15 @@ Ninja = (function() {
             priority: 10,
             helpers: {
               findOverlay: function(elem) {
-                return Ninja.tools.deriveElementsFrom(elem, configs.busyElement)
+                return this.deriveElementsFrom(elem, configs.busyElement)
               }
             },
             events: {
               click:  function(evnt) {
-                var overlay = Ninja.tools.busyOverlay(this.findOverlay(evnt.target))
-                var submitter = Ninja.tools.ajaxSubmitter()
+                var overlay = this.busyOverlay(this.findOverlay(evnt.target))
+                var submitter = this.ajaxSubmitter()
                 submitter.action = evnt.target.href
-                submitter.method = Ninja.tools.extractMethod(evnt.target)
+                submitter.method = this.extractMethod(evnt.target)
 
                 submitter.onResponse = function(xhr, statusTxt) {
                   overlay.remove()
@@ -860,16 +890,16 @@ Ninja = (function() {
             priority: 20,
             helpers: {
               findOverlay: function(elem) {
-                return Ninja.tools.deriveElementsFrom(elem, configs.busyElement)
+                return this.deriveElementsFrom(elem, configs.busyElement)
               }
             },
             events: {
               submit: function(evnt) {
-                var overlay = Ninja.tools.busyOverlay(this.findOverlay(evnt.target))
-                var submitter = Ninja.tools.ajaxSubmitter()
-                submitter.formData = $(evnt.target).serializeArray()
+                var overlay = this.busyOverlay(this.findOverlay(evnt.target))
+                var submitter = this.ajaxSubmitter()
+                submitter.formData = jQuery(evnt.target).serializeArray()
                 submitter.action = evnt.target.action
-                submitter.method = Ninja.tools.extractMethod(evnt.target, submitter.formData)
+                submitter.method = this.extractMethod(evnt.target, submitter.formData)
 
                 submitter.onResponse = function(xhr, statusTxt) {
                   overlay.remove()
@@ -889,7 +919,7 @@ Ninja = (function() {
       //busy overlay - by default we overlay the element itself
       //
       //this.becomesAjaxLink({
-      //  busyElement: function(elem) { $("#user-notification") }
+      //  busyElement: function(elem) { jQuery("#user-notification") }
       //})
       becomesAjaxLink: function(configs) {
         if(!(configs instanceof Object)) {
@@ -920,11 +950,11 @@ Ninja = (function() {
             priority: 30,
             transform: function(form){
               var linkText
-              if ((images = $('input[type=image]', form)).size() > 0){
+              if ((images = jQuery('input[type=image]', form)).size() > 0){
                 image = images[0]
                 linkText = "<img src='" + image.src + "' alt='" + image.alt +"'";
               } 
-              else if((submits = $('input[type=submit]', form)).size() > 0) {
+              else if((submits = jQuery('input[type=submit]', form)).size() > 0) {
                 submit = submits[0]
                 if(submits.size() > 1) {
                   log("Multiple submits.  Using: " + submit)
@@ -935,9 +965,9 @@ Ninja = (function() {
                 log("Couldn't find a submit input in form");
               }
 
-              var link = $("<a rel='nofollow' href='#'>" + linkText + "</a>")
-              Ninja.tools.copyAttributes(form, link, configs.retainAttributes)
-              this.stash($(form).replaceWith(link))
+              var link = jQuery("<a rel='nofollow' href='#'>" + linkText + "</a>")
+              this.copyAttributes(form, link, configs.retainAttributes)
+              this.stash(jQuery(form).replaceWith(link))
               return link
             },
             events: {
@@ -958,26 +988,23 @@ Ninja = (function() {
       //{ lifetime: 10000, diesFor: 600 }
 
       decays: function(configs) {
-        if(typeof configs == "undefined") { configs = {} }
-
-        if(typeof configs.lifetime == "undefined") {
-          configs.lifetime = 10000
-        }
-
-        if(typeof configs.diesFor == "undefined") {
-          configs.diesFor = 600
-        }
+        configs = Ninja.tools.ensureDefaults(configs, {
+            lifetime: 10000,
+            diesFor: 600
+          })
 
         return new ninja.does({
             priority: 100,
             transform: function(elem) {
-              $(elem).delay(configs.lifetime).slideUp(configs.diesFor, function(){
-                  $(elem).remove()})
+              jQuery(elem).delay(configs.lifetime).slideUp(configs.diesFor, function(){
+                  jQuery(elem).remove()
+                  Ninja.tools.fireMutationEvent()
+                })
             },
             events: {
-              click:  function(evnt, elem) {
-                $(elem).remove();
-              }
+              click:  [function(event) {
+                jQuery(this.element).remove();
+              }, "changesDOM"]
             }
           })
       }

@@ -2,6 +2,9 @@
  * NinjaScript - 0.8.0
  * written and copyright 2010-2011 Judson Lester and Logical Reality Design
  * Licensed under the MIT license
+ * 2011-02-03
+ *
+ * Those new to this source should skim down to standardBehaviors
  */
 Ninja = (function() {
     function log(message) {
@@ -973,6 +976,7 @@ Ninja = (function() {
               } 
               else {
                 log("Couldn't find a submit input in form");
+                this.cantTransform()
               }
 
               var link = jQuery("<a rel='nofollow' href='#'>" + linkText + "</a>")
@@ -991,7 +995,7 @@ Ninja = (function() {
 
       //Use for elements that should be transient.  For instance, the default
       //behavior of failed AJAX calls is to insert a message into a
-      //div#messages with a "flash" class.  You can use this behavior to have3A2
+      //div#messages with a "flash" class.  You can use this behavior to have
       //those disappear after a few seconds.
       //
       //Configs:

@@ -1,0 +1,60 @@
+!!!
+%html
+  %head
+    %title NinjaScript Reference
+  %body
+    %div{:class => "section"}
+      %h2 Host Document
+      %div{:class => "entry"}
+        %span{:class => "interface"}
+          Ninja.behavior({ ... })
+        %p
+          Defines the "behavior sheet" for your document.  The object you pass 
+          to <code>behavior()</code> should have fields names that are consist 
+          of CSS style selectors (they're parsed by Sizzle, so if they work in 
+          JQuery...), and the values should be
+          %a{:href => "#behaviors"} resolvable to behaviors.
+        %p
+          It's important to note that NinjaScript uses a "view source" model to 
+          resolve selectors to apply behaviors to.  In general, this is much 
+          simpler to deal with than the CSS live-matching model would be.
+      %div{:class => "entry"}
+        %span{:class => "interface"}
+          Ninja.go()
+        %p
+          Notifies NinjaScript that you are done with behavior definition and 
+          it is safe to apply all your behaviors to the document.  Note this 
+          isn't strictly necessary, but will result in a much smoother 
+          application of your behaviors, since we don't need to wait for all 
+          content to load.
+      %div{:class => "entry"}
+        %p{:id => "behaviors"}
+          There are several syntaxes that are legitimate to use inside of a 
+          <code>Ninja.behavior()</code>definition.  They are:
+          %dl
+            %dt A Behavior object
+            %dd NinjaScript defines a constructor for Behavior objects - you're 
+            unlikely to use them directly since the Behavior constructor is 
+            encapsulated inside the Ninja definition scope - but there are a 
+            number of
+            %a{:href => "#standard_behaviors"}methods
+            that return a Behavior
+            %dt A Metabehavior object
+            %dd Metabehaviors are able to select what Behavior to apply given 
+            the tag they're applied to.  Otherwise, alike to Behaviors.
+            %dt A function
+            %dd This is a minor point: you can use a function that returns a 
+            Behavior, and NinjaScript will use the result of calling the 
+            function.
+            %dt A behavior definition
+            %dd You can give NinjaScript an object suitable as a behavior 
+            definition as the value bound to a selector.  If you aren't using a 
+            packaged behavior, this is the most common form - we call them 
+            <span class="term">ad hoc</span> behaviors.
+
+
+
+
+
+
+

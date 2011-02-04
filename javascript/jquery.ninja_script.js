@@ -1028,6 +1028,40 @@ Ninja = (function() {
   Ninja.packageBehaviors(standardBehaviors)
 })();
 
+(function(){
+    function uiBehaviors(ninja){
+      function watermarkedInput(form) {
+        return ninja.does({
+            transform: function(element) {
+              
+            },
+            events: {
+              focus: function(event) {
+                
+              },
+              blur: function(event) {
+                
+              }
+            }
+          })
+      }
+
+      return {
+        watermarked: function(configs) {
+          return new ninja.does({
+              helpers: {
+                appyWatermarkToInput: function(input, form) {
+                  this.applyBehaviorsTo(input, [])
+                }
+              }
+            })
+        }
+      }
+    }
+
+    Ninja.packageBehaviors(uiBehaviors)
+  })();
+
 
 //This exists to carry over interfaces from earlier versions of Ninjascript.  Likely, it will be removed from future versions of NinjaScript
 ( function($) {

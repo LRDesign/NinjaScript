@@ -1,5 +1,5 @@
 /* 
- * NinjaScript - 0.8.2
+ * NinjaScript - 0.8.3
  * written by and copyright 2010-2011 Judson Lester and Logical Reality Design
  * Licensed under the MIT license
  * 2011-02-04
@@ -1123,7 +1123,9 @@ Ninja = (function() {
             },
             events: {
               focus: function(event) {
-                $(this.element).removeClass('ninja_watermarked').val('')
+                if($(this.element).hasClass('ninja_watermarked')) {
+                  $(this.element).removeClass('ninja_watermarked').val('')
+                }
               },
               blur: function(event) {
                 if($(this.element).val() == '') {

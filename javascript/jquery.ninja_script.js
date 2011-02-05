@@ -1144,9 +1144,11 @@ Ninja = (function() {
               if($(elem).is("input[type=text],textarea")) {
                 return this.asText
               }
-              else if($(elem).is("input[type=password]")){
-                return this.asPassword
-              }
+              //Seems IE has a thing about changing input types...
+              //We'll get back to this one
+//              else if($(elem).is("input[type=password]")){
+//                return this.asPassword
+//              }
             })
         }
       }

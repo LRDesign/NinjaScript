@@ -11,7 +11,8 @@ describe("Watermarking", function() {
                 formData = $(this.element).serializeArray()
               }
             },
-            "#input_a": Ninja.isWatermarked
+            "#input_a": Ninja.isWatermarked,
+            "#pass_c": Ninja.isWatermarked
           })
         Ninja.go()
         setFixtures( "<form id='form_a' action='#' method='PUT'>" +
@@ -19,6 +20,8 @@ describe("Watermarking", function() {
             "<input id='input_a' name='a' type='text' />" +
             "<label id='label_b' for='input_b'>INPUT B!</label>" +
             "<input id='input_b' name='b' type='text' />" +
+            "<label id='label_c' for='pass_c'>PASSWORD</label>" +
+            "<input id='pass_c' name='c' type='password' />" +
             "</form>" 
         )
       })
@@ -26,7 +29,7 @@ describe("Watermarking", function() {
         it("should still trigger previous handlers", function() {
             expect(formData.length).toEqual(0)
             $('#form_a').trigger('submit')
-            expect(formData.length).toEqual(2)
+            expect(formData.length).toEqual(3)
           })
 
         it("should clear inputs before submitting", function() {
@@ -55,17 +58,10 @@ describe("Watermarking", function() {
                   return itm.value
                 })).toContain("test b")
           })
-          
-
-
-          
         })
-        
-
       })
     
     describe("on inputs", function() {
-
         it("input should have default val() set", function() {
             expect($('#input_a').val()).toEqual("INPUT A!")
           })
@@ -77,6 +73,16 @@ describe("Watermarking", function() {
         it("label should have .ninja_watermarked class", function() {
             expect($('#label_a.ninja_watermarked')).toExist()
           })
+
+        xit("passwords should become text", function() {
+            expect($('#pass_c[type=text]')).toExist()
+          })
+        
+        xdescribe("when password focused", function() {
+            it("should become password again", function() {
+                expect($('#pass_c[type=password]')).toExist()
+            })
+        })
 
         describe("when focused", function() {
             beforeEach(function() {

@@ -43,11 +43,11 @@ describe("Packaged Behaviors:", function() {
 
             it("should put up an overlay", function() {
                 console.log("put up an overlay")
-                expect($("div.ninja.busy")).not.toExist()
+                expect($("div.ninja_busy")).not.toExist()
                 $("a#simple-form").trigger("click")
-                expect($("div.ninja.busy")).toExist()
+                expect($("div.ninja_busy")).toExist()
                 ajaxRequests[0].response(response)
-                expect($("div.ninja.busy")).not.toExist()
+                expect($("div.ninja_busy")).not.toExist()
               })
 
             it("should apply the reply javascript", function() {

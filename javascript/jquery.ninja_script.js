@@ -1,6 +1,6 @@
 /* 
  * NinjaScript - 0.8.0
- * written and copyright 2010-2011 Judson Lester and Logical Reality Design
+ * written by and copyright 2010-2011 Judson Lester and Logical Reality Design
  * Licensed under the MIT license
  * 2011-02-03
  *
@@ -111,6 +111,9 @@ Ninja = (function() {
       return jQuery.extend(left, right)
     },
     ensureDefaults: function(config, defaults) {
+      if(!config instanceof Object) {
+        config = {}
+      }
       return this.enrich(defaults, config)
     },
     //DOM and Events
@@ -873,9 +876,11 @@ Ninja = (function() {
       //})
       //
       submitsAsAjaxLink: function(configs) {
-        if(!(configs instanceof Object)) {
-          configs = { busyElement: undefined }
-        }
+        configs = Ninja.tools.ensureDefaults(configs,
+          { busyElement: function(elem) {
+              $(elem).parents('address,blockquote,body,dd,div,p,dl,dt,table,form,ol,ul,tr')[0]
+            }})
+
         return new ninja.does({
             priority: 10,
             helpers: {
@@ -912,9 +917,9 @@ Ninja = (function() {
       //})
       //
       submitsAsAjaxForm: function(configs) {
-        if(!(configs instanceof Object)) {
-          configs = { busyElement: undefined }
-        }
+        configs = Ninja.tools.ensureDefaults(configs,
+          { busyElement: undefined })
+
         return new ninja.does({
             priority: 20,
             helpers: {
@@ -951,10 +956,6 @@ Ninja = (function() {
       //  busyElement: function(elem) { jQuery("#user-notification") }
       //})
       becomesAjaxLink: function(configs) {
-        if(!(configs instanceof Object)) {
-          configs = { busyElement: undefined }
-        }
-
         configs = Ninja.tools.ensureDefaults(configs, {
             busyElement: undefined,
             retainAttributes: ["id", "class", "lang", "dir", "title", "data-.*"]

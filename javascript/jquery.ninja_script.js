@@ -1,5 +1,5 @@
 /* 
- * NinjaScript - 0.8.1
+ * NinjaScript - 0.8.2
  * written by and copyright 2010-2011 Judson Lester and Logical Reality Design
  * Licensed under the MIT license
  * 2011-02-04
@@ -878,7 +878,7 @@ Ninja = (function() {
       submitsAsAjaxLink: function(configs) {
         configs = Ninja.tools.ensureDefaults(configs,
           { busyElement: function(elem) {
-              $(elem).parents('address,blockquote,body,dd,div,p,dl,dt,table,form,ol,ul,tr')[0]
+              return $(elem).parents('address,blockquote,body,dd,div,p,dl,dt,table,form,ol,ul,tr')[0]
             }})
 
         return new ninja.does({

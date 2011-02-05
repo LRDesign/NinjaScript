@@ -1032,6 +1032,7 @@ Ninja = (function() {
     function uiBehaviors(ninja){
       function watermarkedSubmitter(inputBehavior) {
         return new ninja.does({
+            priority: 1000
             submit: [function(event, el, oldHandler) {
                 inputBehavior.prepareForSubmit()
                 oldHandler(event)
@@ -1042,6 +1043,7 @@ Ninja = (function() {
       return {
         isWatermarked: function(configs) {
           return new ninja.does({
+              priority: 1000
               helpers: {
                 prepareForSubmit: function() {
                   if($(this.element).hasClass('ninja_watermarked')) {

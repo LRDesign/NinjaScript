@@ -413,6 +413,7 @@ Ninja = (function() {
 
   function RootContext() {
     this.stashedElements = []
+    this.eventHandlerSet = {}
   }
 
   RootContext.prototype = Ninja.tools.enrich(
@@ -430,10 +431,16 @@ Ninja = (function() {
         var formDiv = Ninja.tools.hiddenDiv()
         forEach(this.stashedElements, function(element) {
             var elem = jQuery(element)
-            elem.data("ninja-visited", true)
+            elem.data("ninja-visited", this)
             jQuery(formDiv).append(elem)
             elem.trigger(event)
           })
+      },
+      unbindHandlers: function() {
+        var el = jQuery(this.element)
+        for(eventName in this.eventHandlerSet) {
+          el.unbind(eventName, this.eventHandlerSet[eventName])
+        }
       }
   })
 
@@ -530,10 +537,13 @@ Ninja = (function() {
       }
     },
     applyBehaviorsTo: function(element, behaviors) {
+      return this.applyBehaviorsInContext(new RootContext, element, behaviors)
+    },
+    applyBehaviorsInContext: function(context, element, behaviors) {
       var curContext, 
-      context = new RootContext, 
       applyList = [], 
       scribe = new EventScribe
+      Ninja.tools.enrich(scribe.handlers, context.eventHandlerSet)
 
       behaviors = behaviors.sort(function(left, right) {
           if(left.priority != right.priority) {
@@ -576,9 +586,10 @@ Ninja = (function() {
           }
         }
       )
-      jQuery(element).data("ninja-visited", true)
+      jQuery(element).data("ninja-visited", context)
 
       scribe.applyEventHandlers(element)
+      Ninja.tools.enrich(context.eventHandlerSet, scribe.handlers)
 
       this.fireMutationEvent()
 
@@ -604,7 +615,8 @@ Ninja = (function() {
     apply: function(element, startBehaviors, selectorIndex) {
       var applicableBehaviors = [], len = this.selectors.length
       this.collectBehaviors(element, applicableBehaviors, startBehaviors)
-      if (!jQuery(element).data("ninja-visited")) {
+      var context = jQuery(element).data('ninja-visited')
+      if (!context) {
         if(typeof selectorIndex == "undefined") {
           selectorIndex = 0
         }
@@ -613,8 +625,12 @@ Ninja = (function() {
             this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
           }
         }
-      }
       this.applyBehaviorsTo(element, applicableBehaviors)
+      }
+      else {
+        context.unbindHandlers()
+        this.applyBehaviorsInContext(context, element, applicableBehaviors)
+      }
     },
     applyAll: function(root){
       var len = this.selectors.length
@@ -700,7 +716,7 @@ Ninja = (function() {
       var context = this.inContext({})
 
       elem = this.applyTransform(context, elem)
-      jQuery(elem).data("ninja-visited", true)
+      jQuery(elem).data("ninja-visited", context)
 
       this.applyEventHandlers(context, elem)
 
@@ -1052,6 +1068,10 @@ Ninja = (function() {
                 },
               },
               transform: function(element) {
+                if(!/^text$/i.test($(element).attr("type")) && !$(element).is("textarea")) {
+                  this.cantTransform()
+                }
+
                 var label = $('label[for=' + $(element)[0].id + ']')
                 if(label.length == 0) {
                   this.cantTransform()

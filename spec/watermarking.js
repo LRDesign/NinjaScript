@@ -5,15 +5,16 @@ describe("Watermarking", function() {
 
         Ninja.tools.clearRootCollection()
         Ninja.behavior({
-            "#input_a": Ninja.isWatermarked,
             "#form_a": {
               priority: -10,
               submit: function(event) {
                 formData = $(this.element).serializeArray()
               }
-            }
+            },
+            "#input_a": Ninja.isWatermarked
           })
-        setFixtures( "<form id='form_a' action='#' method='POST'>" +
+        Ninja.go()
+        setFixtures( "<form id='form_a' action='#' method='PUT'>" +
             "<label id='label_a' for='input_a'>INPUT A!</label>" +
             "<input id='input_a' name='a' type='text' />" +
             "<label id='label_b' for='input_b'>INPUT B!</label>" +

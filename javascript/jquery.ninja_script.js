@@ -1,8 +1,8 @@
 /* 
- * NinjaScript - 0.8.0
+ * NinjaScript - 0.8.1
  * written by and copyright 2010-2011 Judson Lester and Logical Reality Design
  * Licensed under the MIT license
- * 2011-02-03
+ * 2011-02-04
  *
  * Those new to this source should skim down to standardBehaviors
  */

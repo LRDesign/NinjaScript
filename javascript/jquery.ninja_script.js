@@ -399,7 +399,7 @@ Ninja = (function() {
       for(var eventName in behavior.eventHandlers) {
         var oldHandler = this.handlers[eventName]
         if(typeof oldHandler == "undefined") {
-          oldHandler = function(){}
+          oldHandler = function(){return true}
         }
         this.handlers[eventName] = behavior.buildHandler(context, eventName, oldHandler)
       }

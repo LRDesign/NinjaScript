@@ -1053,7 +1053,7 @@ Ninja = (function() {
             submit: [function(event, el, oldHandler) {
                 inputBehavior.prepareForSubmit()
                 oldHandler(event)
-              }, "doDefault"]
+              }, "andDoDefault"]
           })
       }
 

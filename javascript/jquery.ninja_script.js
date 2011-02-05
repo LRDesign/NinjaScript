@@ -227,7 +227,7 @@ Ninja = (function() {
     },
     busyOverlay: function(elem) {
       var overlay = this.overlay(elem)
-      overlay.set.addClass("ninja busy")
+      overlay.set.addClass("ninja_busy")
       overlay.laziness = this.ninja.config.busyLaziness
       return overlay
     },

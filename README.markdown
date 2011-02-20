@@ -14,6 +14,13 @@ makes it easier to build your site such that it'll work for those benighted
 souls who don't have Javascript enabled or available.  NinjaScript makes it
 reasonable to build a site that degrades gracefully.
 
+## Important Note!
+
+In the current version (NinjaScript 0.8.x), NinjaScript depends on jQuery 1.4.2.
+It **WILL NOT WORK**  with any version of jQuery >= 1.4.3 at least not in DOM
+level 2/3 compliant browsers, including Firefox and Chrome.  We will be fixing this
+in the next major release.  For now, use jQuery 1.4.2.
+
 ## Why is NinjaScript useful?   Why do I care?
 
 We take the awesomeness of CSS for granted.  In CSS, when you apply a style to

@@ -2131,7 +2131,7 @@ Ninja = (function() {
                 if($(this.element).hasClass('ninja_watermarked')) {
                   $(this.element).val('')
                 }
-              },
+              }
             },
             transform: function(element) {
               var label = $('label[for=' + $(element)[0].id + ']')
@@ -2171,7 +2171,7 @@ Ninja = (function() {
                 if($(this.element).hasClass('ninja_watermarked')) {
                   $(this.element).val('')
                 }
-              },
+              }
             },
             transform: function(element) {
               var label = $('label[for=' + $(element)[0].id + ']')

@@ -1,5 +1,5 @@
 /* 
- * NinjaScript - 0.8.3
+ * NinjaScript - 0.9.0
  * written by and copyright 2010-2011 Judson Lester and Logical Reality Design
  * Licensed under the MIT license
  * 2011-02-04

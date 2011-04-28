@@ -25,7 +25,7 @@ describe("Watermarking", function() {
             "</form>" 
         )
       })
-    describe("on the form", function() {
+    xdescribe("on the form", function() {
         it("should still trigger previous handlers", function() {
             expect(formData.length).toEqual(0)
             $('#form_a').trigger('submit')

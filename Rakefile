@@ -1,3 +1,6 @@
+ASSET_ROOT = 'generated'
+VERSION = '0.9'
+
 rule ".html" => [
     proc{|name| name.sub(/\.html\Z/, '.haml').sub(/\Adoc\//, 'doc-src/')}
   ] do |t|
@@ -30,8 +33,8 @@ rule ".html" => [
 namespace :stylesheets do
   stylefiles = Rake::FileList['sass/**/*.sass']
   stylefiles.sub!(
-    %r{\Asass/(.*)\.sass\Z},
-    'css/\1.css'
+    %r{\Asrc/sass/(.*)\.sass\Z},
+    "#{ASSET_ROOT}/css/\1.css"
   )
   
   desc "Generates the CSS for use with NinjaScript"
@@ -41,6 +44,33 @@ namespace :stylesheets do
     dir = File::dirname(path)
     directory dir
     task :generate => [dir, path]
+  end
+end
+
+namespace :build do
+
+  dir "generated"
+
+  desc "Build Ninjascript & assets"
+  task :project => %w{stylesheets:generate generated} do
+    require 'sprockets'
+
+    sec = Sprockets::Secretary.new(
+      :root => '.',
+      :asset_root => ASSET_ROOT,
+      :load_path => %w[src/javascript vendor],
+      :source_files => %w[src/javascript/main.js]
+    )
+    sec.concatenation.save_to("#{ASSET_ROOT}/ninjascript.js")
+    sec.install_assets
+  end
+
+  require 'rake/packagetask'
+  Rake::PackageTask.new('ninjascript', '0.9') do |t|
+    t.need_zip = true
+    t.need_tar_bz2 = true
+    t.need_tar_gz = true
+    t.package_files.include("#{ASSET_ROOT}/**/*")  
   end
 end
 
@@ -63,6 +93,9 @@ namespace :doc do
     directory dir
     task :generate => [dir, path]
   end
+
+  desc "Serves as a reminder to write the task"
+  task :pdoc
 end
 
 

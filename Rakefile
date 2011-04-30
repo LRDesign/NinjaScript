@@ -1,5 +1,4 @@
 ASSET_ROOT = 'generated'
-VERSION = '0.9'
 
 rule ".html" => [
     proc{|name| name.sub(/\.html\Z/, '.haml').sub(/\Adoc\//, 'doc-src/')}
@@ -50,15 +49,27 @@ end
 namespace :build do
 
   directory "generated/javascript"
+  directory "auto-constants"
+
+  task :constants => %w{auto-constants} do
+    require 'yaml'
+
+    File::open("auto-constants/constants.yml", "w") do |file|
+      file.write(YAML::dump({
+        "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
+        "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
+      }))
+    end
+  end
 
   desc "Build Ninjascript & assets"
-  task :project => %w{stylesheets:generate generated/javascript} do
+  task :project => %w{stylesheets:generate generated/javascript constants} do
     require 'sprockets'
 
     sec = Sprockets::Secretary.new(
       :root => '.',
       :asset_root => ASSET_ROOT,
-      :load_path => %w[src/javascript vendor],
+      :load_path => %w[src/javascript vendor auto-constants],
       :source_files => %w[src/javascript/main.js]
     )
 

@@ -16,8 +16,8 @@ rule ".html" => [
 
   rule ".css" => [
     proc{|name| name.sub(/.css\Z/, '.sass').
-      sub(/\Adoc\//, 'doc-src/').
-      sub(/\Acss\//, 'sass/')
+      sub(%r{\Adoc/}, 'doc-src/').
+      sub(%r{\Asrc/assets/css/}, 'src/sass/')
   }
   ] do |t|
     puts " generate #{t.name}"
@@ -31,10 +31,10 @@ rule ".html" => [
   end
 
 namespace :stylesheets do
-  stylefiles = Rake::FileList['sass/**/*.sass']
+  stylefiles = Rake::FileList['src/sass/**/*.sass']
   stylefiles.sub!(
     %r{\Asrc/sass/(.*)\.sass\Z},
-    "#{ASSET_ROOT}/css/\1.css"
+    "src/assets/css/\\1.css"
   )
   
   desc "Generates the CSS for use with NinjaScript"
@@ -49,10 +49,10 @@ end
 
 namespace :build do
 
-  dir "generated"
+  directory "generated/javascript"
 
   desc "Build Ninjascript & assets"
-  task :project => %w{stylesheets:generate generated} do
+  task :project => %w{stylesheets:generate generated/javascript} do
     require 'sprockets'
 
     sec = Sprockets::Secretary.new(
@@ -61,7 +61,9 @@ namespace :build do
       :load_path => %w[src/javascript vendor],
       :source_files => %w[src/javascript/main.js]
     )
-    sec.concatenation.save_to("#{ASSET_ROOT}/ninjascript.js")
+
+    puts "Saving concatentated javascript"
+    sec.concatenation.save_to("#{ASSET_ROOT}/javascript/ninjascript.js")
     sec.install_assets
   end
 

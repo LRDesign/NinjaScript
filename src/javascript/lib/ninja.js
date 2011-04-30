@@ -65,8 +65,6 @@ Ninja = (function() {
 
     //= require "ninja/tools"
 
-
-
     var Ninja = new NinjaScript();
     //Below here is the dojo - the engines that make NinjaScript work.
     //With any luck, only the helpful and curious should have call to keep
@@ -79,7 +77,6 @@ Ninja = (function() {
 
     function TransformFailedException(){}
     function CouldntChooseException() { }
-
 
     //= require "ninja/ajax-submitter"
     //= require "ninja/overlay"

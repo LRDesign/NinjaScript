@@ -11,3 +11,4 @@
 //= require "lib/ninja/std-behaviors"
 //= require "lib/ninja/placeholder"
 //= require "lib/ninja/jquery"
+//= provide "../assets"

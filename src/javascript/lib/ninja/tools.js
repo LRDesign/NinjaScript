@@ -4,8 +4,6 @@ function Tools(ninja) {
 
 //Classes that Tools wrap ought to be defined here or required here.
 
-//= require "json-handler"
-
 Tools.prototype = {
   //Handy JS things
   forEach: forEach,
@@ -120,21 +118,6 @@ Tools.prototype = {
     Ninja.tools.getRootCollection().applyBehaviorsTo(hide, [Ninja.tools.suppressChangeEvents()])
     return hide
   },
-  ajaxSubmitter: function(form) {
-    return new AjaxSubmitter(form)
-  },
-  jsonHandler: function(desc) {
-    return new JSONHandler(desc)
-  },
-  ajaxToJson: function(desc) {
-    var handler = new JSONHandler(desc)
-    var submitter = new AjaxSubmitter()
-    submitter.dataType = 'json'
-    submitter.onSuccess = function(xhr, statusText, data) {
-      handler.receive(data)
-    }
-    return submitter
-  },
   overlay: function() {
     // I really liked using 
     //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
@@ -163,3 +146,7 @@ Tools.prototype = {
     return overlay
   }
 }
+
+//= require "ajax-submitter"
+//= require "json-handler"
+

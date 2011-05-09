@@ -1,3 +1,4 @@
+
 function AjaxSubmitter() {
   this.formData = []
   this.action = "/"
@@ -49,3 +50,10 @@ AjaxSubmitter.prototype = {
     Ninja.tools.message("Server error: " + xhr.statusText, "error")
   }
 }
+
+//= require "tools"
+
+Tools.prototype.ajaxSubmitter = function(form) {
+  return new AjaxSubmitter(form)
+}
+

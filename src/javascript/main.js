@@ -7,7 +7,14 @@
  */
 
 //= require "lib/ninja"
-//= require "lib/ninja/std-behaviors"
-//= require "lib/ninja/placeholder"
+/**
+ * All the behaviors defined by default:
+ **/
+//= require "lib/ninja/behaviors/standard"
+//= require "lib/ninja/behaviors/placeholder"
+//= require "lib/ninja/behaviors/trigger-on"
+/*
+ * End behaviors
+ **/
 //= require "lib/ninja/jquery"
 //= provide "../assets"

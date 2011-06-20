@@ -35,7 +35,7 @@ namespace :stylesheets do
     %r{\Asrc/sass/(.*)\.sass\Z},
     "src/assets/css/\\1.css"
   )
-  
+
   desc "Generates the CSS for use with NinjaScript"
   task :generate
 
@@ -83,15 +83,15 @@ namespace :build do
     t.need_zip = true
     t.need_tar_bz2 = true
     t.need_tar_gz = true
-    t.package_files.include("#{ASSET_ROOT}/**/*")  
+    t.package_files.include("#{ASSET_ROOT}/**/*")
   end
 end
 
-namespace :doc do 
+namespace :doc do
   docfiles = Rake::FileList['doc-src/**/*.haml', 'doc-src/**/*.sass']
-  
+
   docfiles.sub!(
-    /\Adoc-src\/(.*)\.haml\Z/, 
+    /\Adoc-src\/(.*)\.haml\Z/,
     'doc/\1.html'
   ).sub!(
     /\Adoc-src\/(.*)\.sass\Z/,
@@ -106,9 +106,6 @@ namespace :doc do
     directory dir
     task :generate => [dir, path]
   end
-
-  desc "Serves as a reminder to write the task"
-  task :pdoc
 end
 
 

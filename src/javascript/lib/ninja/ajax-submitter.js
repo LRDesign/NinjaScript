@@ -1,4 +1,3 @@
-
 function AjaxSubmitter() {
   this.formData = []
   this.action = "/"
@@ -12,6 +11,10 @@ AjaxSubmitter.prototype = {
   submit: function() {
     log("Computed method: " + this.method)
     jQuery.ajax(this.ajaxData())
+  },
+
+  sourceForm: function(form) {
+    this.formData = jQuery(form).serializeArray()
   },
 
   ajaxData: function() {
@@ -56,4 +59,3 @@ AjaxSubmitter.prototype = {
 Tools.prototype.ajaxSubmitter = function(form) {
   return new AjaxSubmitter(form)
 }
-

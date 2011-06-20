@@ -1,6 +1,6 @@
 *.sw?
 .conductor/
-lib
+./lib
 doc/*
 css/*
 src/assets/css/

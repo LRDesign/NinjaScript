@@ -1,0 +1,59 @@
+(function() {
+    function actOnSelect(ninja) {
+      return {
+        triggersOnSelect: function(configs) {
+          configs = Ninja.tools.ensureDefaults(configs,
+            { 
+              busyElement: undefined,
+              placeholderText: "Select to go",
+              placeholderValue: "instructions"
+            })
+          var jsonActions = configs
+          if (typeof(configs.actions) === "object") {
+            jsonActions = configs.actions
+          }
+
+          return new ninja.does({
+              priority: 20,
+              helpers: {
+                findOverlay: function(elem) {
+                  return this.deriveElementsFrom(elem, configs.busyElement)
+                }
+              },
+              transform: function(form) {
+                var select = $(form).find("select").first()
+                if( typeof select == "undefined" ) {
+                  this.cantTransform()
+                }
+                select.prepend("<option value='"+ configs.placeholderValue  +"'> " + configs.placeholderText + "</option>")
+                select.val(configs.placeholderValue)
+                $(form).find("input[type='submit']").remove()
+                return form
+              },
+              events: {
+                change: [
+                  function(evnt, elem) {
+                    var submitter = Ninja.tools.ajaxToJson(this.element, jsonActions)
+                    var overlay = this.busyOverlay(this.findOverlay(evnt.target))
+
+                    submitter.sourceForm(this.element)
+                    submitter.action = this.element.action
+                    submitter.method = Ninja.tools.extractMethod(this.element, submitter.formData)
+
+                    submitter.overlay = overlay
+                    submitter.onResponse = function(xhr, statusTxt) {
+                      overlay.remove()
+                    }
+
+                    overlay.affix()
+                    submitter.submit()
+                  
+                }, "andDoDefault" ]
+              }
+
+            })
+        }
+      };
+    }
+    Ninja.packageBehaviors(actOnSelect)
+  }());

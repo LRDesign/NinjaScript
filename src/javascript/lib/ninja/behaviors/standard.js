@@ -1,14 +1,22 @@
 (function() {
+    /**
+     * Ninja
+     **/
+
     function standardBehaviors(ninja){
       return {
-      /**
-       * Converts either a link or a form to send its requests via AJAX - we
-       * eval the Javascript we get back.  We get an busy overlay if configured
-       * to do so.
-       * 
-       * This farms out the actual behavior to submitsAsAjaxLink and
-       * submitsAsAjaxForm, c.f.
-      **/
+        /**
+         * Ninja.submitsAsAjax(configs) -> null
+         * - configs(Object): configuration for the behavior, passed directly 
+         *   to either submitsAsAjaxLink or submitsAsAjaxForm
+         *
+         * Converts either a link or a form to send its requests via AJAX - we
+         * eval the Javascript we get back.  We get an busy overlay if 
+         * configured to do so.
+         * 
+         * This farms out the actual behavior to submitsAsAjaxLink and
+         * submitsAsAjaxForm, c.f.
+         **/
         submitsAsAjax: function(configs) {
           return new ninja.chooses(function(meta) {
               meta.asLink = Ninja.submitsAsAjaxLink(configs),
@@ -23,15 +31,15 @@
         },
 
 
-      /** 
-       * Converts a link to send its GET request via Ajax - we assume that we
-       * get Javascript back, which is eval'd.  While we're waiting, we'll
-       * throw up a busy overlay if configured to do so.  By default, we don't
-       * use a busy overlay.
-       * 
-       * Ninja.submitAsAjaxLink({ busyElement: function(elem) { elem.parent }
-       * })
-       **/
+        /**
+         * Ninja.submitAsAjaxLink( configs ) -> null
+         *
+         * Converts a link to send its GET request via Ajax - we assume that we
+         * get Javascript back, which is eval'd.  While we're waiting, we'll
+         * throw up a busy overlay if configured to do so.  By default, we don't
+         * use a busy overlay.
+         * 
+         **/
         submitsAsAjaxLink: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs,
             { busyElement: function(elem) {
@@ -62,17 +70,17 @@
             })
         },
 
-      /** 
-       * Converts a form to send its request via Ajax - we assume that we get
-       * Javascript back, which is eval'd.  We pull the method from the form:
-       * either from the method attribute itself, a data-method attribute or a
-       * Method input. While we're waiting, we'll throw up a busy overlay if
-       * configured to do so.  By default, we use the form itself as the busy
-       * element.
-       * 
-       * Ninja.submitAsAjaxForm({ busyElement: function(elem) { elem.parent }
-       * })
-       **/ 
+        /** 
+         * Ninja.submitAsAjaxForm(configs) -> null
+         *
+         * Converts a form to send its request via Ajax - we assume that we get
+         * Javascript back, which is eval'd.  We pull the method from the form:
+         * either from the method attribute itself, a data-method attribute or a
+         * Method input. While we're waiting, we'll throw up a busy overlay if
+         * configured to do so.  By default, we use the form itself as the busy
+         * element.
+         * 
+         **/ 
         submitsAsAjaxForm: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs,
             { busyElement: undefined })
@@ -88,7 +96,7 @@
                 submit: function(evnt) {
                   var overlay = this.busyOverlay(this.findOverlay(evnt.target))
                   var submitter = this.ajaxSubmitter()
-                  submitter.formData = jQuery(evnt.target).serializeArray()
+                  submitter.sourceForm(evnt.target)
                   submitter.action = evnt.target.action
                   submitter.method = this.extractMethod(evnt.target, submitter.formData)
 
@@ -103,16 +111,15 @@
         },
 
 
-      /** 
-       * Converts a whole form into a link that submits via AJAX.  The
-       * intention is that you create a <form> elements with hidden inputs and
-       * a single submit button - then when we transform it, you don't lose
-       * anything in terms of user interface.  Like submitsAsAjaxForm, it will
-       * put up a busy overlay - by default we overlay the element itself
-       * 
-       * this.becomesAjaxLink({ busyElement: function(elem) {
-       * jQuery("#user-notification") } })
-       **/
+        /** 
+         * Ninja.becomesAjaxLink( configs ) -> null
+         * 
+         * Converts a whole form into a link that submits via AJAX.  The
+         * intention is that you create a <form> elements with hidden inputs and
+         * a single submit button - then when we transform it, you don't lose
+         * anything in terms of user interface.  Like submitsAsAjaxForm, it will
+         * put up a busy overlay - by default we overlay the element itself
+         **/
         becomesAjaxLink: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs, {
               busyElement: undefined,
@@ -122,15 +129,18 @@
           return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink(configs) ]
         },
 
-       /** 
-        * Replaces a form with a link - the text of the link is based on the
-        * Submit input of the form.  The form itself is pulled out of the
-        * document until the link is clicked, at which point, it gets stuffed
-        * back into the document and submitted, so the link behaves exactly
-        * link submitting the form with its default inputs.  The motivation is
-        * to use hidden-input-only forms for POST interactions, which
-        * Javascript can convert into links if you want.
-       **/
+        /** 
+         * Ninja.becomesLink( configs ) -> null
+         *
+         * Replaces a form with a link - the text of the link is based on the
+         * Submit input of the form.  The form itself is pulled out of the
+         * document until the link is clicked, at which point, it gets stuffed
+         * back into the document and submitted, so the link behaves exactly
+         * link submitting the form with its default inputs.  The motivation is
+         * to use hidden-input-only forms for POST interactions, which
+         * Javascript can convert into links if you want.
+         *
+         **/
         becomesLink: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs, {
               retainAttributes: ["id", "class", "lang", "dir", "title", "rel", "data-.*"]
@@ -171,6 +181,8 @@
         },
 
         /** 
+         * Ninja.decay( configs ) -> null
+         *
          * Use for elements that should be transient.  For instance, the
          * default behavior of failed AJAX calls is to insert a message into a
          * div#messages with a "flash" class.  You can use this behavior to

@@ -55,7 +55,7 @@
               },
               events: {
                 click:  function(evnt) {
-                  this.overlayAndSubmit(evnt.target, evnt.target.href, undefined)
+                  this.overlayAndSubmit(evnt.target, evnt.target.href)
                 }
               }
             })
@@ -85,7 +85,7 @@
               },
               events: {
                 submit: function(evnt) {
-                  this.overlayAndSubmit(evnt.target, evnt.target.action, evnt.target)
+                  this.overlayAndSubmit(evnt.target, evnt.target.action)
                 }
               }
             })

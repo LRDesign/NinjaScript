@@ -33,7 +33,7 @@
               events: {
                 change: [
                   function(evnt, elem) {
-                    this.overlayAndSubmit(elem, elem.action, elem, jsonActions)
+                    this.overlayAndSubmit(elem, elem.action, jsonActions)
 
                 }, "andDoDefault" ]
               }

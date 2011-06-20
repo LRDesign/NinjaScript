@@ -145,7 +145,8 @@ Tools.prototype = {
     overlay.css("zIndex", "2")
     return overlay
   },
-  overlayAndSubmit: function(target, action, form, jsonHandling) {
+
+  overlayAndSubmit: function(target, action, jsonHandling) {
     var overlay = this.busyOverlay(this.findOverlay(target))
 
     var submitter
@@ -156,9 +157,7 @@ Tools.prototype = {
       submitter = this.ajaxToJson(jsonHandling)
     }
 
-    if( typeof form != "undefined" ) {
-      submitter.sourceForm(form)
-    }
+    submitter.sourceForm(target)
 
     submitter.action = action
     submitter.method = this.extractMethod(target, submitter.formData)

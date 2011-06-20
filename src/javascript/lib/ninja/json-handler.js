@@ -48,9 +48,9 @@ Tools.prototype.jsonHandler = function(desc) {
   return new JSONHandler(desc)
 }
 
-Tools.prototype.ajaxToJson = function(form, desc) {
+Tools.prototype.ajaxToJson = function(desc) {
   var handler = this.jsonHandler(desc)
-  var submitter = this.ajaxSubmitter(form)
+  var submitter = this.ajaxSubmitter()
   submitter.dataType = 'json'
   submitter.onSuccess = function(xhr, statusText, data) {
     handler.receive(data)

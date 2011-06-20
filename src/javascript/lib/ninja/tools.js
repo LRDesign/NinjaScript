@@ -144,6 +144,30 @@ Tools.prototype = {
     overlay.height(hideMe.outerHeight())
     overlay.css("zIndex", "2")
     return overlay
+  },
+  overlayAndSubmit: function(target, action, form, jsonHandling) {
+    var overlay = this.busyOverlay(this.findOverlay(target))
+
+    var submitter
+    if( typeof jsonHandling == "undefined" ) {
+      submitter = this.ajaxSubmitter()
+    }
+    else {
+      submitter = this.ajaxToJson(jsonHandling)
+    }
+
+    if( typeof form != "undefined" ) {
+      submitter.sourceForm(form)
+    }
+
+    submitter.action = action
+    submitter.method = this.extractMethod(target, submitter.formData)
+
+    submitter.onResponse = function(xhr, statusTxt) {
+      overlay.remove()
+    }
+    overlay.affix()
+    submitter.submit()
   }
 }
 

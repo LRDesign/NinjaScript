@@ -8,7 +8,7 @@ describe("AjaxToJson", function() {
     beforeEach(function() {
         setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
         target = {}
-        submitter = Ninja.tools.ajaxToJson($('#simple-link')[0], 
+        submitter = Ninja.tools.ajaxToJson( 
           {
             shallow: function(html) {
               target.shallow = html

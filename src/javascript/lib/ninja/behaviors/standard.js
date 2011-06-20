@@ -55,16 +55,7 @@
               },
               events: {
                 click:  function(evnt) {
-                  var overlay = this.busyOverlay(this.findOverlay(evnt.target))
-                  var submitter = this.ajaxSubmitter()
-                  submitter.action = evnt.target.href
-                  submitter.method = this.extractMethod(evnt.target)
-
-                  submitter.onResponse = function(xhr, statusTxt) {
-                    overlay.remove()
-                  }
-                  overlay.affix()
-                  submitter.submit()						
+                  this.overlayAndSubmit(evnt.target, evnt.target.href, undefined)
                 }
               }
             })
@@ -94,17 +85,7 @@
               },
               events: {
                 submit: function(evnt) {
-                  var overlay = this.busyOverlay(this.findOverlay(evnt.target))
-                  var submitter = this.ajaxSubmitter()
-                  submitter.sourceForm(evnt.target)
-                  submitter.action = evnt.target.action
-                  submitter.method = this.extractMethod(evnt.target, submitter.formData)
-
-                  submitter.onResponse = function(xhr, statusTxt) {
-                    overlay.remove()
-                  }
-                  overlay.affix()
-                  submitter.submit()
+                  this.overlayAndSubmit(evnt.target, evnt.target.action, evnt.target)
                 }
               }
             })

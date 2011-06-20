@@ -33,21 +33,8 @@
               events: {
                 change: [
                   function(evnt, elem) {
-                    var submitter = Ninja.tools.ajaxToJson(this.element, jsonActions)
-                    var overlay = this.busyOverlay(this.findOverlay(evnt.target))
+                    this.overlayAndSubmit(elem, elem.action, elem, jsonActions)
 
-                    submitter.sourceForm(this.element)
-                    submitter.action = this.element.action
-                    submitter.method = Ninja.tools.extractMethod(this.element, submitter.formData)
-
-                    submitter.overlay = overlay
-                    submitter.onResponse = function(xhr, statusTxt) {
-                      overlay.remove()
-                    }
-
-                    overlay.affix()
-                    submitter.submit()
-                  
                 }, "andDoDefault" ]
               }
 

@@ -1,5 +1,6 @@
-(function() {
-    function actOnSelect(ninja) {
+define(["ninja"],
+  function(Ninja) {
+    Ninja.packageBehaviors( function(ninja) {
       return {
         triggersOnSelect: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs,
@@ -41,6 +42,5 @@
             })
         }
       };
-    }
-    Ninja.packageBehaviors(actOnSelect)
-  }());
+    })
+  })

@@ -1,7 +1,7 @@
-Ninja = (function() {
-    //= require <sizzle-1.0>
-    //= require "utils"
-
+define(   ["./utils", "./tools", "./behaviors"], 
+  function(Utils,     Tools,     Behaviors) {
+    var log = Utils.log
+    
     function NinjaScript() {
       //NinjaScript-wide configurations.  Currently, not very many
       this.config = {
@@ -22,9 +22,9 @@ Ninja = (function() {
 
       packageBehaviors: function(callback) {
         var types = {
-          does: Behavior,
-          chooses: Metabehavior,
-          selects: Selectabehavior
+          does: Behaviors.base,
+          chooses: Behaviors.meta,
+          selects: Behaviors.select
         }
         result = callback(types)
         this.tools.enrich(this, result)
@@ -49,6 +49,12 @@ Ninja = (function() {
       },
 
       go: function() {
+        var Ninja = this
+
+        function handleMutation(evnt) {
+          Ninja.tools.getRootCollection().mutationEventTriggered(evnt);
+        }
+
         if(this.behavior != this.misbehavior) {
           var rootOfDocument = this.tools.getRootOfDocument()
           rootOfDocument.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
@@ -65,19 +71,7 @@ Ninja = (function() {
 
     //= require "ninja/tools"
 
-    var Ninja = new NinjaScript();
-    //Below here is the dojo - the engines that make NinjaScript work.
-    //With any luck, only the helpful and curious should have call to keep
-    //reading
-    //
-
-    function handleMutation(evnt) {
-      Ninja.tools.getRootCollection().mutationEventTriggered(evnt);
-    }
-
-    function TransformFailedException(){}
-    function CouldntChooseException() { }
-
+    // XXX These'll be problematic
     //= require "ninja/ajax-submitter"
     //= require "ninja/overlay"
     //= require "ninja/event-scribe"
@@ -85,5 +79,5 @@ Ninja = (function() {
     //= require "ninja/behavior-collection"
     //= require "ninja/behaviors"
 
-    return Ninja;  
+    return new NinjaScript()
   })();

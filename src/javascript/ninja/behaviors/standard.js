@@ -1,9 +1,7 @@
-(function() {
-    /**
-     * Ninja
-     **/
-
-    function standardBehaviors(ninja){
+define(["ninja", "ninja/utils"],
+  function(Ninja, Utils) {
+    var log = Utils.log
+    Ninja.packageBehaviors( function(ninja){
       return {
         /**
          * Ninja.submitsAsAjax(configs) -> null
@@ -150,6 +148,7 @@
                 var link = jQuery("<a rel='nofollow' href='#'>" + linkText + "</a>")
                 this.copyAttributes(form, link, configs.retainAttributes)
                 this.stash(jQuery(form).replaceWith(link))
+
                 return link
               },
               events: {
@@ -194,7 +193,5 @@
             })
         }
       };
-    }
-
-    Ninja.packageBehaviors(standardBehaviors)
-  })();
+    })
+  })

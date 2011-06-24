@@ -2,7 +2,7 @@
 %html
   %head
     %title NinjaScript Reference
-    %link{:href => "style/docco.css", :media => "all", :rel => "stylesheet", 
+    %link{:href => "style/docco.css", :media => "all", :rel => "stylesheet",
     :type => "text/css"}
   %body
     .section
@@ -11,90 +11,90 @@
         %span.interface
           Ninja.behavior({ ... })
         %p
-          Defines the "behavior sheet" for your document.  The object you pass 
-          to <code>behavior()</code> should have fields names that are consist 
-          of CSS style selectors (they're parsed by Sizzle, so if they work in 
+          Defines the "behavior sheet" for your document.  The object you pass
+          to <code>behavior()</code> should have fields names that are consist
+          of CSS style selectors (they're parsed by Sizzle, so if they work in
           JQuery...), and the values should be
           %a{:href => "#behaviors"} resolvable to behaviors.
         %p
-          It's important to note that NinjaScript uses a "view source" model to 
-          resolve selectors to apply behaviors to.  In general, this is much 
+          It's important to note that NinjaScript uses a "view source" model to
+          resolve selectors to apply behaviors to.  In general, this is much
           simpler to deal with than the CSS live-matching model would be.
       .entry
         %span.interface
           Ninja.go()
         %p
-          Notifies NinjaScript that you are done with behavior definition and 
-          it is safe to apply all your behaviors to the document.  Note this 
-          isn't strictly necessary, but will result in a much smoother 
-          application of your behaviors, since we don't need to wait for all 
+          Notifies NinjaScript that you are done with behavior definition and
+          it is safe to apply all your behaviors to the document.  Note this
+          isn't strictly necessary, but will result in a much smoother
+          application of your behaviors, since we don't need to wait for all
           content to load.
         %p
-          <code>Ninja.behavior()</code> calls after <code>go()</code> will 
-          fail, however.  Composition of behaviors is tricky, and we need to 
+          <code>Ninja.behavior()</code> calls after <code>go()</code> will
+          fail, however.  Composition of behaviors is tricky, and we need to
           know they're all in before we start processing them.
       .entry
         %p#behaviors
-          There are several syntaxes that are legitimate to use inside of a 
+          There are several syntaxes that are legitimate to use inside of a
           <code>Ninja.behavior()</code>definition.  They are:
           %dl
             %dt A Behavior object
             %dd
-              NinjaScript defines a constructor for Behavior objects - you're 
-              unlikely to use them directly since the Behavior constructor is 
-              encapsulated inside the Ninja definition scope - but there are a 
+              NinjaScript defines a constructor for Behavior objects - you're
+              unlikely to use them directly since the Behavior constructor is
+              encapsulated inside the Ninja definition scope - but there are a
               number of
               %a{:href => "#standard_behaviors"}< methods
               that return a Behavior
             %dt A Metabehavior object
-            %dd 
-              Metabehaviors are able to select what Behavior to apply given 
+            %dd
+              Metabehaviors are able to select what Behavior to apply given
               the tag they're applied to.  Otherwise, alike to Behaviors.
             %dt A function
-            %dd 
-              This is a minor point: you can use a function that returns a 
-              Behavior, and NinjaScript will use the result of calling the 
+            %dd
+              This is a minor point: you can use a function that returns a
+              Behavior, and NinjaScript will use the result of calling the
               function with no arguments.
             %dt A behavior definition
-            %dd 
-              You can give NinjaScript an object suitable as a behavior 
-              definition as the value bound to a selector.  If you aren't using 
-              a packaged behavior, this is the most common form - we call them 
+            %dd
+              You can give NinjaScript an object suitable as a behavior
+              definition as the value bound to a selector.  If you aren't using
+              a packaged behavior, this is the most common form - we call them
               <span class="term">ad hoc behaviors.</span>
             %dt An array of the above
             %dd
-              Multiple behaviors can be applied to the same element - their 
-              composition is a little tricky but powerful.  An array will apply 
+              Multiple behaviors can be applied to the same element - their
+              composition is a little tricky but powerful.  An array will apply
               each of the behaviors in turn.
           %p
-            In case it's not clear: you can call <code>Ninja.behavior()</code> 
-            several times and across several source files, so long as all the 
+            In case it's not clear: you can call <code>Ninja.behavior()</code>
+            several times and across several source files, so long as all the
             calls come before <code>Ninja.go()</code>
     .section
       %h2 Packaged Behaviors
       .entry
-        %p 
-          There are a number of pre-packaged behaviors available for 
+        %p
+          There are a number of pre-packaged behaviors available for
           NinjaScript.  These can be used in two general forms:
           %pre= ['"#my_el": Ninja.submitsAsAjax,',
             '"#other": Ninja.submitsAsAjax({busyElement: "#busy"})'].join("\n")
-          The first uses all the defaults for the behaviors, the second lets 
-          you pass configuration details (in this case the target for a busy 
+          The first uses all the defaults for the behaviors, the second lets
+          you pass configuration details (in this case the target for a busy
           overlay)
       .entry#submitsAsAjax
         %span.interface Ninja.submitsAsAjax()
         %p<
-          The targeted link or form is set up so that it submits via a 
-          XMLHTTPRequest object.  We expect back a javascript snippet which is 
+          The targeted link or form is set up so that it submits via a
+          XMLHTTPRequest object.  We expect back a javascript snippet which is
           eval'd.
           %span.aside (yeah, yeah)
           This is a Metabehavior for
           %a(href= '#submitsAsAjaxForm') submitsAsAjaxForm
           and
           %a(href= '#submitsAsAjaxLink') submitsAsAjaxLink.
-          In this case, the Metabehavior looks to see if the element under 
-          consideration is a link or a form and applies the appropriate 
-          behavior - Metabehaviors can apply whatever logic they like in making 
+          In this case, the Metabehavior looks to see if the element under
+          consideration is a link or a form and applies the appropriate
+          behavior - Metabehaviors can apply whatever logic they like in making
           this decision.
         %h3 Configuration:
         %dl.configuration
@@ -106,9 +106,9 @@
       .entry#submitsAsAjaxLink
         %span.interface Ninja.submitsAsAjaxLink()
         %p
-          Converts a link to send its GET request via Ajax - we assume that we 
-          get Javascript back, which is eval'd.  While we're waiting, we'll 
-          throw up a busy overlay if configured to do so.  By default, we don't 
+          Converts a link to send its GET request via Ajax - we assume that we
+          get Javascript back, which is eval'd.  While we're waiting, we'll
+          throw up a busy overlay if configured to do so.  By default, we don't
           use a busy overlay.
         %p
           In general, you'll want to use
@@ -124,11 +124,11 @@
       .entry#submitsAsAjaxForm
         %span.interface Ninja.submitsAsAjaxForm()
         %p
-          Converts a form to send its request via Ajax - we assume that we get 
-          Javascript back, which is eval'd.  We pull the method from the form: 
-          either from the method attribute itself, a data-method attribute or a 
-          Method input. While we're waiting, we'll throw up a busy overlay if 
-          configured to do so.  By default, we use the form itself as the busy 
+          Converts a form to send its request via Ajax - we assume that we get
+          Javascript back, which is eval'd.  We pull the method from the form:
+          either from the method attribute itself, a data-method attribute or a
+          Method input. While we're waiting, we'll throw up a busy overlay if
+          configured to do so.  By default, we use the form itself as the busy
           element.
         %p
           In general, you'll want to use
@@ -149,7 +149,7 @@
           %a(href='#submitsAsAjax')submitsAsAjax
           and
           %a(href='#becomesLink')becomesLink.
-          Applied to a form (normally without visible inputs), it yanks the 
+          Applied to a form (normally without visible inputs), it yanks the
           form itself out of the DOM, replacing it with an
           %pre
             :escaped
@@ -159,7 +159,7 @@
         %dl.configuration
           %dt retainAttributes
           %dd
-            An array of strings that lists the attributes to copy from the 
+            An array of strings that lists the attributes to copy from the
             original form into the link.
           %dd.default
             :escaped
@@ -173,20 +173,20 @@
       .entry#becomesLink
         %span.interface Ninja.becomesLink()
         %p
-          Applied to a form (normally without visible inputs), it yanks the 
+          Applied to a form (normally without visible inputs), it yanks the
           form itself out of the DOM, replacing it with an
           %pre
             :escaped
 
               <a href='#'>...</a>
-          that will submit the original form.  The result is that you can use a 
-          link to do non-GET requests, but still have it degrade nicely when 
+          that will submit the original form.  The result is that you can use a
+          link to do non-GET requests, but still have it degrade nicely when
           Javascript isn't available.  Handles image submits as well.
         %h3 Configuration:
         %dl.configuration
           %dt retainAttributes
           %dd
-            An array of strings that lists the attributes to copy from the 
+            An array of strings that lists the attributes to copy from the
             original form into the link.
           %dd.default
             :escaped
@@ -194,13 +194,13 @@
       .entry#decays
         %span.interface Ninja.decays()
         %p
-          A UI behavior: this element should survive for a little while and 
+          A UI behavior: this element should survive for a little while and
           then disappear, or else vanish when clicked on.
         %h3 Configuration:
         %dl.configuration
           %dt lifetime
-          %dd 
-            How long the element survives before being removed automatically 
+          %dd
+            How long the element survives before being removed automatically
             (in millis)
           %dd.default 10000
           %dt diesFor
@@ -210,7 +210,7 @@
       %h2 Ad Hoc Behaviors
       .entry
         %p
-          You'll sometimes need a behavior that hasn't been packaged up for you 
+          You'll sometimes need a behavior that hasn't been packaged up for you
           already.  Here's what that looks like:
         %pre=["{",
           "  transform: function(elem) {",
@@ -226,44 +226,44 @@
           "  }",
           "}"].join("\n")
         %p
-          A behavior has two major parts: at most one <em>transform</em> and 
+          A behavior has two major parts: at most one <em>transform</em> and
           some <em>event</em> methods.
         %p
-          The transform is a method takes an element - which is the target of 
-          the behavior - and returns an element (which can be the same 
-          element).  If you're going to be replacing elements in the DOM, do 
+          The transform is a method takes an element - which is the target of
+          the behavior - and returns an element (which can be the same
+          element).  If you're going to be replacing elements in the DOM, do
           it here and return the one you put in.
         %p
-          The event handlers will get bound to the resulting element.  They're 
+          The event handlers will get bound to the resulting element.  They're
           a slightly different API than the usual "onevent" handlers.
         %p
-          Important to the way the behavior operates is that there is a unique 
-          behavior object for each application, so the transform method can 
-          store data on <code>this</code> and the event handlers will be able 
+          Important to the way the behavior operates is that there is a unique
+          behavior object for each application, so the transform method can
+          store data on <code>this</code> and the event handlers will be able
           to retreive it.  Or, event handlers can store their own data.
     .section
       %h2 Behavior tools
       .entry
         %p
-          There are a lot of tools available within a behavior: this is merely 
+          There are a lot of tools available within a behavior: this is merely
           a cheatsheet for some of them.
       .entry
         %span.interface
           this.fireMutationEvent()
         %p
-          NinjaScript works by watching for MutationEvents and applying 
-          behaviors in response.  Certain browsers that will remain nameless do 
+          NinjaScript works by watching for MutationEvents and applying
+          behaviors in response.  Certain browsers that will remain nameless do
           not implement this DOM Event interface in any form.
           %span.aside There's a whole other discussion there...
-          As a result, if you do modify the DOM, you'll need to call this to 
-          signal the change.  Behavior application triggers one, so transforms 
-          don't need to call this, and event handlers can be tagged to do this 
+          As a result, if you do modify the DOM, you'll need to call this to
+          signal the change.  Behavior application triggers one, so transforms
+          don't need to call this, and event handlers can be tagged to do this
           automatically, but sometimes you want to make it conditional.
       .entry
         %span.interface
           this.copyAttributes(from, to, which)
         %p
-          Especially in transforms, it's useful to copy attributes in bulk 
+          Especially in transforms, it's useful to copy attributes in bulk
           between elements.
         %dl.params
           %dt from
@@ -271,21 +271,21 @@
           %dt to
           %dd the destination element
           %dt which
-          %dd 
-            an array of strings (RegExp syntax accepted) that name or match the 
+          %dd
+            an array of strings (RegExp syntax accepted) that name or match the
             attributes to be copied
       .entry
         %span.interface
           this.cantTransform()
         %p
-          Raises an exception - use this in a transform method if you're passed 
-          an element that you can't process.  There'll be a nice log message to 
+          Raises an exception - use this in a transform method if you're passed
+          an element that you can't process.  There'll be a nice log message to
           let you know, and this behavior will be cancelled for the element.
       .entry
         %span.interface
           this.applyBehaviors(element, behaviorList)
         %p
-          Apply behaviors while transforming or during an event handler.  
+          Apply behaviors while transforming or during an event handler.
           Really good for behaviors that only make sense together.
         %dl.params
           %dt element
@@ -296,41 +296,41 @@
         %span.interface
           this.message(text)
         %p
-          Send a message to the user - you'll need to make sure the Ninja is 
+          Send a message to the user - you'll need to make sure the Ninja is
           configured to target an element to insert messages into
       .entry
         %span.interface
           this.ajaxSubmitter()
         %p
-          Gets an XMLHTTPRequest wrangler object.  Has a nice, uniform 
+          Gets an XMLHTTPRequest wrangler object.  Has a nice, uniform
           interface for handling events, and some conveniences like a default
-          <code>fireMutationEvent()</code> - since we assume that by the time 
+          <code>fireMutationEvent()</code> - since we assume that by the time
           you're done processing a response, you will have modified the DOM.
       .entry
         %span.interface
           this.busyOverlay()
         %p
-          Real crowd pleaser: create an overlay for an element (or list of 
-          elements), complete with spinner.  The result has two important 
-          methods: <code>affix()</code> which will display the overlays and 
-          prevent interaction with the elements, and <code>remove()</code> 
+          Real crowd pleaser: create an overlay for an element (or list of
+          elements), complete with spinner.  The result has two important
+          methods: <code>affix()</code> which will display the overlays and
+          prevent interaction with the elements, and <code>remove()</code>
           which will remove the overlay.
       .entry
         %span.interface
           this.stash(element)
           this.cascadeEvent(name)
         %p
-          <code>stash()</code> puts an element in a behavior-local list.  
-          <code>cascadeEvent()</code> sends an event to the elements in that 
-          list.  This is superior to saving a removed element in a field and 
+          <code>stash()</code> puts an element in a behavior-local list.
+          <code>cascadeEvent()</code> sends an event to the elements in that
+          list.  This is superior to saving a removed element in a field and
           sending the event directly for two reasons:
           %ol
             %li
-              It's a well known location, so multiple behaviors can each have a 
-              crack at each other's transformed elements and still know where 
+              It's a well known location, so multiple behaviors can each have a
+              crack at each other's transformed elements and still know where
               to find them
             %li
-              The targeted elements will be stuck back in the DOM in a hidden 
+              The targeted elements will be stuck back in the DOM in a hidden
               div, so we can be sure that the browser will honor the event.
     .section
       %h2 Packaging Your Own Behaviors

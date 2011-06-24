@@ -1,38 +1,6 @@
-/*
- * HTML5 introduces a very handy feature: placeholder text for inputs etc.
- * However, not all browsers support placeholder text yet.
- * And of course, if we make the feature JS, it does degrade gracefully.
- *
- * So, here's the plan:
- *
- * - Associate and element with an input - a label, or a note or whatever
- *   a la: 
- *     <label for="id1">Text</label><input type='text' id='id1'/> 
- *     or
- *     <input type='text' id='id1' /><span data-for='id1'>Text</span>
- *
- * - Ninjascript's first pass is to yoink the associated label and make it the
- *   placeholder text.
- *
- * - NS second pass is to make placeholder text actual placeholder if it's not
- *   available in the browser.
- *   = That means: do whatever it takes to make the input "placeholder"
- *     + text is just styled default
- *     + likewise textareas
- *     + password is crazytown
- *   = Some inputs maybe want a placeholdering, even when placeholder doesn't
- *     have an effect: 
- *     + selects (and maybe radio buttons) get an extra option
- *     + file entry?
- *
- *   = The submitter needs to clear the inputs if they still have "placeholder"
- *     values
- **/
-
-(function($){
-
-    // These are handlers for old browsers that don't suport placeholder yet
-    function uiBehaviors(ninja){
+define(["ninja"],
+  function(Ninja) {
+    Ninja.packageBehaviors( function(ninja){
       function placeholderSubmitter(inputBehavior) {
         return new ninja.does({
             priority: 1000,
@@ -200,7 +168,5 @@
         return behaviors
       }
     }
-  }
-
-  Ninja.packageBehaviors(uiBehaviors)
-})(jQuery);
+  })
+})

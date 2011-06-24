@@ -6,6 +6,16 @@
  * <%= BUILD_DATE %>
  */
 
+require([
+    "ninja/behaviors/standard",
+    "ninja/behaviors/placeholder",
+    "ninja/behaviors/trigger-on",
+
+    "ninja/jquery"
+  ], function(ninja, stdBehaviors, placeholder, triggerOn, jquery) {
+    Ninja = new ninja()
+  })
+
 //= require "lib/ninja"
 /**
  * All the behaviors defined by default:

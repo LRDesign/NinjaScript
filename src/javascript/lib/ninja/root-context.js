@@ -9,6 +9,9 @@ RootContext.prototype = Ninja.tools.enrich(
     stash: function(element) {
       this.stashedElements.unshift(element)
     },
+    unstash: function() {
+      return this.stashedElements.shift()
+    },
     clearStash: function() {
       this.stashedElements = []
     },

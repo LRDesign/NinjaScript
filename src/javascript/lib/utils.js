@@ -1,5 +1,5 @@
 function log(message) {
-  if(false) { //LOGGING TURNED OFF IS 100% faster!
+  if(true) { //LOGGING TURNED OFF IS 100% faster!
     try {
       console.log(message)
     }

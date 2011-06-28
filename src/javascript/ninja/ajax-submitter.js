@@ -1,4 +1,4 @@
-define(["ninja/utils"], function(Utils) {
+define(["utils"], function(Utils) {
     var log = Utils.log
 
     function AjaxSubmitter() {

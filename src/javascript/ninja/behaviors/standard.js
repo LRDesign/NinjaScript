@@ -1,4 +1,4 @@
-define(["ninja", "ninja/utils"],
+define(["ninja", "utils"],
   function(Ninja, Utils) {
     var log = Utils.log
     Ninja.packageBehaviors( function(ninja){

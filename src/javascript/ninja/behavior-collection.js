@@ -1,18 +1,19 @@
-define(["sizzle-1.0", "ninja", "ninja/behaviors", "utils", 
-    "ninja/root-context", "ninja/event-scribe", "ninja/exceptions"], 
-  function(Sizzle, Ninja, Behaviors, Utils, RootContext, EventScribe, Exceptions) {
+define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/exceptions"], 
+  function(Sizzle, Behaviors, Utils, EventScribe, Exceptions) {
 
     var forEach = Utils.forEach
     var log = Utils.log
 
     var TransformFailedException = Exceptions.TransformFailed
+    var CouldntChooseException = Exceptions.CouldntChoose
 
-    function BehaviorCollection() {
+    function BehaviorCollection(tools) {
       this.lexicalCount = 0
       this.eventQueue = []
       this.behaviors = {}
       this.selectors = []
       this.mutationTargets = []
+      this.tools = tools
       return this
     }
 
@@ -52,19 +53,20 @@ define(["sizzle-1.0", "ninja", "ninja/behaviors", "utils",
         }
       },
       addMutationTargets: function(targets) {
-        this.mutationTargets = this.mutationTargets.concat(target)
+        this.mutationTargets = this.mutationTargets.concat(targets)
       },
+      //Move to Tools
       fireMutationEvent: function() {
         var targets = this.mutationTargets
         if (targets.length > 0 ) {
-          for(var target = targets.shift(); 
+          for(var target = targets[0]; 
             targets.length > 0; 
             target = targets.shift()) {
             jQuery(target).trigger("thisChangedDOM")
           }
         }
         else {
-          Ninja.tools.getRootOfDocument().trigger("thisChangedDOM")
+          this.tools.getRootOfDocument().trigger("thisChangedDOM")
         }
       },
       mutationEventTriggered: function(evnt){
@@ -99,13 +101,15 @@ define(["sizzle-1.0", "ninja", "ninja/behaviors", "utils",
         }
       },
       applyBehaviorsTo: function(element, behaviors) {
-        return this.applyBehaviorsInContext(new RootContext, element, behaviors)
+        return this.applyBehaviorsInContext(new this.tools.behaviorContext, element, behaviors)
       },
       applyBehaviorsInContext: function(context, element, behaviors) {
         var curContext, 
         applyList = [], 
         scribe = new EventScribe
-        Ninja.tools.enrich(scribe.handlers, context.eventHandlerSet)
+
+        //Move enrich to Utils
+        this.tools.enrich(scribe.handlers, context.eventHandlerSet)
 
         behaviors = behaviors.sort(function(left, right) {
             if(left.priority != right.priority) {
@@ -151,7 +155,8 @@ define(["sizzle-1.0", "ninja", "ninja/behaviors", "utils",
         jQuery(element).data("ninja-visited", context)
 
         scribe.applyEventHandlers(element)
-        Ninja.tools.enrich(context.eventHandlerSet, scribe.handlers)
+        //Move enrich to utils
+        this.tools.enrich(context.eventHandlerSet, scribe.handlers)
 
         this.fireMutationEvent()
 

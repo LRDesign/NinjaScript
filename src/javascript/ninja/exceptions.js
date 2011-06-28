@@ -1,6 +1,6 @@
 define(function () {
     return {
-      CouldntChoose = function(){},
-      TransformFailed = function(){}
+      CouldntChoose: function(){},
+      TransformFailed: function(){}
     }
   })

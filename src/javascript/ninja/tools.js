@@ -1,15 +1,15 @@
-define([
-    "./behaviors", "./behavior-collection", "./exceptions", 
-    "./utils", "./overlay", "./ajax-submitter", "./json-handler"
+define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", "utils", "ninja/overlay", "ninja/ajax-submitter", "ninja/json-handler", "ninja/root-context"
   ], function(
     Behaviors,     BehaviorCollection,      Exceptions,     
-    Utils,     Overlay,     AjaxSubmitter,      JSONHandler
+    Utils,     Overlay,     AjaxSubmitter,      JSONHandler,
+    rootContext
   ) {
     var CantTransformException = Exceptions.CantTransform
     var log = Utils.log
 
     function Tools(ninja) {
       this.ninja = ninja
+      this.behaviorContext = rootContext(this)
     }
 
     Tools.prototype = {
@@ -38,7 +38,7 @@ define([
           return rootOfDocument.data("ninja-behavior")
         }
 
-        var collection = new BehaviorCollection()
+        var collection = new BehaviorCollection(this)
         rootOfDocument.data("ninja-behavior", collection);
         return collection
       },
@@ -200,4 +200,4 @@ define([
 
     //= require "ajax-submitter"
     //= require "json-handler"
-  }
+  })

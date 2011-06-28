@@ -7,13 +7,15 @@
  */
 
 require([
+    "ninja",
+
     "ninja/behaviors/standard",
     "ninja/behaviors/placeholder",
     "ninja/behaviors/trigger-on",
 
     "ninja/jquery"
   ], function(ninja, stdBehaviors, placeholder, triggerOn, jquery) {
-    Ninja = new ninja()
+    Ninja = ninja
   })
 
 //= require "lib/ninja"

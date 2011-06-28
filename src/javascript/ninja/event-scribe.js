@@ -1,5 +1,4 @@
-define([],
-  function() {
+define( function() {
     function EventScribe() {
       this.handlers = {}
       this.currentElement = null

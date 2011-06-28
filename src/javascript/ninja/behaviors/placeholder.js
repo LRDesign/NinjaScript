@@ -43,13 +43,37 @@ define(["ninja"],
     var textarea_placeholder = !!('placeholder' in document.createElement('textarea'))
 
     if(! input_placeholder) {
+      function alternateInput(passwordField, parentForm) {
+        return new ninja.does({
+            helpers: {
+              prepareForSubmit: function() {
+                $(this.element).val('')
+              }
+            },
+            transform: function() {
+              this.applyBehaviors(parentForm, [placeholderSubmitter(this)])
+            },
+            events: {
+              focus: function(event) {
+                console.log("focus")
+                var el = $(this.element)
+                var id = el.attr("id")
+                el.attr("id", '')
+                el.replaceWith(passwordField)
+                passwordField.attr("id", id)
+                passwordField.focus()
+              }
+            }
+          })
+      }
+
       function hasPlaceholderPassword(configs) {
         configs = Ninja.tools.ensureDefaults(configs, {
             findParentForm: function(elem) {
               return elem.parents('form')[0]
             },
             retainAttributes: [
-              "id", "class", "style", "title", "lang", "dir", 
+              "name", "class", "style", "title", "lang", "dir", 
               "size", "maxlength", "alt", "tabindex", "accesskey",
               "data-.*"
             ]
@@ -57,9 +81,13 @@ define(["ninja"],
         return new ninja.does({
             priority: 1000,
             helpers: {
-              prepareForSubmit: function() {
-                if($(this.element).attr('type') == 'text') {
-                  $(this.element).val('')
+              swapInAlternate: function() {
+                var el = $(this.element)
+                var id = el.attr("id")
+                if(el.val() == '') {
+                  el.attr("id", '')
+                  el.replaceWith(this.placeholderTextInput)
+                  this.placeholderTextInput.attr('id', id)
                 }
               }
             },
@@ -67,24 +95,23 @@ define(["ninja"],
               var replacement
               var el = $(element)
 
-              try {
-                replacement = el.clone().attr({ type: 'text' })
-              } catch(e) {
-                replacement = $('<input>').attr({ type: 'text' })
-                this.copyAttributes(element, replacement, configs.retainAttributes)
-              }
+              replacement = $('<input type="text">')
+              this.copyAttributes(element, replacement, configs.retainAttributes)
               replacement.addClass("ninja_placeholder")
-              this.stash(el.replaceWith(replacement))
+              replacement.val(this.placeholderText)
 
-              this.applyBehaviors(configs.findParentForm(el), [placeholderSubmitter(this)])
+              var alternate = alternateInput(el, configs.findParentForm(el))
+              this.applyBehaviors(replacement, [alternate])
+
+              this.placeholderTextInput = replacement
+              this.swapInAlternate()
+
               return element
             },
             events: {
-              focus: function(event) {
-                this.stash($(this.element).replaceWith(this.unstash()))
-              },
               blur: function(event) {
-                this.stash($(this.element).replaceWith(this.unstash()))
+                console.log("blur")
+                this.swapInAlternate()
               }
             }
           })

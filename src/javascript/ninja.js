@@ -1,4 +1,4 @@
-define(   ["./utils", "./tools", "./behaviors"], 
+define(   ["utils", "ninja/tools", "ninja/behaviors"], 
   function(Utils,     Tools,     Behaviors) {
     var log = Utils.log
     
@@ -80,4 +80,4 @@ define(   ["./utils", "./tools", "./behaviors"],
     //= require "ninja/behaviors"
 
     return new NinjaScript()
-  })();
+  })

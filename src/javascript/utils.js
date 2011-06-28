@@ -1,17 +1,17 @@
 define(function(){
     return {
       log: function(message) {
-        if(true) { //LOGGING TURNED OFF IS 100% faster!
+        if(false) { //LOGGING TURNED OFF IS 100% faster!
           try {
             console.log(message)
           }
           catch(e) {} //we're in IE or FF w/o Firebug or something
         }
-      }
+      },
 
       isArray: function(candidate) {
         return (candidate.constructor == Array)
-      }
+      },
 
       forEach: function(list, callback, thisArg) {
         if(typeof list.forEach == "function") {

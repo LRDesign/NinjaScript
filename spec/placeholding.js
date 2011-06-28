@@ -14,22 +14,27 @@ describe("Placeholding", function() {
               priority: -10,
               submit: function(event) {
                 console.log("Triggered submit handler")
+                console.log($(this.element).children("input").map(function(idx, itm){
+                      if($(itm).is("input")) {
+                        return $(itm).val()
+                      } else {
+                        return "label"
+                      }
+                    }))
                 formData = $(this.element).serializeArray()
               }
             },
-            "#input_a": Ninja.hasPlaceholder,
-            "#input_d": Ninja.hasPlaceholder,
-            "#pass_c": Ninja.hasPlaceholder
+            "#input_a,#input_d,#pass_c": Ninja.hasPlaceholder
           })
         setFixtures( "<form onsubmit='console.log(\"submitting fixture form\");' id='form_a' action='/fail_on_purpose' method='PUT'>" +
-            "<label id='label_a' for='input_a'>INPUT A!</label>" +
+            "<label id='label_a' data-for='input_a'>INPUT A!</label>" +
             "<input id='input_a' name='a' type='text' />" +
-            "<label id='label_b' for='input_b'>INPUT B!</label>" +
+            "<label id='label_b' data-for='input_b'>INPUT B!</label>" +
             "<input id='input_b' name='b' type='text' />" +
-            "<label id='label_d' for='input_d'>TEXTAREA!</label>" +
-            "<textarea id='input_d' name='d' />" +
-            "<label id='label_c' for='pass_c'>PASSWORD</label>" +
+            "<label id='label_c' data-for='pass_c'>SECRET</label>" +
             "<input id='pass_c' name='c' type='password' />" +
+            "<label id='label_d' data-for='input_d'>TEXTAREA!</label>" +
+            "<textarea id='input_d' name='d' />" +
             "</form>" 
         )
         Ninja.go()
@@ -51,7 +56,7 @@ describe("Placeholding", function() {
                 })).not.toContain("INPUT A!")
             expect($.map(formData, function(itm) {
                   return itm.value
-                })).not.toContain("PASSWORD")
+                })).not.toContain("SECRET")
           })
 
         describe("after inputs have been changed", function() {
@@ -62,9 +67,13 @@ describe("Placeholding", function() {
               $("#input_b").trigger("focus")
               $("#input_b").val("test b")
               $("#input_b").trigger("blur")
+              console.log($('#pass_c').parent())
               $("#pass_c").trigger("focus")
+              console.log($('#pass_c').parent())
               $("#pass_c").val("password")
+              console.log($('#pass_c').parent())
               $("#pass_c").trigger("blur")
+              console.log($('#pass_c').parent())
             })
 
           it("should retain user input", function() {
@@ -95,7 +104,7 @@ describe("Placeholding", function() {
             })
 
           it("label should have .ninja_placeholder class", function() {
-              expect($('#label_a.ninja_placeholder')).toExist()
+              expect($('#label_a')).not.toExist()
             })
 
           xit("passwords should become text", function() {
@@ -122,7 +131,7 @@ describe("Placeholding", function() {
                 })
 
               it("label should have .ninja_placeholder class", function() {
-                  expect($('#label_a.ninja_placeholder')).toExist()
+                  expect($('#label_a')).not.toExist()
                 })
 
               describe("when loses focus with input", function() {
@@ -140,7 +149,7 @@ describe("Placeholding", function() {
                     })
 
                   it("label should have .ninja_placeholder class", function() {
-                      expect($('#label_a.ninja_placeholder')).toExist()
+                      expect($('#label_a')).not.toExist()
                     })
                 })
 
@@ -158,7 +167,7 @@ describe("Placeholding", function() {
                     })
 
                   it("label should have .ninja_placeholder class", function() {
-                      expect($('#label_a.ninja_placeholder')).toExist()
+                      expect($('#label_a')).not.toExist()
                     })
                 })
             })

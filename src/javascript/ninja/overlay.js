@@ -1,4 +1,4 @@
-define(["ninja/utils"],
+define(["utils"],
   function(Utils) {
     var forEach = Utils.forEach
 

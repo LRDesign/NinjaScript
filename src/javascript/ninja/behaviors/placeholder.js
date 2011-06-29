@@ -55,7 +55,6 @@ define(["ninja"],
             },
             events: {
               focus: function(event) {
-                console.log("focus")
                 var el = $(this.element)
                 var id = el.attr("id")
                 el.attr("id", '')
@@ -110,7 +109,6 @@ define(["ninja"],
             },
             events: {
               blur: function(event) {
-                console.log("blur")
                 this.swapInAlternate()
               }
             }

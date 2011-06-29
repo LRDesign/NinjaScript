@@ -50,6 +50,7 @@ namespace :build do
 
   directory "generated/javascript"
   directory "auto-constants"
+  directory "tmp"
 
   task :constants => %w{auto-constants} do
     require 'yaml'
@@ -62,8 +63,37 @@ namespace :build do
     end
   end
 
+  sourcefiles = FileList['src/javascript/**/*.js']
+
+  file "tmp/header-comments.js" => "tmp" do |file|
+    require 'erb'
+    erb = ERB.new(File::read('src/header-comment.js.erb'))
+    File::open(file.to_s, "w") do |file|
+      build_date = Time.new.strftime("%m-%d-%Y")
+      copyright_year = Time.new.strftime("%Y")
+      version = "0.9"
+      file.write( erb.result binding)
+    end
+  end
+
+  file "generated/javascript/ninjascript.js" => %w{tmp/header-comments.js generated/javascript} + sourcefiles do |file|
+    tmpfile = File::join("tmp", file.to_s.gsub(File::Separator, "_"))
+    sh "libs/requirejs/build/buildj.sh name=main out=#{tmpfile} baseUrl=src/javascript includeRequire=true optimize=none"
+    sh "cat tmp/header-comments.js #{tmpfile} > #{file}"
+  end
+
+  file "generated/javascript/ns.min.js" =>
+  %w{generated/javascript/ninjascript.js tmp/header-comments.js} do |file|
+    tmpfile = File::join("tmp", file.to_s.gsub(File::Separator, "_"))
+    sh "java -jar libs/compiler.jar --js generated/javascript/ninjascript.js --js_output_file #{tmpfile}"
+    sh "cat tmp/header-comments.js #{tmpfile} > #{file}"
+  end
+
   desc "Build Ninjascript & assets"
-  task :project => %w{stylesheets:generate generated/javascript constants} do
+  task :project => %w{stylesheets:generate generated/javascript/ninjascript.js generated/javascript/ns.min.js}
+
+  task :sprockets => %w{stylesheets:generate generated/javascript constants} do
+    raise "This is an old task, scheduled for deletion"
     require 'sprockets'
 
     sec = Sprockets::Secretary.new(

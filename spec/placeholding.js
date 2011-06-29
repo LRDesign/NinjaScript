@@ -13,14 +13,6 @@ describe("Placeholding", function() {
             "#form_a": {
               priority: -10,
               submit: function(event) {
-                console.log("Triggered submit handler")
-                console.log($(this.element).children("input").map(function(idx, itm){
-                      if($(itm).is("input")) {
-                        return $(itm).val()
-                      } else {
-                        return "label"
-                      }
-                    }))
                 formData = $(this.element).serializeArray()
               }
             },
@@ -67,13 +59,9 @@ describe("Placeholding", function() {
               $("#input_b").trigger("focus")
               $("#input_b").val("test b")
               $("#input_b").trigger("blur")
-              console.log($('#pass_c').parent())
               $("#pass_c").trigger("focus")
-              console.log($('#pass_c').parent())
               $("#pass_c").val("password")
-              console.log($('#pass_c').parent())
               $("#pass_c").trigger("blur")
-              console.log($('#pass_c').parent())
             })
 
           it("should retain user input", function() {

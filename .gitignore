@@ -5,3 +5,5 @@ doc/*
 css/*
 src/assets/css/
 generated/
+deflist.txt
+tmp/

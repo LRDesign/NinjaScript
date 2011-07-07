@@ -1,18 +1,10 @@
-define(   ["utils", "ninja/tools", "ninja/behaviors"], 
-  function(Utils,     Tools,     Behaviors) {
+define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration"], 
+  function(Utils,     Tools,     Behaviors, Configs) {
     var log = Utils.log
     
     function NinjaScript() {
       //NinjaScript-wide configurations.  Currently, not very many
-      this.config = {
-        //This is the half-assed: it should be template of some sort
-        messageWrapping: function(text, classes) {
-          return "<div class='flash " + classes +"'><p>" + text + "</p></div>"
-        },
-        messageList: "#messages",
-        busyLaziness: 200
-      }
-
+      this.config = Configs
 
       this.behavior = this.goodBehavior
       this.tools = new Tools(this)
@@ -28,6 +20,10 @@ define(   ["utils", "ninja/tools", "ninja/behaviors"],
         }
         result = callback(types)
         this.tools.enrich(this, result)
+      },
+
+      configure: function(opts) {
+        this.tools.enrich(this.config, opts)
       },
 
       goodBehavior: function(dispatching) {
@@ -68,16 +64,6 @@ define(   ["utils", "ninja/tools", "ninja/behaviors"],
         }
       }
     }
-
-    //= require "ninja/tools"
-
-    // XXX These'll be problematic
-    //= require "ninja/ajax-submitter"
-    //= require "ninja/overlay"
-    //= require "ninja/event-scribe"
-    //= require "ninja/root-context"
-    //= require "ninja/behavior-collection"
-    //= require "ninja/behaviors"
 
     return new NinjaScript()
   })

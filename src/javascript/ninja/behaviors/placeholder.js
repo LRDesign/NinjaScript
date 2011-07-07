@@ -13,9 +13,11 @@ define(["ninja"],
 
     function grabsPlaceholderText(configs) {
       configs = Ninja.tools.ensureDefaults(configs, {
-          idref_attr: "data-for",
-          findText: function(elem) {
-            var textHolder = $("*[" + configs.idref_attr + "=" + elem.id + "]")
+          textElementSelector: function(elem) {
+            return "*[data-for=" + elem.id + "]"
+          },
+          findTextElement: function(elem) {
+            var textHolder = $(configs.textElementsSelector(elem))
             if(textHolder.length == 0) {
               return null
             }
@@ -26,7 +28,7 @@ define(["ninja"],
       return new ninja.does({
           priority: -10,
           transform: function(element) {
-            var label = $(configs.findText(element))
+            var label = $(configs.findTextElement(element))
             if( label === null ) {
               this.cantTransform()
             }
@@ -71,7 +73,7 @@ define(["ninja"],
             findParentForm: function(elem) {
               return elem.parents('form')[0]
             },
-            retainAttributes: [
+            retainedInputAttributes: [
               "name", "class", "style", "title", "lang", "dir", 
               "size", "maxlength", "alt", "tabindex", "accesskey",
               "data-.*"
@@ -95,7 +97,7 @@ define(["ninja"],
               var el = $(element)
 
               replacement = $('<input type="text">')
-              this.copyAttributes(element, replacement, configs.retainAttributes)
+              this.copyAttributes(element, replacement, configs.retainedInputAttributes)
               replacement.addClass("ninja_placeholder")
               replacement.val(this.placeholderText)
 

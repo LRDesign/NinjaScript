@@ -53,7 +53,7 @@ define(["ninja", "utils"],
               },
               events: {
                 click:  function(evnt) {
-                  this.overlayAndSubmit(evnt.target, evnt.target.href)
+                  this.overlayAndSubmit(evnt.target, evnt.target.href, configs.actions)
                 }
               }
             })
@@ -83,7 +83,7 @@ define(["ninja", "utils"],
               },
               events: {
                 submit: function(evnt) {
-                  this.overlayAndSubmit(evnt.target, evnt.target.action)
+                  this.overlayAndSubmit(evnt.target, evnt.target.action, configs.actions)
                 }
               }
             })
@@ -102,7 +102,7 @@ define(["ninja", "utils"],
         becomesAjaxLink: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs, {
               busyElement: undefined,
-              retainAttributes: ["id", "class", "lang", "dir", "title", "data-.*"]
+              retainedFormAttributes: ["id", "class", "lang", "dir", "title", "data-.*"]
             })
 
           return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink(configs) ]
@@ -122,7 +122,7 @@ define(["ninja", "utils"],
          **/
         becomesLink: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs, {
-              retainAttributes: ["id", "class", "lang", "dir", "title", "rel", "data-.*"]
+              retainedFormAttributes: ["id", "class", "lang", "dir", "title", "rel", "data-.*"]
             })
 
           return new ninja.does({
@@ -146,7 +146,7 @@ define(["ninja", "utils"],
                 }
 
                 var link = jQuery("<a rel='nofollow' href='#'>" + linkText + "</a>")
-                this.copyAttributes(form, link, configs.retainAttributes)
+                this.copyAttributes(form, link, configs.retainedFormAttributes)
                 this.stash(jQuery(form).replaceWith(link))
 
                 return link

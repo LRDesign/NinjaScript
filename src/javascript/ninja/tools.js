@@ -18,12 +18,23 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", "ut
       enrich: function(left, right) {
         return jQuery.extend(left, right)
       },
+
       ensureDefaults: function(config, defaults) {
-        if(!config instanceof Object) {
+        if(!(config instanceof Object)) {
           config = {}
         }
-        return this.enrich(defaults, config)
+        for(var key in defaults) {
+          if(typeof config[key] == "undefined") {
+            if(typeof this.ninja.config[key] != "undefined") {
+              config[key] = this.ninja.config[key]
+            } else if(typeof defaults[key] != "undefined") {
+              config[key] = defaults[key]
+            }
+          }
+        }
+        return config
       },
+
       //DOM and Events
       getRootOfDocument: function() {
         return jQuery("html") //document.firstChild)

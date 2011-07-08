@@ -17,7 +17,7 @@ define(["ninja"],
             return "*[data-for=" + elem.id + "]"
           },
           findTextElement: function(elem) {
-            var textHolder = $(configs.textElementsSelector(elem))
+            var textHolder = $(configs.textElementSelector(elem))
             if(textHolder.length == 0) {
               return null
             }

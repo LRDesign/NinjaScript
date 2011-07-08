@@ -1,5 +1,5 @@
-define(["utils"],
-  function(Utils) {
+define(["utils", "ninja"],
+  function(Utils, Ninja) {
     var forEach = Utils.forEach
 
     function Overlay(list) {
@@ -62,6 +62,38 @@ define(["utils"],
         this.set.remove()
       }
     }
+
+
+    Ninja.packageTools({
+        overlay: function() {
+          // I really liked using 
+          //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
+          //but IE8 doesn't implement ECMA 2.6.2 5th ed.
+
+          return new Overlay(jQuery.makeArray(arguments))
+        },
+        busyOverlay: function(elem) {
+          var overlay = this.overlay(elem)
+          overlay.set.addClass("ninja_busy")
+          overlay.laziness = this.ninja.config.busyLaziness
+          return overlay
+        },
+        //Currently, this doesn't respect changes to the original block...
+        //There should be an "Overlay behavior" that gets applied
+        buildOverlayFor: function(elem) {
+          var overlay = jQuery(document.createElement("div"))
+          var hideMe = jQuery(elem)
+          var offset = hideMe.offset()
+          overlay.css("position", "absolute")
+          overlay.css("top", offset.top)
+          overlay.css("left", offset.left)
+          overlay.width(hideMe.outerWidth())
+          overlay.height(hideMe.outerHeight())
+          overlay.css("zIndex", "2")
+          return overlay
+        }
+      })
+
     return Overlay
   })
 

@@ -1,8 +1,8 @@
-define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", "utils", "ninja/overlay", "ninja/ajax-submitter", "ninja/json-handler", "ninja/root-context"
+define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", 
+    "utils", "ninja/root-context"
   ], function(
     Behaviors,     BehaviorCollection,      Exceptions,     
-    Utils,     Overlay,     AjaxSubmitter,      JSONHandler,
-    rootContext
+    Utils,     rootContext
   ) {
     var CantTransformException = Exceptions.CantTransform
     var log = Utils.log
@@ -52,14 +52,6 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", "ut
         var collection = new BehaviorCollection(this)
         rootOfDocument.data("ninja-behavior", collection);
         return collection
-      },
-      suppressChangeEvents: function() {
-        return new Behaviors.base({
-            events: {
-              DOMSubtreeModified: function(e){},
-              DOMNodeInserted: function(e){}
-            }
-          })
       },
       addMutationTargets: function(targets) {
         this.getRootCollection().addMutationTargets(targets)
@@ -134,81 +126,10 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", "ut
 
         var hide = jQuery("<div id='ninja-hide'></div>").css("display", "none")
         jQuery("body").append(hide)
-        this.getRootCollection().applyBehaviorsTo(hide, [this.suppressChangeEvents()])
+        this.getRootCollection().applyBehaviorsTo(hide, [this.ninja.suppressChangeEvents()])
         return hide
-      },
-      overlay: function() {
-        // I really liked using 
-        //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
-        //but IE8 doesn't implement ECMA 2.6.2 5th ed.
-
-        return new Overlay(jQuery.makeArray(arguments))
-      },
-      busyOverlay: function(elem) {
-        var overlay = this.overlay(elem)
-        overlay.set.addClass("ninja_busy")
-        overlay.laziness = this.ninja.config.busyLaziness
-        return overlay
-      },
-      //Currently, this doesn't respect changes to the original block...
-      //There should be an "Overlay behavior" that gets applied
-      buildOverlayFor: function(elem) {
-        var overlay = jQuery(document.createElement("div"))
-        var hideMe = jQuery(elem)
-        var offset = hideMe.offset()
-        overlay.css("position", "absolute")
-        overlay.css("top", offset.top)
-        overlay.css("left", offset.left)
-        overlay.width(hideMe.outerWidth())
-        overlay.height(hideMe.outerHeight())
-        overlay.css("zIndex", "2")
-        return overlay
-      },
-
-      jsonHandler: function(desc) {
-        return new JSONHandler(desc)
-      },
-
-      ajaxSubmitter: function() {
-        return new AjaxSubmitter()
-      },
-
-      ajaxToJson: function(desc) {
-        var handler = this.jsonHandler(desc)
-        var submitter = this.ajaxSubmitter()
-        submitter.dataType = 'json'
-        submitter.onSuccess = function(xhr, statusText, data) {
-          handler.receive(data)
-        }
-        return submitter
-      },
-
-      overlayAndSubmit: function(target, action, jsonHandling) {
-        var overlay = this.busyOverlay(this.findOverlay(target))
-
-        var submitter
-        if( typeof jsonHandling == "undefined" ) {
-          submitter = this.ajaxSubmitter()
-        }
-        else {
-          submitter = this.ajaxToJson(jsonHandling)
-        }
-
-        submitter.sourceForm(target)
-
-        submitter.action = action
-        submitter.method = this.extractMethod(target, submitter.formData)
-
-        submitter.onResponse = function(xhr, statusTxt) {
-          overlay.remove()
-        }
-        overlay.affix()
-        submitter.submit()
       }
     }
 
     return Tools;
-
-    //= require "ajax-submitter"
-    //= require "json-handler"
   })

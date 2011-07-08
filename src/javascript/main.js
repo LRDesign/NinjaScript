@@ -1,12 +1,9 @@
 require([
     "ninja",
-
-    "ninja/behaviors/standard",
-    "ninja/behaviors/placeholder",
-    "ninja/behaviors/trigger-on",
-
+    "ninja/behaviors/all",
+    "ninja/tools/all",
     "ninja/jquery"
-  ], function(Ninja, stdBehaviors, placeholder, triggerOn, jquery) {
+  ], function(Ninja, stdBehaviors, placeholder, triggerOn, allTools, jquery) {
     window["Ninja"] = Ninja
     Ninja['behavior'] = Ninja.behavior
 

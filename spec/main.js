@@ -1,10 +1,7 @@
 require([
     "ninja",
-
-    "ninja/behaviors/standard",
-    "ninja/behaviors/placeholder",
-    "ninja/behaviors/trigger-on",
-
+    "ninja/behaviors/all",
+    "ninja/tools/all",
     "ninja/jquery"
   ], function(ninja, stdBehaviors, placeholder, triggerOn, jquery) {
     Ninja = ninja

@@ -22,6 +22,10 @@ define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration"],
         this.tools.enrich(this, result)
       },
 
+      packageTools: function(object) {
+        this.tools.enrich(Tools.prototype, object)
+      },
+
       configure: function(opts) {
         this.tools.enrich(this.config, opts)
       },

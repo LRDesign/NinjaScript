@@ -1,4 +1,4 @@
-define(["utils"], function(Utils) {
+define(["ninja", "utils", "./json-handler", "./overlay"], function(Ninja, Utils, jH, O) {
     var log = Utils.log
 
     function AjaxSubmitter() {
@@ -56,6 +56,47 @@ define(["utils"], function(Utils) {
         Ninja.tools.message("Server error: " + xhr.statusText, "error")
       }
     }
+
+
+    Ninja.packageTools({
+        ajaxSubmitter: function() {
+          return new AjaxSubmitter()
+        },
+
+        ajaxToJson: function(desc) {
+          var handler = this.jsonHandler(desc)
+          var submitter = this.ajaxSubmitter()
+          submitter.dataType = 'json'
+          submitter.onSuccess = function(xhr, statusText, data) {
+            handler.receive(data)
+          }
+          return submitter
+        },
+
+        overlayAndSubmit: function(target, action, jsonHandling) {
+          var overlay = this.busyOverlay(this.findOverlay(target))
+
+          var submitter
+          if( typeof jsonHandling == "undefined" ) {
+            submitter = this.ajaxSubmitter()
+          }
+          else {
+            submitter = this.ajaxToJson(jsonHandling)
+          }
+
+          submitter.sourceForm(target)
+
+          submitter.action = action
+          submitter.method = this.extractMethod(target, submitter.formData)
+
+          submitter.onResponse = function(xhr, statusTxt) {
+            overlay.remove()
+          }
+          overlay.affix()
+          submitter.submit()
+        }
+      })
+
 
     return AjaxSubmitter
   })

@@ -5,7 +5,7 @@ way we use CSS stylesheets to apply stylings.  Additionally, NinjaScript makes
 it easy to package up useful behaviors and apply them quickly to disparate
 elements, or in different projects.
 
-For more information, [[check out the wiki|https://github.com/LRDesign/NinjaScript/wiki]]
+For more information, see https://github.com/LRDesign/NinjaScript/wiki
 
 ## Contributing
 

@@ -71,7 +71,7 @@ namespace :build do
     File::open(file.to_s, "w") do |file|
       build_date = Time.new.strftime("%m-%d-%Y")
       copyright_year = Time.new.strftime("%Y")
-      version = "0.9"
+      version = "0.10"
       file.write( erb.result binding)
     end
   end

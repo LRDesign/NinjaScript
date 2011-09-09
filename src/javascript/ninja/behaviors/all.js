@@ -2,7 +2,7 @@ define([
     "./utility",
     "./standard", 
     "./placeholder", 
-    "./trigger-on"
+    "./trigger-on",
     "./confirm"
   ], 
   function(){})

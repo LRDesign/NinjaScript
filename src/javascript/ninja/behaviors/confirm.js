@@ -3,9 +3,10 @@ define(["ninja"],
     Ninja.packageBehaviors( function(ninja) {
         return {
           confirms: function(configs) {
+
             configs = Ninja.tools.ensureDefaults(configs,
               { confirmMessage: function(elem){
-                  return $(elem).attr('data-confirm'))
+                  return $(elem).attr('data-confirm')
                 }})
             if(typeof configs.confirmMessage == "string"){
               message = configs.confirmMessage
@@ -15,7 +16,7 @@ define(["ninja"],
             }
 
             function confirmDefault(event,elem) {
-              if(!confirm(configs.confirmMessage(elem)) {
+              if(!confirm(configs.confirmMessage(elem))) {
                 event.preventDefault()
               }
             }

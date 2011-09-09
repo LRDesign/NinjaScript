@@ -131,6 +131,7 @@ define(["ninja/exceptions"], function(Exceptions) {
           config = config.slice(1,config.length)
           var len = config.length
           for(var i = 0; i < len; i++) {
+            var found = true
             if (config[i] == "andDoDefault" || config[i] == "allowDefault") {
               stopDefault = false
             }
@@ -144,11 +145,18 @@ define(["ninja/exceptions"], function(Exceptions) {
             if (config[i] == "changesDOM") {
               fireMutation = true
             }
+            if (!found) {
+              console.log("Event handler modifier unrecognized: " + config[i])
+            }
           }
         }
         var handler = function(eventRecord) {
           handle.call(context, eventRecord, this, previousHandler)
-          return !stopDefault
+          if(stopDefault){
+            return false
+          } else {
+            return eventRecord.isDefaultPrevented()
+          }
         }
         if(stopDefault) {
           handler = this.prependAction(handler, function(eventRecord) {

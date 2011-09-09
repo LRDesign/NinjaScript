@@ -3,5 +3,6 @@ define([
     "./standard", 
     "./placeholder", 
     "./trigger-on"
+    "./confirm"
   ], 
   function(){})

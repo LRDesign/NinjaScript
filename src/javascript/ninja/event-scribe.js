@@ -5,19 +5,22 @@ define( function() {
     }
 
     EventScribe.prototype = {
-      makeHandlersRemove: function(element) {
-        for(var eventName in this.handlers) {
-          var handler = this.handlers[eventName]
-          this.handlers[eventName] = function(eventRecord) {
-            handler.call(this, eventRecord)
-            jQuery(element).remove()
-          }
-        }
-      },
+      //I'll be frank: I don't remember what this method is for,
+      //so I'm not comfortable keeping it in play.
+//      makeHandlersRemove: function(element) { 
+//        for(var eventName in this.handlers) {
+//          var handler = this.handlers[eventName]
+//          this.handlers[eventName] = function(eventRecord) {
+//            var res = handler.call(eventRecord)
+//            //jQuery(element).remove()
+//            return res
+//          }
+//        }
+//      },
       recordEventHandlers: function (context, behavior) {
         if(this.currentElement !== context.element) {
           if(this.currentElement !== null) {
-            this.makeHandlersRemove(this.currentElement)
+            //this.makeHandlersRemove(this.currentElement)
             this.applyEventHandlers(this.currentElement)
             this.handlers = {}
           }

@@ -155,7 +155,7 @@ define(["ninja/exceptions"], function(Exceptions) {
           if(stopDefault){
             return false
           } else {
-            return eventRecord.isDefaultPrevented()
+            return !eventRecord.isDefaultPrevented()
           }
         }
         if(stopDefault) {

@@ -1,6 +1,6 @@
 define([
     "./overlay",
     "./ajax-submitter",
-    "./json-handler"
+    "./json-dispatcher"
   ],
   function() { })

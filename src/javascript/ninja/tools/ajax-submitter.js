@@ -1,4 +1,4 @@
-define(["ninja", "utils", "./json-handler", "./overlay"], function(Ninja, Utils, jH, O) {
+define(["ninja", "utils", "./json-dispatcher", "./overlay"], function(Ninja, Utils, jH, O) {
     var log = Utils.log
 
     function AjaxSubmitter() {
@@ -64,11 +64,10 @@ define(["ninja", "utils", "./json-handler", "./overlay"], function(Ninja, Utils,
         },
 
         ajaxToJson: function(desc) {
-          var handler = this.jsonHandler(desc)
           var submitter = this.ajaxSubmitter()
           submitter.dataType = 'json'
           submitter.onSuccess = function(xhr, statusText, data) {
-            handler.receive(data)
+            Ninja.jsonDispatcher.dispatch(data)
           }
           return submitter
         },

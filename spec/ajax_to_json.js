@@ -8,8 +8,7 @@ describe("AjaxToJson", function() {
     beforeEach(function() {
         setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
         target = {}
-        submitter = Ninja.tools.ajaxToJson( 
-          {
+        Ninja.respondToJson({
             shallow: function(html) {
               target.shallow = html
             },
@@ -20,8 +19,21 @@ describe("AjaxToJson", function() {
                 }
               }
             }
-          }
-        )
+          })
+        Ninja.respondToJson(function(json) {
+            target.functionDid = json
+          })
+        Ninja.respondToJson({
+            shallow: function(){
+              throw "Just an error"
+            }
+          })
+        Ninja.respondToJson({
+            shallow: function(html) {
+              target.andAlso = html
+            }
+          })
+        submitter = Ninja.tools.ajaxToJson( )
 
         mockAjax()
       })
@@ -37,15 +49,31 @@ describe("AjaxToJson", function() {
         expect(ajaxRequests.length).toEqual(1)
       })
 
-    it("should act on the resulting JSON", function() {
-        submitter.submit()
-        ajaxRequests[0].response({
-            status: 200, 
-            contentType: "application/json", 
-            responseText: '{ "shallow": "testing", "three": { "levels": { "deep": 17 } } }'
+    describe("acting on JSON result", function() {
+        beforeEach(function() {
+            submitter.submit()
+            ajaxRequests[0].response({
+                status: 200, 
+                contentType: "application/json", 
+                responseText: '{ "shallow": "testing", "three": { "levels": { "deep": 17 } } }'
 
+              })
           })
-        expect(target.shallow).toEqual("testing")
-        expect(target.deep).toEqual(17)
+
+        it("should act on simple keys", function() {
+            expect(target.shallow).toEqual("testing")
+          })
+
+        it("should do everything for a key", function() {
+            expect(target.andAlso).toEqual("testing")
+          })
+
+        it("should act on a root handler", function() {
+            expect(target.functionDid.shallow).toEqual("testing")
+          })
+
+        it("should act on deep keys", function() {
+            expect(target.deep).toEqual(17)
+          })
       })
   })

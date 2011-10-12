@@ -1,5 +1,5 @@
-define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration"], 
-  function(Utils,     Tools,     Behaviors, Configs) {
+define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration", 'ninja/tools/json-dispatcher'], 
+  function(Utils,     Tools,     Behaviors, Configs, JSONDispatcher) {
     var log = Utils.log
     
     function NinjaScript() {
@@ -7,6 +7,7 @@ define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration"],
       this.config = Configs
 
       this.behavior = this.goodBehavior
+      this.jsonDispatcher = new JSONDispatcher()
       this.tools = new Tools(this)
     }
 
@@ -46,6 +47,10 @@ define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration"],
 
       badBehavior: function(nonsense) {
         throw new Error("Called Ninja.behavior() after Ninja.go() - don't do that.  'Go' means 'I'm done, please proceed'")
+      },
+
+      respondToJson: function(handlerConfig) {
+        this.jsonDispatcher.addHandler(handlerConfig)
       },
 
       go: function() {

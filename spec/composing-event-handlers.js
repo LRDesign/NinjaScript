@@ -7,16 +7,15 @@ describe("Composed Event Handlers", function() {
 
         Ninja.behavior({
             "#test-target": {
-              "tested": function(event, behavior, oldHandler) {
-                triggeredEvidence.push("I was here")
+              "tested" :function(event, behavior ) {
+                triggeredEvidence.push("And so was I")
               }
             }
           })
         Ninja.behavior({
             "#test-target": {
-              "tested" :function(event, behavior, oldHandler) {
-                oldHandler(event)
-                triggeredEvidence.push("And so was I")
+              "tested": function(event, behavior ) {
+                triggeredEvidence.push("I was here")
               }
             }
           })

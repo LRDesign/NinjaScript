@@ -23,11 +23,11 @@ define(["ninja"],
 
             return new ninja.selects({
                 "form": new ninja.does({
-                  priority: -100,
+                  priority: 20,
                   events: { submit: [confirmDefault, "andDoDefault"] }
                 }),
                 "a,input": new ninja.does({
-                  priority: -100,
+                  priority: 20,
                   events: {  click: [confirmDefault, "andDoDefault"] }
                 })
               })

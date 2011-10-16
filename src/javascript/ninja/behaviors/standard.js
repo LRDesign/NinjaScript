@@ -75,7 +75,7 @@ define(["ninja", "utils"],
             { busyElement: undefined })
 
           return new ninja.does({
-              priority: 20,
+              priority: 10,
               helpers: {
                 findOverlay: function(elem) {
                   return this.deriveElementsFrom(elem, configs.busyElement)

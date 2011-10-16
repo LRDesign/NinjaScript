@@ -117,6 +117,7 @@ define(["ninja/exceptions"], function(Exceptions) {
       },
       buildHandler: function(context, eventName, previousHandler) {
         var handle
+        var fallThrough = true
         var stopDefault = true
         var stopPropagate = true
         var stopImmediate = false
@@ -132,7 +133,13 @@ define(["ninja/exceptions"], function(Exceptions) {
           var len = config.length
           for(var i = 0; i < len; i++) {
             var found = true
-            if (config[i] == "andDoDefault" || config[i] == "allowDefault") {
+            if (config[i] == "dontContinue" ||
+              config[i] == "overridesOthers") {
+              fallThrough = false
+            }
+            if (config[i] == "andDoDefault" || 
+              config[i] == "continues" ||
+              config[i] == "allowDefault") {
               stopDefault = false
             }
             if (config[i] == "allowPropagate" || config[i] == "dontStopPropagation") {
@@ -151,12 +158,20 @@ define(["ninja/exceptions"], function(Exceptions) {
           }
         }
         var handler = function(eventRecord) {
-          handle.call(context, eventRecord, this, previousHandler)
+          handle.call(context, eventRecord, this)
+          if(!eventRecord.isFallthroughPrevented()) {
+            previousHandler.call(context, eventRecord)
+          }
           if(stopDefault){
             return false
           } else {
             return !eventRecord.isDefaultPrevented()
           }
+        }
+        if(!fallThrough) {
+          handler = this.prependAction(handler, function(eventRecord) {
+              eventRecord.preventFallthrough()
+            })
         }
         if(stopDefault) {
           handler = this.prependAction(handler, function(eventRecord) {
@@ -178,6 +193,12 @@ define(["ninja/exceptions"], function(Exceptions) {
               Ninja.tools.fireMutationEvent()
             })
         }
+        handler = this.prependAction(handler, function(eventRecord) {
+            eventRecord.isFallthroughPrevented = function(){ return false };
+            eventRecord.preventFallthrough = function(){
+              eventRecord.isFallthroughPrevented =function(){ return true };
+            }
+          })
 
         return handler
       },

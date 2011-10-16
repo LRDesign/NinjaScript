@@ -18,6 +18,7 @@ define(["ninja"],
             function confirmDefault(event,elem) {
               if(!confirm(configs.confirmMessage(elem))) {
                 event.preventDefault()
+                event.preventFallthrough()
               }
             }
 

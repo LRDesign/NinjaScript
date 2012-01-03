@@ -5,18 +5,25 @@ define(["utils"], function(Utils) {
 
     JSONDispatcher.prototype = {
       addHandler: function(handler) {
-        this.handlers.push({ handler: new JSONHandler(handler) })
+        this.handlers.push(new JSONHandler(handler))
       },
       dispatch: function(json) {
         var len = this.handlers.length
         for(var i = 0; i < len; i++) {
           try {
-            this.handlers[i].handler.receive(json)
+            this.handlers[i].receive(json)
           }
           catch(problem) {
             Utils.log("Caught: " + problem + " while handling JSON response.")
           }
         }
+      },
+      inspect: function() {
+        var handlers = []
+        Utils.forEach(this.handlers, function(handler){
+            handlers.push(handler.inspect())
+          })
+        return "JSONDispatcher, " + this.handlers.length + " handlers:\n" + handlers.join("\n")
       }
     }
 
@@ -66,6 +73,23 @@ define(["utils"], function(Utils) {
           }
         }
         return null
+      },
+      inspectTree: function(desc) {
+        var keys = []
+        for(var key in desc) {
+          if(typeof desc[key] == "function") {
+            keys.push(key)
+          }
+          else {
+            Utils.forEach(this.inspectTree(desc[key]), function(subkey) {
+                keys.push(key + "." + subkey)
+              })
+          }
+        }
+        return keys
+      },
+      inspect: function() {
+        return this.inspectTree(this.desc).join("\n")
       }
     }
 

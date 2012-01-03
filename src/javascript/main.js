@@ -9,7 +9,7 @@ require([
     "ninja/behaviors/all",
     "ninja/tools/all",
     "ninja/jquery"
-  ], function(Ninja, stdBehaviors, placeholder, triggerOn, allTools, jquery) {
+  ], function(Ninja, stdBehaviors, allTools, jquery) {
     var ninjaOrders = window["Ninja"].orderList
     var ordersLength = ninjaOrders.length
 

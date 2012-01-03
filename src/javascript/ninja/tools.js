@@ -4,7 +4,7 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions",
     Behaviors,     BehaviorCollection,      Exceptions,     
     Utils,     rootContext
   ) {
-    var CantTransformException = Exceptions.CantTransform
+    var TransformFailedException = Exceptions.TransformFailed
     var log = Utils.log
 
     function Tools(ninja) {
@@ -108,8 +108,8 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions",
         return "GET"
       },
       //Ninjascript utils
-      cantTransform: function() {
-        throw new TransformFailedException
+      cantTransform: function(message) {
+        throw new TransformFailedException(message)
       },
       applyBehaviors: function(element, behaviors) {
         this.getRootCollection().apply(element, behaviors)

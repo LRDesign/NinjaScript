@@ -16,7 +16,7 @@ define(["ninja/exceptions"], function(Exceptions) {
           return chosen.choose(element)
         }
         else {
-          throw new CouldntChooseException
+          throw new CouldntChooseException("Couldn't choose behavior for " . element.toString())
         }
       }
     }

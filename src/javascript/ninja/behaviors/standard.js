@@ -43,7 +43,10 @@ define(["ninja", "utils"],
             { busyElement: function(elem) {
                 return $(elem).parents('address,blockquote,body,dd,div,p,dl,dt,table,form,ol,ul,tr')[0]
               }})
-
+          if(!configs.actions) {
+            configs.actions = configs.expectsJSON
+          }
+ 
           return new ninja.does({
               priority: 10,
               helpers: {
@@ -73,6 +76,10 @@ define(["ninja", "utils"],
         submitsAsAjaxForm: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs,
             { busyElement: undefined })
+
+          if(!configs.actions) {
+            configs.actions = configs.expectsJSON
+          }
 
           return new ninja.does({
               priority: 10,

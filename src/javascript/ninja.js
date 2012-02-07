@@ -1,7 +1,9 @@
-define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration", 'ninja/tools/json-dispatcher'], 
+define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration", 'ninja/tools/json-dispatcher'],
   function(Utils,     Tools,     Behaviors, Configs, JSONDispatcher) {
-    var log = Utils.log
-    
+    function log(message) {
+      Utils.log(message)
+    };
+
     function NinjaScript() {
       //NinjaScript-wide configurations.  Currently, not very many
       this.config = Configs
@@ -33,11 +35,11 @@ define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration", 'ni
 
       goodBehavior: function(dispatching) {
         var collection = this.tools.getRootCollection()
-        for(var selector in dispatching) 
+        for(var selector in dispatching)
         {
           if(typeof dispatching[selector] == "undefined") {
             log("Selector " + selector + " not properly defined - ignoring")
-          } 
+          }
           else {
             collection.addBehavior(selector, dispatching[selector])
           }

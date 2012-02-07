@@ -157,10 +157,14 @@ define(["ninja/exceptions"], function(Exceptions) {
             }
           }
         }
-        var handler = function(eventRecord, extraData) {
-          handle.call(context, eventRecord, this, extraData)
+        var handler = function() {
+          var eventRecord = Array.prototype.shift.call(arguments)
+          Array.prototype.unshift.call(arguments, this)
+          Array.prototype.unshift.call(arguments, eventRecord)
+
+          handle.apply(context, arguments)
           if(!eventRecord.isFallthroughPrevented()) {
-            previousHandler.call(this, eventRecord, extraData)
+            previousHandler.apply(context, arguments)
           }
           if(stopDefault){
             return false
@@ -203,15 +207,15 @@ define(["ninja/exceptions"], function(Exceptions) {
         return handler
       },
       prependAction: function(handler, doWhat) {
-        return function(eventRecord, extraData) {
-          doWhat.call(this, eventRecord, extraData)
-          return handler.call(this, eventRecord, extraData)
+        return function() {
+          doWhat.apply(this, arguments)
+          return handler.apply(this, arguments)
         }
       },
       appendAction: function(handler, doWhat) {
-        return function(eventRecord, extraData) {
-          var result = handler.call(this, eventRecord, extraData)
-          doWhat.call(this, eventRecord, extraData)
+        return function() {
+          var result = handler.apply(this, arguments)
+          doWhat.apply(this, arguments)
           return result
         }
       },

@@ -1,11 +1,13 @@
-define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions", 
+define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions",
     "utils", "ninja/root-context"
   ], function(
-    Behaviors,     BehaviorCollection,      Exceptions,     
+    Behaviors,     BehaviorCollection,      Exceptions,
     Utils,     rootContext
   ) {
     var TransformFailedException = Exceptions.TransformFailed
-    var log = Utils.log
+    function log(message) {
+      Utils.log(message)
+    }
 
     function Tools(ninja) {
       this.ninja = ninja
@@ -83,13 +85,13 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions",
         }
       },
       extractMethod: function(element, formData) {
-        if(element.dataset !== undefined && 
-          element.dataset["method"] !== undefined && 
+        if(element.dataset !== undefined &&
+          element.dataset["method"] !== undefined &&
           element.dataset["method"].length > 0) {
           log("Override via dataset: " + element.dataset["method"])
           return element.dataset["method"]
         }
-        if(element.dataset === undefined && 
+        if(element.dataset === undefined &&
           jQuery(element).attr("data-method") !== undefined) {
           log("Override via data-method: " + jQuery(element).attr("data-method"))
           return jQuery(element).attr("data-method")
@@ -104,7 +106,7 @@ define([ "ninja/behaviors", "ninja/behavior-collection", "ninja/exceptions",
         }
         if(typeof element.method !== "undefined") {
           return element.method
-        } 
+        }
         return "GET"
       },
       //Ninjascript utils

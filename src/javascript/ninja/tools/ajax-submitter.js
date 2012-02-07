@@ -1,5 +1,7 @@
 define(["ninja", "utils", "./json-dispatcher", "./overlay"], function(Ninja, Utils, jH, O) {
-    var log = Utils.log
+    function log(message) {
+      Utils.log(message)
+    }
 
     function AjaxSubmitter() {
       this.formData = []

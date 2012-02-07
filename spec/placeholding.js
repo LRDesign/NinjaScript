@@ -7,7 +7,6 @@ describe("Placeholding", function() {
     var formData
     beforeEach(function() {
         formData = "didn't trigger"
-
         Ninja.tools.clearRootCollection()
         Ninja.behavior({
             "#form_a": {
@@ -27,7 +26,7 @@ describe("Placeholding", function() {
             "<input id='pass_c' name='c' type='password' />" +
             "<label id='label_d' data-for='input_d'>TEXTAREA!</label>" +
             "<textarea id='input_d' name='d' />" +
-            "</form>" 
+            "</form>"
         )
         Ninja.go()
       })
@@ -79,7 +78,7 @@ describe("Placeholding", function() {
           })
         })
       })
-    
+
     describe("on inputs", function() {
         //Need to check that placholder is set
         if(!input_placeholder) {
@@ -163,4 +162,3 @@ describe("Placeholding", function() {
     })
 
   })
-

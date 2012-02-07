@@ -1,17 +1,19 @@
 define(["ninja", "utils"],
   function(Ninja, Utils) {
-    var log = Utils.log
+    function log(message) {
+      Utils.log(message)
+    }
     Ninja.packageBehaviors( function(ninja){
       return {
         /**
          * Ninja.submitsAsAjax(configs) -> null
-         * - configs(Object): configuration for the behavior, passed directly 
+         * - configs(Object): configuration for the behavior, passed directly
          *   to either submitsAsAjaxLink or submitsAsAjaxForm
          *
          * Converts either a link or a form to send its requests via AJAX - we
-         * eval the Javascript we get back.  We get an busy overlay if 
+         * eval the Javascript we get back.  We get an busy overlay if
          * configured to do so.
-         * 
+         *
          * This farms out the actual behavior to submitsAsAjaxLink and
          * submitsAsAjaxForm, c.f.
          **/
@@ -36,7 +38,7 @@ define(["ninja", "utils"],
          * get Javascript back, which is eval'd.  While we're waiting, we'll
          * throw up a busy overlay if configured to do so.  By default, we don't
          * use a busy overlay.
-         * 
+         *
          **/
         submitsAsAjaxLink: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs,
@@ -46,7 +48,7 @@ define(["ninja", "utils"],
           if(!configs.actions) {
             configs.actions = configs.expectsJSON
           }
- 
+
           return new ninja.does({
               priority: 10,
               helpers: {
@@ -62,7 +64,7 @@ define(["ninja", "utils"],
             })
         },
 
-        /** 
+        /**
          * Ninja.submitAsAjaxForm(configs) -> null
          *
          * Converts a form to send its request via Ajax - we assume that we get
@@ -71,8 +73,8 @@ define(["ninja", "utils"],
          * Method input. While we're waiting, we'll throw up a busy overlay if
          * configured to do so.  By default, we use the form itself as the busy
          * element.
-         * 
-         **/ 
+         *
+         **/
         submitsAsAjaxForm: function(configs) {
           configs = Ninja.tools.ensureDefaults(configs,
             { busyElement: undefined })
@@ -97,9 +99,9 @@ define(["ninja", "utils"],
         },
 
 
-        /** 
+        /**
          * Ninja.becomesAjaxLink( configs ) -> null
-         * 
+         *
          * Converts a whole form into a link that submits via AJAX.  The
          * intention is that you create a <form> elements with hidden inputs and
          * a single submit button - then when we transform it, you don't lose
@@ -115,7 +117,7 @@ define(["ninja", "utils"],
           return [ Ninja.submitsAsAjax(configs), Ninja.becomesLink(configs) ]
         },
 
-        /** 
+        /**
          * Ninja.becomesLink( configs ) -> null
          *
          * Replaces a form with a link - the text of the link is based on the
@@ -139,17 +141,17 @@ define(["ninja", "utils"],
                 if ((images = jQuery('input[type=image]', form)).size() > 0){
                   image = images[0]
                   linkText = "<img src='" + image.src + "' alt='" + image.alt +"'";
-                } 
+                }
                 else if((submits = jQuery('input[type=submit]', form)).size() > 0) {
                   submit = submits[0]
                   if(submits.size() > 1) {
                     log("Multiple submits.  Using: " + submit)
                   }
                   linkText = submit.value
-                } 
+                }
                 else {
                   log("Couldn't find a submit input in form");
-                  this.cantTransform()
+                  this.cantTransform("Couldn't find a submit input")
                 }
 
                 var link = jQuery("<a rel='nofollow' href='#'>" + linkText + "</a>")
@@ -167,14 +169,14 @@ define(["ninja", "utils"],
 
         },
 
-        /** 
+        /**
          * Ninja.decay( configs ) -> null
          *
          * Use for elements that should be transient.  For instance, the
          * default behavior of failed AJAX calls is to insert a message into a
          * div#messages with a "flash" class.  You can use this behavior to
          * have those disappear after a few seconds.
-         * 
+         *
          * Configs: { lifetime: 10000, diesFor: 600 }
          **/
 

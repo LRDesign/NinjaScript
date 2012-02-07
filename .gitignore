@@ -7,3 +7,9 @@ src/assets/css/
 generated/
 deflist.txt
 tmp/
+JSTD-coverage.conf
+index.html
+log/
+ninjascript-testlibs.tar.gz
+ninjascript.zip
+pkg/

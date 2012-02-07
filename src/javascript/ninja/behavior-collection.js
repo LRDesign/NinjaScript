@@ -1,8 +1,10 @@
-define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/exceptions"], 
+define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/exceptions"],
   function(Sizzle, Behaviors, Utils, EventScribe, Exceptions) {
 
     var forEach = Utils.forEach
-    var log = Utils.log
+    function log(message) {
+      Utils.log(message)
+    }
 
     var TransformFailedException = Exceptions.TransformFailed
     var CouldntChooseException = Exceptions.CouldntChoose
@@ -26,7 +28,7 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
         }
         else if(behavior instanceof Behaviors.base) {
           this.insertBehavior(selector, behavior)
-        } 
+        }
         else if(behavior instanceof Behaviors.select) {
           this.insertBehavior(selector, behavior)
         }
@@ -59,8 +61,8 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
       fireMutationEvent: function() {
         var targets = this.mutationTargets
         if (targets.length > 0 ) {
-          for(var target = targets[0]; 
-            targets.length > 0; 
+          for(var target = targets[0];
+            targets.length > 0;
             target = targets.shift()) {
             jQuery(target).trigger("thisChangedDOM")
           }
@@ -92,7 +94,7 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
         if(!eventCovered) {
           uncovered.unshift(evnt)
           this.eventQueue = uncovered
-        } 
+        }
       },
       handleQueue: function(){
         while (this.eventQueue.length != 0){
@@ -104,8 +106,8 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
         return this.applyBehaviorsInContext(new this.tools.behaviorContext, element, behaviors)
       },
       applyBehaviorsInContext: function(context, element, behaviors) {
-        var curContext, 
-        applyList = [], 
+        var curContext,
+        applyList = [],
         scribe = new EventScribe
 
         //Move enrich to Utils
@@ -214,7 +216,7 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
             })
 
 
-          //        jQuery(root).find(this.selectors[i]).each( 
+          //        jQuery(root).find(this.selectors[i]).each(
           //          function(index, elem){
           //            if (!jQuery(elem).data("ninja-visited")) { //Pure optimization
           //              collection.apply(elem, [], i)

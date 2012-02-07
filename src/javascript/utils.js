@@ -1,14 +1,26 @@
 define(function(){
-    return {
-      log: function(message) {
-        if(false) { //LOGGING TURNED OFF IS 100% faster!
-          try {
-            console.log(message)
-          }
-          catch(e) {} //we're in IE or FF w/o Firebug or something
-        }
-      },
+    function Utils() {
+      this.log_function = null
+    }
 
+    Utils.prototype = {
+      log: function(message) {
+        this.log_function(message)
+      },
+      active_logging: function(message) {
+        try {
+          console.log(message)
+        }
+        catch(e) {} //we're in IE or FF w/o Firebug or something
+      },
+      inactive_logging: function(message) {
+      },
+      disactivate_logging: function() {
+        this.log_function = this.inactive_logging
+      },
+      activate_logging: function() {
+        this.log_function = this.active_logging
+      },
       isArray: function(candidate) {
         return (candidate.constructor == Array)
       },
@@ -31,5 +43,8 @@ define(function(){
         }
       }
     }
-  })
+    var utils = new Utils
+    utils.disactivate_logging()
 
+    return utils
+  })

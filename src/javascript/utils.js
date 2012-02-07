@@ -44,7 +44,12 @@ define(function(){
       }
     }
     var utils = new Utils
-    utils.disactivate_logging()
+    if(typeof NINJASCRIPT_DEBUGGING == 'undefined') {
+      utils.disactivate_logging()
+    } else {
+      utils.activate_logging()
+    }
+
 
     return utils
   })

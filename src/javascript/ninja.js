@@ -7,6 +7,7 @@ define(   ["utils", "ninja/tools", "ninja/behaviors", "ninja/configuration", 'ni
     function NinjaScript() {
       //NinjaScript-wide configurations.  Currently, not very many
       this.config = Configs
+      this.utils = Utils
 
       this.behavior = this.goodBehavior
       this.jsonDispatcher = new JSONDispatcher()

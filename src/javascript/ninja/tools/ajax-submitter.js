@@ -74,8 +74,8 @@ define(["ninja", "utils", "./json-dispatcher", "./overlay"], function(Ninja, Uti
           return submitter
         },
 
-        overlayAndSubmit: function(target, action, jsonHandling) {
-          var overlay = this.busyOverlay(this.findOverlay(target))
+        overlayAndSubmit: function(overlaid, target, action, jsonHandling) {
+          var overlay = this.busyOverlay(this.findOverlay(overlaid))
 
           var submitter
           if( typeof jsonHandling == "undefined" ) {

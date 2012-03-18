@@ -107,6 +107,7 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
       },
       applyBehaviorsInContext: function(context, element, behaviors) {
         var curContext,
+        rootContext = context,
         applyList = [],
         scribe = new EventScribe
 
@@ -133,7 +134,6 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
 
         forEach(behaviors,
           function(behavior){
-            //XXX This needs to have exception handling back
             try {
               curContext = behavior.inContext(context)
               element = behavior.applyTransform(curContext, element)
@@ -154,6 +154,9 @@ define(["sizzle-1.0", "ninja/behaviors", "utils", "ninja/event-scribe", "ninja/e
             }
           }
         )
+
+        rootContext.visibleElement = element
+
         jQuery(element).data("ninja-visited", context)
 
         scribe.applyEventHandlers(element)

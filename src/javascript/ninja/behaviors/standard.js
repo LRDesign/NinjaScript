@@ -58,7 +58,7 @@ define(["ninja", "utils"],
               },
               events: {
                 click:  function(evnt) {
-                  this.overlayAndSubmit(evnt.target, evnt.target.href, configs.actions)
+                  this.overlayAndSubmit(this.visibleElement, evnt.target, evnt.target.href, configs.actions)
                 }
               }
             })
@@ -92,7 +92,7 @@ define(["ninja", "utils"],
               },
               events: {
                 submit: function(evnt) {
-                  this.overlayAndSubmit(evnt.target, evnt.target.action, configs.actions)
+                  this.overlayAndSubmit(this.visibleElement, evnt.target, evnt.target.action, configs.actions)
                 }
               }
             })

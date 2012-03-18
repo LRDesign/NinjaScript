@@ -109,7 +109,7 @@ namespace :build do
   end
 
   require 'rake/packagetask'
-  Rake::PackageTask.new('ninjascript', '0.9.1') do |t|
+  Rake::PackageTask.new('ninjascript', '0.9.2') do |t|
     t.need_zip = true
     t.need_tar_bz2 = true
     t.need_tar_gz = true

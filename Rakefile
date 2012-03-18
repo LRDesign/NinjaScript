@@ -76,6 +76,10 @@ namespace :build do
     end
   end
 
+  task :clobber_header_comments do
+    rm_f 'tmp/header-comments.js'
+  end
+
   file "generated/javascript/ninjascript.js" => %w{tmp/header-comments.js generated/javascript} + sourcefiles do |file|
     tmpfile = File::join("tmp", file.to_s.gsub(File::Separator, "_"))
     sh "libs/requirejs/build/buildj.sh name=main out=#{tmpfile} baseUrl=src/javascript includeRequire=true optimize=none"
@@ -90,7 +94,7 @@ namespace :build do
   end
 
   desc "Build Ninjascript & assets"
-  task :project => %w{stylesheets:generate generated/javascript/ninjascript.js generated/javascript/ns.min.js}
+  task :project => %w{stylesheets:generate clobber_header_comments generated/javascript/ninjascript.js generated/javascript/ns.min.js}
 
   task :sprockets => %w{stylesheets:generate generated/javascript constants} do
     raise "This is an old task, scheduled for deletion"

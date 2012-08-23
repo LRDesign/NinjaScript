@@ -47,7 +47,6 @@ define(["utils", "ninja"],
         overlay.css("left", offset.left)
         overlay.width(hideMe.outerWidth())
         overlay.height(hideMe.outerHeight())
-        overlay.css("zIndex", "2")
         overlay.css("display", "none")
         return overlay[0]
       },
@@ -66,7 +65,7 @@ define(["utils", "ninja"],
 
     Ninja.packageTools({
         overlay: function() {
-          // I really liked using 
+          // I really liked using
           //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
           //but IE8 doesn't implement ECMA 2.6.2 5th ed.
 
@@ -96,4 +95,3 @@ define(["utils", "ninja"],
 
     return Overlay
   })
-

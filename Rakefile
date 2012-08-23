@@ -52,14 +52,17 @@ namespace :build do
   directory "auto-constants"
   directory "tmp"
 
+  PACKAGE_CONFIG= {
+    "VERSION" => "0.10",
+    "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
+    "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
+  }
+
   task :constants => %w{auto-constants} do
     require 'yaml'
 
     File::open("auto-constants/constants.yml", "w") do |file|
-      file.write(YAML::dump({
-        "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
-        "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
-      }))
+      file.write(YAML::dump(PACKAGE_CONFIG))
     end
   end
 
@@ -69,9 +72,9 @@ namespace :build do
     require 'erb'
     erb = ERB.new(File::read('src/header-comment.js.erb'))
     File::open(file.to_s, "w") do |file|
-      build_date = Time.new.strftime("%m-%d-%Y")
-      copyright_year = Time.new.strftime("%Y")
-      version = "0.10"
+      build_date = PACKAGE_CONFIG["BUILD_DATE"]
+      copyright_year = COPYRIGHT_YEAR["COPYRIGHT_YEAR"]
+      version = PACKAGE_CONFIG["VERSION"]
       file.write( erb.result binding)
     end
   end
@@ -113,7 +116,7 @@ namespace :build do
   end
 
   require 'rake/packagetask'
-  Rake::PackageTask.new('ninjascript', '0.9.2') do |t|
+  Rake::PackageTask.new('ninjascript', PACKAGE_CONFIG["VERSION"]) do |t|
     t.need_zip = true
     t.need_tar_bz2 = true
     t.need_tar_gz = true

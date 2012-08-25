@@ -1,6 +1,7 @@
-define(
-  function() {
-    /* 
+goog.provide('ninjascript.sizzle')
+
+ninjascript.sizzle = (function() {
+    /*
      * Sizzle CSS engine
      * Copyright 2009 The Dojo Foundation
      * Released under the MIT, BSD, and GPL Licenses.
@@ -597,18 +598,18 @@ define(
             case 'only':
             case 'first':
               while ( (node = node.previousSibling) )	 {
-                if ( node.nodeType === 1 ) { 
-                  return false; 
+                if ( node.nodeType === 1 ) {
+                  return false;
                 }
               }
-              if ( type === "first" ) { 
-                return true; 
+              if ( type === "first" ) {
+                return true;
               }
               node = elem;
             case 'last':
               while ( (node = node.nextSibling) )	 {
-                if ( node.nodeType === 1 ) { 
-                  return false; 
+                if ( node.nodeType === 1 ) {
+                  return false;
                 }
               }
               return true;
@@ -628,7 +629,7 @@ define(
                   if ( node.nodeType === 1 ) {
                     node.nodeIndex = ++count;
                   }
-                } 
+                }
                 parent.sizcache = doneName;
               }
 
@@ -1027,7 +1028,7 @@ define(
 
       var isXML = function(elem){
         // documentElement is verified for cases where it doesn't yet exist
-        // (such as loading iframes in IE - #4833) 
+        // (such as loading iframes in IE - #4833)
         var documentElement = (elem ? elem.ownerDocument || elem : 0).documentElement;
         return documentElement ? documentElement.nodeName !== "HTML" : false;
       };
@@ -1053,4 +1054,4 @@ define(
       };
 
       return Sizzle;
-    })
+    })()

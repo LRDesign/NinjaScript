@@ -1,75 +1,75 @@
-define(["utils", "ninja"],
-  function(Utils, Ninja) {
+goog.provide('ninjascript.tools.Overlay')
+
+goog.require('ninjascript.utils')
+//XXX maybe need a 'ninjascript.SETUP or something?
+
+function ninjascript.tools.Overlay(list) {
+  var elements = this.convertToElementArray(list)
+  this.laziness = 0
+  var ov = this
+  this.set = jQuery(jQuery.map(elements, function(element, idx) {
+        return ov.buildOverlayFor(element)
+      }))
+};
+
+(function() {
+    var Utils = ninjascript.Utils
     var forEach = Utils.forEach
 
-    function Overlay(list) {
-      var elements = this.convertToElementArray(list)
-      this.laziness = 0
-      var ov = this
-      this.set = jQuery(jQuery.map(elements, function(element, idx) {
-            return ov.buildOverlayFor(element)
-          }))
-    }
+    var prototype = ninjascript.tools.Overlay.prototype
 
-    Overlay.prototype = {
-      convertToElementArray: function(list) {
-        var h = this
-        switch(typeof list) {
-        case 'undefined': return []
-        case 'boolean': return []
-        case 'string': return h.convertToElementArray(jQuery(list))
-        case 'function': return h.convertToElementArray(list())
-        case 'object': {
-            //IE8 barfs on 'list instanceof Element'
-            if("focus" in list && "blur" in list && !("jquery" in list)) {
-              return [list]
-            }
-            else if("length" in list && "0" in list) {
-              var result = []
-              forEach(list, function(element) {
-                  result = result.concat(h.convertToElementArray(element))
-                })
-              return result
-            }
-            else {
-              return []
-            }
+    prototype.convertToElementArray = function(list) {
+      var h = this
+      switch(typeof list) {
+      case 'undefined': return []
+      case 'boolean': return []
+      case 'string': return h.convertToElementArray(jQuery(list))
+      case 'function': return h.convertToElementArray(list())
+      case 'object': {
+          //IE8 barfs on 'list instanceof Element'
+          if("focus" in list && "blur" in list && !("jquery" in list)) {
+            return [list]
+          }
+          else if("length" in list && "0" in list) {
+            var result = []
+            forEach(list, function(element) {
+                result = result.concat(h.convertToElementArray(element))
+              })
+            return result
+          }
+          else {
+            return []
           }
         }
-      },
-
-      buildOverlayFor: function(elem) {
-        var overlay = jQuery(document.createElement("div"))
-        var hideMe = jQuery(elem)
-        var offset = hideMe.offset()
-        overlay.css("position", "absolute")
-        overlay.css("top", offset.top)
-        overlay.css("left", offset.left)
-        overlay.width(hideMe.outerWidth())
-        overlay.height(hideMe.outerHeight())
-        overlay.css("display", "none")
-        return overlay[0]
-      },
-      affix: function() {
-        this.set.appendTo(jQuery("body"))
-        overlaySet = this.set
-        window.setTimeout(function() {
-            overlaySet.css("display", "block")
-          }, this.laziness)
-      },
-      remove: function() {
-        this.set.remove()
       }
-    }
+    },
 
+    prototype.buildOverlayFor = function(elem) {
+      var overlay = jQuery(document.createElement("div"))
+      var hideMe = jQuery(elem)
+      var offset = hideMe.offset()
+      overlay.css("position", "absolute")
+      overlay.css("top", offset.top)
+      overlay.css("left", offset.left)
+      overlay.width(hideMe.outerWidth())
+      overlay.height(hideMe.outerHeight())
+      overlay.css("display", "none")
+      return overlay[0]
+    },
+    prototype.affix = function() {
+      this.set.appendTo(jQuery("body"))
+      overlaySet = this.set
+      window.setTimeout(function() {
+          overlaySet.css("display", "block")
+        }, this.laziness)
+    },
+    prototype.remove = function() {
+      this.set.remove()
+    }
 
     Ninja.packageTools({
         overlay: function() {
-          // I really liked using
-          //return new Overlay([].map.apply(arguments,[function(i) {return i}]))
-          //but IE8 doesn't implement ECMA 2.6.2 5th ed.
-
-          return new Overlay(jQuery.makeArray(arguments))
+          return new ninjascript.tools.Overlay(jQuery.makeArray(arguments))
         },
         busyOverlay: function(elem) {
           var overlay = this.overlay(elem)
@@ -77,7 +77,7 @@ define(["utils", "ninja"],
           overlay.laziness = this.ninja.config.busyLaziness
           return overlay
         },
-        //Currently, this doesn't respect changes to the original block...
+        //XXX Currently, this doesn't respect changes to the original block...
         //There should be an "Overlay behavior" that gets applied
         buildOverlayFor: function(elem) {
           var overlay = jQuery(document.createElement("div"))
@@ -92,6 +92,4 @@ define(["utils", "ninja"],
           return overlay
         }
       })
-
-    return Overlay
-  })
+  })()

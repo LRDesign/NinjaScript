@@ -1,4 +1,6 @@
-define(function () {
+goog.provide('ninjascript.exceptions');
+
+(function () {
     function buildException(named) {
       var exceptionConstructor = function (message) {
         Error.call(this, message)
@@ -12,8 +14,6 @@ define(function () {
       return exceptionConstructor
     }
 
-    return {
-      CouldntChoose: buildException("CouldntChoose"),
-      TransformFailed: buildException("TransformFailed")
-    }
-  })
+    ninjascript.exceptions.CouldntChoose = buildException("CouldntChoose")
+    ninjascript.exceptions.TransformFailed = buildException("TransformFailed")
+  })()

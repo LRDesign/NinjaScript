@@ -1,5 +1,7 @@
-define(["ninja"],
-  function(Ninja) {
+goog.provide('ninjascript.behaviors.Placeholder');
+
+(function() {
+
     Ninja.packageBehaviors( function(ninja){
       function placeholderSubmitter(inputBehavior) {
         return new ninja.does({
@@ -69,12 +71,12 @@ define(["ninja"],
       }
 
       function hasPlaceholderPassword(configs) {
-        configs = Ninja.tools.ensureDefaults(configs, {
+        var configs = Ninja.tools.ensureDefaults(configs, {
             findParentForm: function(elem) {
               return elem.parents('form')[0]
             },
             retainedInputAttributes: [
-              "name", "class", "style", "title", "lang", "dir", 
+              "name", "class", "style", "title", "lang", "dir",
               "size", "maxlength", "alt", "tabindex", "accesskey",
               "data-.*"
             ]
@@ -120,7 +122,7 @@ define(["ninja"],
 
     if((!input_placeholder) || (!textarea_placeholder)) {
         function hasPlaceholderText(configs) {
-          configs = Ninja.tools.ensureDefaults(configs, {
+          var configs = Ninja.tools.ensureDefaults(configs, {
               findParentForm: function(elem) {
                 return elem.parents('form')[0]
               }
@@ -175,7 +177,7 @@ define(["ninja"],
 
                 if( textarea_placeholder) {
                   meta.asTextArea = null
-                } else { 
+                } else {
                   meta.asTextArea = hasPlaceholderText(configs)
                 }
               },
@@ -196,4 +198,4 @@ define(["ninja"],
       }
     }
   })
-})
+})()

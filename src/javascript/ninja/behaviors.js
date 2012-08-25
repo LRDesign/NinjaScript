@@ -1,8 +1,11 @@
-define(["ninja/exceptions"], function(Exceptions) {
-    var CouldntChooseException = Exceptions.CouldntChoose
+goog.provide('ninjascript.behaviors')
 
-    var behaviors = {
-    }
+goog.require('ninjascript.exceptions')
+
+;
+(function() {
+    var CouldntChooseException = ninjascript.exceptions.CouldntChoose
+    var behaviors = ninjascript.behaviors
 
     behaviors.meta = function(setup, callback) {
       setup(this)
@@ -58,7 +61,7 @@ define(["ninja/exceptions"], function(Exceptions) {
       delete handlers.priority
       if (typeof handlers.events != "undefined") {
         this.eventHandlers = handlers.events
-      } 
+      }
       else {
         this.eventHandlers = handlers
       }
@@ -66,7 +69,7 @@ define(["ninja/exceptions"], function(Exceptions) {
       return this
     }
 
-    behaviors.base.prototype = {   
+    behaviors.base.prototype = {
       //XXX applyTo?
       apply: function(elem) {
         var context = this.inContext({})
@@ -137,7 +140,7 @@ define(["ninja/exceptions"], function(Exceptions) {
               config[i] == "overridesOthers") {
               fallThrough = false
             }
-            if (config[i] == "andDoDefault" || 
+            if (config[i] == "andDoDefault" ||
               config[i] == "continues" ||
               config[i] == "allowDefault") {
               stopDefault = false
@@ -219,10 +222,16 @@ define(["ninja/exceptions"], function(Exceptions) {
           return result
         }
       },
-      transform: function(elem){ 
-        return elem 
+      transform: function(elem){
+        return elem
       }
     }
 
     return behaviors
-  })
+  })()
+
+goog.require('ninjascript.behaviors.utility');
+goog.require('ninjascript.behaviors.standard');
+goog.require('ninjascript.behaviors.placeholder');
+goog.require('ninjascript.behaviors.triggerOn');
+goog.require('ninjascript.behaviors.confirm');

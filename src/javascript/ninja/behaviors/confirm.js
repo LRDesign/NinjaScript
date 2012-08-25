@@ -1,5 +1,6 @@
-define(["ninja"],
-  function(Ninja){
+goog.provide('ninjascript.behaviors.confirm');
+
+(function(){
     Ninja.packageBehaviors( function(ninja) {
         return {
           confirms: function(configs) {
@@ -35,4 +36,4 @@ define(["ninja"],
           }
         }
       })
-  })
+  })()

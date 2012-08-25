@@ -1,4 +1,6 @@
-define(["ninja"], function(Ninja) {
+goog.provide('ninjascript.behaviors.utility');
+
+(function(Ninja) {
     Ninja.packageBehaviors(function(ninja) {
         return {
           suppressChangeEvents: function() {
@@ -11,4 +13,4 @@ define(["ninja"], function(Ninja) {
           }
         }
       })
-  })
+  })()

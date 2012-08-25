@@ -1,8 +1,15 @@
-define(["ninja", "utils"],
-  function(Ninja, Utils) {
+goog.provide('ninjascript.behaviors.standard');
+
+goog.require('ninjascript.utils');
+goog.require('ninjascript.Logger');
+
+(function() {
+    var Utils = ninjascript.utils
     function log(message) {
-      Utils.log(message)
+      ninjascript.Logger.log(message)
     }
+
+    ///XXX Seriously consider backing out of this complicated thing
     Ninja.packageBehaviors( function(ninja){
       return {
         /**
@@ -170,7 +177,7 @@ define(["ninja", "utils"],
         },
 
         /**
-         * Ninja.decay( configs ) -> null
+         * Ninja.decays( configs ) -> null
          *
          * Use for elements that should be transient.  For instance, the
          * default behavior of failed AJAX calls is to insert a message into a
@@ -203,4 +210,4 @@ define(["ninja", "utils"],
         }
       };
     })
-  })
+})()

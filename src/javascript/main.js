@@ -1,24 +1,10 @@
-window["Ninja"] = {
-  orderList: [],
-  orders: function(order_func){
-    this.orderList.push(order_func)
-  }
-}
-require([
-    "ninja",
-    "ninja/behaviors/all",
-    "ninja/tools/all",
-    "ninja/jquery"
-  ], function(Ninja, stdBehaviors, allTools, jquery) {
-    var ninjaOrders = window["Ninja"].orderList
-    var ordersLength = ninjaOrders.length
+goog.require('ninjascript.NinjaScript')
 
-    window["Ninja"] = Ninja
-    Ninja['behavior'] = Ninja.behavior
-    for(var i = 0; i < ordersLength; i++) {
-      ninjaOrders[i](Ninja)
-    }
-    Ninja.orders = function(funk) {
-      funk(this) //because it amuses JDL, that's why.
-    }
-  })
+Ninja = new ninjascript.NinjaScript()
+
+//Covers for deprecated API requirement
+Ninja.orders = function(funk) {
+  funk(window.Ninja)
+}
+
+goog.exportSymbol('Ninja', Ninja)

@@ -16,7 +16,7 @@ goog.provide('ninjascript.tools.JSONHandler')
  *
  * { "item": "<li>A list item<\li>", "item_count": 17 }
  **/
-function ninjascript.tools.JSONHandler(desc) {
+ninjascript.tools.JSONHandler = function(desc) {
   this.desc = desc
 };
 

@@ -1,5 +1,6 @@
-goog.provide('ninjascript.behaviors.standard');
+goog.provide('ninjascript.packagedBehaviors.standard');
 
+goog.require('ninjascript.singleton');
 goog.require('ninjascript.utils');
 goog.require('ninjascript.Logger');
 

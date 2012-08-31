@@ -3,7 +3,7 @@ goog.provide('ninjascript.tools.JSONDispatcher')
 goog.require('ninjascript.tools.JSONHandler')
 goog.require('ninjascript.utils')
 
-function ninjascript.tools.JSONDispatcher() {
+ninjascript.tools.JSONDispatcher = function() {
   this.handlers = []
 };
 

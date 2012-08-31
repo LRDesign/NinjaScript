@@ -1,6 +1,8 @@
-goog.provide('ninjascript.behaviors.utility');
+goog.provide('ninjascript.packagedBehaviors.utility');
 
-(function(Ninja) {
+goog.require('ninjascript.singleton');
+
+(function() {
     Ninja.packageBehaviors(function(ninja) {
         return {
           suppressChangeEvents: function() {

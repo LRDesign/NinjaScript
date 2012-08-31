@@ -1,12 +1,12 @@
 goog.provide('ninjascript.tools.AjaxSubmitter')
 
-goog.require('ninjascript.Ninjascript')
+goog.require('ninjascript.singleton')
 goog.require('ninjascript.utils')
 goog.require('ninjascript.Logger')
 goog.require('ninjascript.tools.JSONDispatcher')
 goog.require('ninjascript.tools.Overlay')
 
-function ninjascript.tools.AjaxSubmitter() {
+ninjascript.tools.AjaxSubmitter = function() {
   this.formData = []
   this.action = "/"
   this.method = "GET"
@@ -35,13 +35,13 @@ function ninjascript.tools.AjaxSubmitter() {
 
     prototype.ajaxData = function() {
       return {
-        prototype.data = this.formData,
-        prototype.dataType = this.dataType,
-        prototype.url = this.action,
-        prototype.type = this.method,
-        prototype.complete = this.responseHandler(),
-        prototype.success = this.successHandler(),
-        prototype.error = this.onError
+        data: this.formData,
+        dataType: this.dataType,
+        url: this.action,
+        type: this.method,
+        complete: this.responseHandler(),
+        success: this.successHandler(),
+        error: this.onError
       }
     },
 

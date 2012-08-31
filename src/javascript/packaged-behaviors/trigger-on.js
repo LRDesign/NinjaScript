@@ -1,4 +1,6 @@
-goog.provide('ninjascript.behaviors.triggerOn');
+goog.provide('ninjascript.packagedBehaviors.triggerOn');
+
+goog.require('ninjascript.singleton');
 
 (function() {
     Ninja.packageBehaviors( function(ninja) {

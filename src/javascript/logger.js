@@ -1,4 +1,4 @@
-goog.provides("ninjascript.Logger")
+goog.provide("ninjascript.Logger")
 
 ninjascript.Logger = function() {
   this.log_function = null

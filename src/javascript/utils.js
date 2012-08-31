@@ -1,4 +1,4 @@
-goog.provides("ninjascript.utils");
+goog.provide("ninjascript.utils");
 
 (function(){
     var utils = ninjascript.utils

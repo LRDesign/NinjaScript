@@ -11,11 +11,12 @@
   <!-- <script type="text/javascript" src="libs/jquery-1.5.js"></script> -->
   <script type="text/javascript" src="libs/jquery-1.6.1.js"></script>
 
-  <script src="src/javascript/require.js"></script>
+  <script type="text/javascript" src="libs/closure-library/closure/goog/base.js"></script>
+  <script type="text/javascript" src="deps.js"></script>
 
   <script type="text/javascript">
-    require({baseUrl: "src/javascript"}, ["spec/main.js"])
-    </script>
+    goog.require('ninjascript.loaded')
+  </script>
 </head>
 <body>
 

@@ -1,4 +1,6 @@
-goog.provide('ninjascript.behaviors.confirm');
+goog.provide('ninjascript.packagedBehaviors.confirm');
+
+goog.require('ninjascript.singleton');
 
 (function(){
     Ninja.packageBehaviors( function(ninja) {

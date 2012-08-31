@@ -1,46 +1,53 @@
-goog.provide("ninjascript.Ninjascript")
+goog.provide("ninjascript.NinjaScript")
 
 goog.require("ninjascript.utils")
-goog.require("ninjascript.behaviors")
 goog.require("ninjascript.configuration")
-goog.require("ninjascript.tools")
+goog.require('ninjascript.mutation.EventHandler');
 
-/*
-function log(message) {
-  ninjascript.Utils.log(message)
-};
-*/
+goog.require('ninjascript.behaviors.Basic');
+goog.require('ninjascript.behaviors.Meta');
+goog.require('ninjascript.behaviors.Select');
 
-ninjascript.NinjaScript = function() {
-  //NinjaScript-wide configurations.  Currently, not very many
-  this.config = ninjascript.configuration
-
-  this.behavior = this.goodBehavior
-  this.jsonDispatcher = new JSONDispatcher()
-  this.tools = new Tools(this)
+ninjascript.NinjaScript = function(tools, config, jsonDispatcher) {
+  this.config = config
+  this.tools = tools
+  this.tools.ninja = this
+  this.jsonDispatcher = jsonDispatcher
+  this.mutationHandler =
+    new ninjascript.mutation.EventHandler(
+      tools.getRootOfDocument(),
+      tools.getRootCollection()
+    )
 };
 
 (function(){
     var prototype = ninjascript.NinjaScript.prototype
     var Utils = ninjascript.utils
+    var Behaviors = ninjascript.behaviors
 
     prototype.packageBehaviors = function(callback) {
       var types = {
-        does: Behaviors.base,
-        chooses: Behaviors.meta,
-        selects: Behaviors.select
+        does: Behaviors.Basic,
+        chooses: Behaviors.Meta,
+        selects: Behaviors.Select
       }
       result = callback(types)
       Utils.enrich(this, result)
     },
 
     prototype.packageTools = function(object) {
-      Utils.enrich(Tools.prototype, object)
+      Utils.enrich(this.tools.prototype, object)
     },
 
     prototype.configure = function(opts) {
       Utils.enrich(this.config, opts)
     },
+
+    prototype.respondToJson = function(handlerConfig) {
+      this.jsonDispatcher.addHandler(handlerConfig)
+    },
+
+
 
     prototype.goodBehavior = function(dispatching) {
       var collection = this.tools.getRootCollection()
@@ -56,6 +63,8 @@ ninjascript.NinjaScript = function() {
       this.failSafeGo()
     },
 
+    prototype.behavior = prototype.goodBehavior
+
     prototype.failSafeGo = function() {
       this.failSafeGo = function(){}
       jQuery(window).load( function(){ Ninja.go() } )
@@ -65,27 +74,13 @@ ninjascript.NinjaScript = function() {
       throw new Error("Called Ninja.behavior() after Ninja.go() - don't do that.  'Go' means 'I'm done, please proceed'")
     },
 
-    prototype.respondToJson = function(handlerConfig) {
-      this.jsonDispatcher.addHandler(handlerConfig)
-    },
-
     prototype.go = function() {
       var Ninja = this
 
-      function handleMutation(evnt) {
-        Ninja.tools.getRootCollection().mutationEventTriggered(evnt);
-      }
-
       if(this.behavior != this.badBehavior) {
-        var rootOfDocument = this.tools.getRootOfDocument()
-        rootOfDocument.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
-        //If we ever receive either of the W3C DOMMutation events, we don't need our IE based
-        //hack, so nerf it
-        rootOfDocument.one("DOMSubtreeModified DOMNodeInserted", function(){
-            Ninja.tools.detachSyntheticMutationEvents()
-          })
+        this.mutationHandler.setup()
         this.behavior = this.badBehavior
-        this.tools.fireMutationEvent()
+        this.mutationHandler.fireMutationEvent()
       }
     }
   })()

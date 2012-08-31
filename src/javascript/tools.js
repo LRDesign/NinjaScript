@@ -1,34 +1,35 @@
-goog.provides('ninjascript.Tools')
+goog.provide('ninjascript.Tools')
 
-goog.requires('ninjascript.Behaviors')
-goog.requires('ninjascript.Logger')
-goog.requires('ninjascript.BehaviorCollection')
-goog.requires('ninjascript.exceptions')
-goog.requires('ninjascript.utils')
-goog.requires('ninjascript.RootContext')
+goog.require('ninjascript.behaviors.Basic')
+goog.require('ninjascript.behaviors.Select')
+goog.require('ninjascript.behaviors.Meta')
+goog.require('ninjascript.Logger')
+goog.require('ninjascript.BehaviorCollection')
+goog.require('ninjascript.exceptions')
+goog.require('ninjascript.utils')
 
-ninjascript.Tools = function(ninja) {
-  this.ninja = ninja
-  this.behaviorContext = rootContext(this)
+ninjascript.Tools = function() {
+  this.ninja = null
 };
 
+/*
+ * Essential to the working of Ninjascript, but not part of the API
+ */
 (function() {
     var prototype = ninjascript.Tools.prototype
 
-    var Behaviors = ninjascript.Behaviors
     var BehaviorCollection = ninjascript.BehaviorCollection
-    var Exceptions = ninjascript.Exceptions
+    var Exceptions = ninjascript.exceptions
     var Utils = ninjascript.utils
     var Logger = ninjascript.Logger
-    var rootContext = ninjascript.RootContext
-
     var TransformFailedException = Exceptions.TransformFailed
+
     function log(message) {
       Logger.log(message)
     }
 
     //Handy JS things
-    prototype.forEach = Utils.forEach,
+    prototype.forEach = Utils.forEach
 
     prototype.ensureDefaults = function(config, defaults) {
       if(!(config instanceof Object)) {
@@ -44,37 +45,33 @@ ninjascript.Tools = function(ninja) {
         }
       }
       return config
-    },
+    }
 
     //DOM and Events
     prototype.getRootOfDocument = function() {
       return jQuery("html") //document.firstChild)
-    },
-    prototype.clearRootCollection = function() {
-      this.ninja.behavior = this.ninja.goodBehavior
-      this.getRootOfDocument().data("ninja-behavior", null)
-    },
+    }
+
     prototype.getRootCollection = function() {
       var rootOfDocument = this.getRootOfDocument()
+
       if(rootOfDocument.data("ninja-behavior") instanceof BehaviorCollection) {
         return rootOfDocument.data("ninja-behavior")
       }
 
       var collection = new BehaviorCollection(this)
+
       rootOfDocument.data("ninja-behavior", collection);
       return collection
-    },
-    prototype.addMutationTargets = function(targets) {
-      this.getRootCollection().addMutationTargets(targets)
-    },
-    prototype.fireMutationEvent = function() {
-      this.getRootCollection().fireMutationEvent()
-    },
-    prototype.detachSyntheticMutationEvents = function() {
-      this.getRootCollection().fireMutationEvent = function(){}
-      this.getRootCollection().addMutationTargets = function(t){}
-    },
+    }
+    prototype.clearRootCollection = function() {
+      this.ninja.behavior = this.ninja.goodBehavior
+      this.getRootOfDocument().data("ninja-behavior", null)
+    }
+
+
     //HTML Utils
+    //XXX new home
     prototype.copyAttributes = function(from, to, which) {
       var attributeList = []
       var attrs = []
@@ -85,14 +82,14 @@ ninjascript.Tools = function(ninja) {
             to.attr(att.nodeName, att.nodeValue)
           }
         })
-    },
+    }
     prototype.deriveElementsFrom = function(element, means){
       switch(typeof means){
       case 'undefined': return element
       case 'string': return jQuery(means)
       case 'function': return means(element)
       }
-    },
+    }
     prototype.extractMethod = function(element, formData) {
       if(element.dataset !== undefined &&
         element.dataset["method"] !== undefined &&
@@ -117,18 +114,19 @@ ninjascript.Tools = function(ninja) {
         return element.method
       }
       return "GET"
-    },
+    }
+
     //Ninjascript utils
     prototype.cantTransform = function(message) {
       throw new TransformFailedException(message)
-    },
+    }
     prototype.applyBehaviors = function(element, behaviors) {
       this.getRootCollection().apply(element, behaviors)
-    },
+    }
     prototype.message = function(text, classes) {
       var addingMessage = this.ninja.config.messageWrapping(text, classes)
       jQuery(this.ninja.config.messageList).append(addingMessage)
-    },
+    }
     prototype.hiddenDiv = function() {
       var existing = jQuery("div#ninja-hide")
       if(existing.length > 0) {
@@ -137,12 +135,7 @@ ninjascript.Tools = function(ninja) {
 
       var hide = jQuery("<div id='ninja-hide'></div>").css("display", "none")
       jQuery("body").append(hide)
-      this.getRootCollection().applyBehaviorsTo(hide, [this.ninja.suppressChangeEvents()])
+      this.getRootCollection().apply(hide, [this.ninja.suppressChangeEvents()])
       return hide
     }
   })()
-
-//XXX This really what I want here?
-goog.require('ninjascript.tools.Overlay')
-goog.require('ninjascript.tools.AjaxSubmitter')
-goog.require('ninjascript.tools.JSONDispatcher')

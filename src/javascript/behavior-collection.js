@@ -1,23 +1,24 @@
 goog.provide('ninjascript.BehaviorCollection')
 
-goog.require('ninjascript.Sizzle')
-goog.require('ninjascript.behaviors')
+goog.require('ninjascript.sizzle')
+goog.require('ninjascript.behaviors.Abstract')
 goog.require('ninjascript.utils')
-goog.require('ninjascript.EventScribe')
 goog.require('ninjascript.exceptions')
 
-function ninjascript.BehaviorCollection(tools) {
+ninjascript.BehaviorCollection = function(tools) {
   this.lexicalCount = 0
-  this.eventQueue = []
   this.behaviors = {}
   this.selectors = []
-  this.mutationTargets = []
   this.tools = tools
   return this
 };
 
 (function() {
     var prototype = ninjascript.BehaviorCollection.prototype
+
+    var Utils = ninjascript.utils
+    var Behaviors = ninjascript.behaviors
+    var BehaviorBinding = ninjascript.BehaviorBinding
 
     var forEach = Utils.forEach
 
@@ -34,13 +35,7 @@ function ninjascript.BehaviorCollection(tools) {
             this.addBehavior(selector, behaves)
           }, this)
       }
-      else if(behavior instanceof Behaviors.base) {
-        this.insertBehavior(selector, behavior)
-      }
-      else if(behavior instanceof Behaviors.select) {
-        this.insertBehavior(selector, behavior)
-      }
-      else if(behavior instanceof Behaviors.meta) {
+      else if(behavior instanceof ninjascript.behaviors.Abstract) {
         this.insertBehavior(selector, behavior)
       }
       else if(typeof behavior == "function"){
@@ -50,7 +45,8 @@ function ninjascript.BehaviorCollection(tools) {
         var behavior = new Behaviors.base(behavior)
         this.addBehavior(selector, behavior)
       }
-    },
+    }
+
     prototype.insertBehavior = function(selector, behavior) {
       behavior.lexicalOrder = this.lexicalCount
       this.lexicalCount += 1
@@ -61,68 +57,10 @@ function ninjascript.BehaviorCollection(tools) {
       else {
         this.behaviors[selector].push(behavior)
       }
-    },
-    prototype.addMutationTargets = function(targets) {
-      this.mutationTargets = this.mutationTargets.concat(targets)
-    },
-    //Move to Tools
-    prototype.fireMutationEvent = function() {
-      var targets = this.mutationTargets
-      if (targets.length > 0 ) {
-        for(var target = targets[0];
-          targets.length > 0;
-          target = targets.shift()) {
-          jQuery(target).trigger("thisChangedDOM")
-        }
-      }
-      else {
-        this.tools.getRootOfDocument().trigger("thisChangedDOM")
-      }
-    },
-    prototype.mutationEventTriggered = function(evnt){
-      if(this.eventQueue.length == 0){
-        log("mutation event - first")
-        this.enqueueEvent(evnt)
-        this.handleQueue()
-      }
-      else {
-        log("mutation event - queueing")
-        this.enqueueEvent(evnt)
-      }
-    },
-    prototype.enqueueEvent = function(evnt) {
-      var eventCovered = false
-      var uncovered = []
-      forEach(this.eventQueue, function(val) {
-          eventCovered = eventCovered || jQuery.contains(val.target, evnt.target)
-          if (!(jQuery.contains(evnt.target, val.target))) {
-            uncovered.push(val)
-          }
-        })
-      if(!eventCovered) {
-        uncovered.unshift(evnt)
-        this.eventQueue = uncovered
-      }
-    },
-    prototype.handleQueue = function(){
-      while (this.eventQueue.length != 0){
-        this.applyAll(this.eventQueue[0].target)
-        this.eventQueue.shift()
-      }
-    },
-    prototype.applyBehaviorsTo = function(element, behaviors) {
-      return this.applyBehaviorsInContext(new this.tools.behaviorContext, element, behaviors)
-    },
-    prototype.applyBehaviorsInContext = function(context, element, behaviors) {
-      var curContext,
-      rootContext = context,
-      applyList = [],
-      scribe = new EventScribe
+    }
 
-      //Move enrich to Utils
-      this.tools.enrich(scribe.handlers, context.eventHandlerSet)
-
-      behaviors = behaviors.sort(function(left, right) {
+    prototype.sortBehaviors = function(behaviors) {
+      return behaviors.sort(function(left, right) {
           if(left.priority != right.priority) {
             if(left.priority === undefined) {
               return -1
@@ -139,17 +77,25 @@ function ninjascript.BehaviorCollection(tools) {
           }
         }
       )
+    }
 
+    prototype.applyBehaviorsInContext = function(context, element, behaviors) {
+      var curContext,
+      rootContext = context,
+
+      behaviors = this.sortBehaviors(behaviors)
+
+      /*
+       * This replaces an arcane setup by which transforms that completely
+       * changed the element in question "broke" the chain of event handlers
+       *
+       * At the moment, I have a vague un-ease that that had a purpose, but I
+       * don't remember what it was.
+       */
       forEach(behaviors,
         function(behavior){
           try {
-            curContext = behavior.inContext(context)
-            element = behavior.applyTransform(curContext, element)
-
-            context = curContext
-            context.element = element
-
-            scribe.recordEventHandlers(context, behavior)
+            context = context.binding(behavior, element)
           }
           catch(ex) {
             if(ex instanceof TransformFailedException) {
@@ -167,14 +113,12 @@ function ninjascript.BehaviorCollection(tools) {
 
       jQuery(element).data("ninja-visited", context)
 
-      scribe.applyEventHandlers(element)
-      //Move enrich to utils
-      this.tools.enrich(context.eventHandlerSet, scribe.handlers)
+      context.bindHandlers()
 
       this.fireMutationEvent()
 
       return element
-    },
+    }
     prototype.collectBehaviors = function(element, collection, behaviors) {
       forEach(behaviors, function(val) {
           try {
@@ -190,7 +134,8 @@ function ninjascript.BehaviorCollection(tools) {
             }
           }
         })
-    },
+    }
+
     //XXX Still doesn't quite handle the sub-behavior case - order of application
     prototype.apply = function(element, startBehaviors, selectorIndex) {
       var applicableBehaviors = [], len = this.selectors.length
@@ -205,21 +150,19 @@ function ninjascript.BehaviorCollection(tools) {
             this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
           }
         }
-        this.applyBehaviorsTo(element, applicableBehaviors)
+        this.applyBehaviorsInContext(new BehaviorBinding, element, applicableBehaviors)
       }
       else {
         context.unbindHandlers()
         this.applyBehaviorsInContext(context, element, applicableBehaviors)
       }
-    },
+    }
     prototype.applyAll = function(root){
       var len = this.selectors.length
+      var collection = this
       for(var i = 0; i < len; i++) {
-        var collection = this
-
         //Sizzle?
-
-        forEach(Sizzle( this.selectors[i], root), //an array, not a jQuery
+        forEach(ninjascript.sizzle( this.selectors[i], root), //an array, not a jQuery
           function(elem){
             if (!jQuery(elem).data("ninja-visited")) { //Pure optimization
               collection.apply(elem, [], i)

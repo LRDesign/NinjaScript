@@ -1,0 +1,27 @@
+[submodule "buildtools/js-test-driver"]
+	path = buildtools/js-test-driver
+	url = https://code.google.com/p/js-test-driver/
+[submodule "buildtools/jasmine-jstd-adapter"]
+	path = buildtools/jasmine-jstd-adapter
+	url = git://github.com/ibolmo/jasmine-jstd-adapter.git
+[submodule "buildtools/jasmine-jquery"]
+	path = buildtools/jasmine-jquery
+	url = git://github.com/velesin/jasmine-jquery.git
+[submodule "buildtools/jasmine-ajax"]
+	path = buildtools/jasmine-ajax
+	url = https://github.com/pivotal/jasmine-ajax
+[submodule "buildtools/closure-compiler"]
+	path = buildtools/closure-compiler
+	url = git://github.com/adinardi/google-closure-compiler.git
+[submodule "buildtools/google-closure-library"]
+	path = buildtools/google-closure-library
+	url = git://github.com/jarib/google-closure-library.git
+[submodule "buildtools/jasmine-1.2.0"]
+	path = buildtools/jasmine-1.2.0
+	url = git://github.com/pivotal/jasmine.git
+[submodule "buildtools/sinon"]
+	path = buildtools/sinon
+	url = git://github.com/cjohansen/Sinon.JS.git
+[submodule "buildtools/jasmine-sinon"]
+	path = buildtools/jasmine-sinon
+	url = git://github.com/froots/jasmine-sinon.git

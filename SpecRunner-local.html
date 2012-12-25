@@ -1,25 +1,48 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-  "http://www.w3.org/TR/html4/loose.dtd">
+"http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head>
-  <title>NinjaScript Jasmine Test Runner</title>
-  <link rel="stylesheet" type="text/css" href="libs/jasmine-1.0.1/jasmine.css">
-  <script type="text/javascript" src="libs/console-stub.js"></script>
+  <head>
+    <title>NinjaScript Jasmine Test Runner</title>
+    <link rel="stylesheet" type="text/css" href="libs/jasmine-1.0.1/jasmine.css">
+    <script type="text/javascript" src="http://js-testing.lrdesign.com/libs/jasmine-1.0.1/jasmine.js"></script>
+    <script type="text/javascript" src="libs/console-stub.js"></script>
 
-  <!-- <script type="text/javascript" src="libs/jquery-1.4.2.js"></script> -->
-  <!-- <script type="text/javascript" src="libs/jquery-1.4.3.js"></script> -->
-  <!-- <script type="text/javascript" src="libs/jquery-1.5.js"></script> -->
-  <script type="text/javascript" src="libs/jquery-1.6.1.js"></script>
+    <script type="text/javascript" src="libs/jquery-1.6.1.js"></script>
+    <script type="text/javascript" src="http://js-testing.lrdesign.com/libs/jasmine-jquery-1.1.2.js"></script>
+    <script src="http://js-testing.lrdesign.com/libs/jasmine-ajax/mock-ajax.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="http://js-testing.lrdesign.com/libs/jasmine-1.0.1/jasmine-html.js"></script>
 
-  <script type="text/javascript" src="libs/closure-library/closure/goog/base.js"></script>
-  <script type="text/javascript" src="deps.js"></script>
+    <!-- end test setup -->
 
-  <script type="text/javascript">
-    goog.require('ninjascript.loaded')
-  </script>
+
+<!-- source files -->
+<script type="text/javascript" src="libs/closure-library/closure/goog/base.js"></script>
+<script type="text/javascript" src="deps.js"></script>
+
+<script type="text/javascript">
+  goog.require('ninjascript.loaded')
+</script>
+<!-- end source -->
+
+<!-- include spec files here... -->
+<script src="spec-setup.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" src="spec/ajax_submitter.js"></script>
+<script type="text/javascript" src="spec/packaged_behaviors.js"></script>
+<script type="text/javascript" src="spec/metabehaviors.js"></script>
+<script type="text/javascript" src="spec/overlays.js"></script>
+<script type="text/javascript" src="spec/ninja_tools.js"></script>
+<script type="text/javascript" src="spec/priority.js"></script>
+<script type="text/javascript" src="spec/composing-event-handlers.js"></script>
+<script type="text/javascript" src="spec/ajax_to_json.js"></script>
+
+
 </head>
 <body>
 
+<script type="text/javascript">
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+  jasmine.getEnv().execute();
+</script>
 
 </body>
 </html>

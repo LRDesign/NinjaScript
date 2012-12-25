@@ -36,7 +36,7 @@ ninjascript.NinjaScript = function(tools, config, jsonDispatcher) {
     },
 
     prototype.packageTools = function(object) {
-      Utils.enrich(this.tools.prototype, object)
+      Utils.enrich(ninjascript.Tools.prototype, object)
     },
 
     prototype.configure = function(opts) {

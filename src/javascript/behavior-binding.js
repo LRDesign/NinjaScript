@@ -14,9 +14,9 @@ ninjascript.BehaviorBinding.prototype = new ninjascript.Tools;
     var forEach = Utils.forEach
 
     var prototype = ninjascript.BehaviorBinding.prototype
-    var class = ninjascript.BehaviorBinding
+    var binding = ninjascript.BehaviorBinding
 
-    class.initialize = function(parent, config, element) {
+    binding.initialize = function(parent, config, element) {
       this.behaviorConfig = config
       this.parent = parent
 
@@ -34,7 +34,7 @@ ninjascript.BehaviorBinding.prototype = new ninjascript.Tools;
       return this
     }
 
-    class.acquireEventHandlers = function(handlers) {
+    binding.acquireEventHandlers = function(handlers) {
       var len = handlers.length
       var i = 0
       var eventName
@@ -44,7 +44,7 @@ ninjascript.BehaviorBinding.prototype = new ninjascript.Tools;
       }
     }
 
-    class.acquireHelpers = function(helpers) {
+    binding.acquireHelpers = function(helpers) {
       for(var name in helpers) {
         this[name] = helpers[name]
       }
@@ -52,7 +52,7 @@ ninjascript.BehaviorBinding.prototype = new ninjascript.Tools;
 
     prototype.binding = function(behaviorConfig, element) {
       function binding(config, element) {
-        class.initialize.call(this, config, element)
+        binding.initialize.call(this, config, element)
       }
       binding.prototype = this
       return new binding(behaviorConfig)

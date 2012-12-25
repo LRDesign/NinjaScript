@@ -3,7 +3,6 @@ goog.provide('ninjascript.behaviors.Basic');
 goog.require('ninjascript.behaviors.EventHandlerConfig');
 goog.require('ninjascript.behaviors.Abstract');
 goog.require('ninjascript.utils');
-goog.require('ninjascript.Tools');
 
 ninjascript.behaviors.Basic = function(handlers) {
   this.helpers = {}

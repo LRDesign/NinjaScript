@@ -12,7 +12,7 @@ ninjascript.tools.JSONDispatcher = function() {
     var prototype = ninjascript.tools.JSONDispatcher.prototype
 
     prototype.addHandler = function(handler) {
-      this.handlers.push(new JSONHandler(handler))
+      this.handlers.push(new ninjascript.tools.JSONHandler(handler))
     },
     prototype.dispatch = function(json) {
       var len = this.handlers.length

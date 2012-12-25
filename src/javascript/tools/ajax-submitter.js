@@ -71,7 +71,7 @@ ninjascript.tools.AjaxSubmitter = function() {
 
     Ninja.packageTools({
         ajaxSubmitter: function() {
-          return new AjaxSubmitter()
+          return new ninjascript.tools.AjaxSubmitter()
         },
 
         ajaxToJson: function(desc) {

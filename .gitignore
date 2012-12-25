@@ -13,3 +13,7 @@ log/
 ninjascript-testlibs.tar.gz
 ninjascript.zip
 pkg/
+src/deps.js
+legacy-spec-main.js
+dependency.MF
+jsTestDriver.conf

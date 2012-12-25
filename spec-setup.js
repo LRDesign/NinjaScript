@@ -1,3 +1,5 @@
+goog.require('ninjascript.loaded')
+
 var fixtures = {
   ajaxTarget: '<div id="ajax-target"></div>',
   simpleLink: '<a href="#" id="simple-link">Click on me!</a>',
@@ -10,10 +12,11 @@ var fixtures = {
   scriptResponse: '$("#ajax-target").append("<p>One</p>").append("<p>Two</p>").append("<p>Threeeeee!</p>")'
 }
 
-jQuery.ajaxSettings.xhr = function() {
-  return new XMLHttpRequest();
-}
+/*
+#jQuery.ajaxSettings.xhr = function() {
+  #  return new XMLHttpRequest();
+  #}
+  */
 
 
 // vim: set sw=2:
-

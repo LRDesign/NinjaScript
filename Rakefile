@@ -46,6 +46,70 @@ namespace :stylesheets do
   end
 end
 
+BUILDTOOLS_DIR = "buildtools"
+JS_TEST_DRIVER_DIR = File::join(BUILDTOOLS_DIR, "js-test-driver/JsTestDriver")
+JS_TEST_DRIVER_JAR = File::join(JS_TEST_DRIVER_DIR, "target/bin/JsTestDriver.jar")
+CLOSURE_COMPILER_DIR = File::join(BUILDTOOLS_DIR, "closure-compiler")
+CLOSURE_JAR = File::join(CLOSURE_COMPILER_DIR, "build", "compiler.jar")
+CLOSURE_DIR = File::join(BUILDTOOLS_DIR, "google-closure-library/closure")
+CLOSURE_DEPSWRITER = File::join(CLOSURE_DIR, "bin/build/depswriter.py")
+CLOSURE_LIBRARY_DIR = File::join(CLOSURE_DIR, "goog")
+CLOSURE_DOTS = File::join(*(%w{..} * CLOSURE_LIBRARY_DIR.split(File::Separator).length))
+
+namespace :test do
+  desc "Run JSTestDriver Server"
+  task :server => 'jsTestDriver.conf' do
+    puts %x{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --port 9876 &}
+  end
+
+  desc "Run chrome against server"
+  task :chromium do
+    %x{/bin/env chromium --new-window localhost:9876/capture &}
+  end
+
+  desc "Run firefox against server"
+  task :firefox do
+    %x{/bin/env firefox localhost:9876/capture &}
+  end
+
+  desc "Run tests against JSTestDriver"
+  task :run, [:tests] => %w'src/deps.js jsTestDriver.conf' do |task, args|
+    if args[:tests]
+      tests = args[:tests]
+    else
+      "all"
+    end
+    sh %{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --captureConsole --runnerMode DEBUG --tests "#{tests}"}
+  end
+
+end
+
+task :buildtools => %w{buildtools:jstestdriver buildtools:jstestdriver_coverage buildtools:closure_compiler}
+
+namespace :buildtools do
+  task :jstestdriver do
+    chdir JS_TEST_DRIVER_DIR do
+      puts "Running ant"
+      puts %x{ant jstestdriver}
+    end
+  end
+
+  task :jstestdriver_coverage do
+    chdir JS_TEST_DRIVER_DIR do
+      puts "Running ant"
+      puts %x{ant jstestdriver-coverage}
+    end
+  end
+
+
+  task :closure_compiler do
+    chdir CLOSURE_COMPILER_DIR do
+      puts "Running ant"
+      puts %x{ant jar}
+    end
+  end
+end
+
 namespace :build do
 
   directory "generated/javascript"
@@ -79,6 +143,24 @@ namespace :build do
     end
   end
 
+  file "src/deps.js" => sourcefiles do |file|
+    %x{/bin/env #{CLOSURE_DEPSWRITER} --root_with_prefix="src/javascript #{CLOSURE_DOTS}/src/javascript" > #{file}}
+  end
+
+  file "dependency.MF" => sourcefiles do |file|
+    sh %{/bin/env java -jar #{CLOSURE_JAR} #{sourcefiles.map{|src| "--js #{src}"}.join(" ")} --output_manifest #{file}}
+  end
+
+  file 'jsTestDriver.conf' => ['jsTestDriver.yaml', 'dependency.MF'] do |cfg|
+    require 'yaml'
+    jstd_conf = YAML::load(File::read('jsTestDriver.yaml'))
+    deps = File::read("dependency.MF").lines.map{|line| line.chomp}
+    jstd_conf['load'] += deps
+    File::open(cfg.name, 'w') do |file|
+      file.write(YAML::dump(jstd_conf))
+    end
+  end
+
   task :clobber_header_comments do
     rm_f 'tmp/header-comments.js'
   end
@@ -98,22 +180,6 @@ namespace :build do
 
   desc "Build Ninjascript & assets"
   task :project => %w{stylesheets:generate clobber_header_comments generated/javascript/ninjascript.js generated/javascript/ns.min.js}
-
-  task :sprockets => %w{stylesheets:generate generated/javascript constants} do
-    raise "This is an old task, scheduled for deletion"
-    require 'sprockets'
-
-    sec = Sprockets::Secretary.new(
-      :root => '.',
-      :asset_root => ASSET_ROOT,
-      :load_path => %w[src/javascript vendor auto-constants],
-      :source_files => %w[src/javascript/main.js]
-    )
-
-    puts "Saving concatentated javascript"
-    sec.concatenation.save_to("#{ASSET_ROOT}/javascript/ninjascript.js")
-    sec.install_assets
-  end
 
   require 'rake/packagetask'
   Rake::PackageTask.new('ninjascript', PACKAGE_CONFIG["VERSION"]) do |t|

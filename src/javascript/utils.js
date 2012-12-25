@@ -8,7 +8,7 @@ goog.provide("ninjascript.utils");
     },
 
     utils.enrich = function(left, right) {
-      return jQuery.extend({}, left, right)
+      return jQuery.extend(left, right)
     },
 
     utils.clone = function(original) {

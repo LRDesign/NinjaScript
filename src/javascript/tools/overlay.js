@@ -1,5 +1,6 @@
 goog.provide('ninjascript.tools.Overlay')
 
+goog.require('ninjascript.singleton')
 goog.require('ninjascript.utils')
 //XXX maybe need a 'ninjascript.SETUP or something?
 

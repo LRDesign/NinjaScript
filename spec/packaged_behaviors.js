@@ -1,5 +1,7 @@
 describe("Packaged Behaviors:", function() {
     describe("becomesAjaxLink()", function() {
+        var sandbox
+
         beforeEach(function() {
             Ninja.tools.clearRootCollection()
             Ninja.behavior({
@@ -7,8 +9,13 @@ describe("Packaged Behaviors:", function() {
               })
             Ninja.go()
             setFixtures( fixtures.simpleForm('packaged') + fixtures.ajaxTarget)
-            mockAjax()
+            sandbox = sinon.sandbox.create()
+            sandbox.useFakeServer()
             Ninja.tools.fireMutationEvent()
+          })
+
+        afterEach(function(){
+            sandbox.restore()
           })
 
         it("should transform the form into a link", function() {
@@ -19,39 +26,39 @@ describe("Packaged Behaviors:", function() {
         describe("handling clicking the link", function() {
             var response
             beforeEach(function() {
-                response = {
-                  status: 200,
-                  contentType: "text/javascript",
-                  responseText: fixtures.scriptResponse
-                }
+                response = [
+                  200,
+                  {"Content-Type": "text/javascript"},
+                  fixtures.scriptResponse
+                ]
               })
 
-            afterEach(function() { 
-                for(var i in ajaxRequests) {
-                  ajaxRequests[i].response(response) 
+            afterEach(function() {
+                for(var i in sandbox.requests) {
+                  sandbox.requests[i].respond(response)
                 }
               })
 
 
             it("should handle clicking the link to send a post", function() {
-                expect(ajaxRequests.length).toEqual(0)
+                expect(sandbox.requests.length).toEqual(0)
                 $("a#simple-form").trigger("click")
-                expect(ajaxRequests.length).toEqual(1)
-                expect(ajaxRequests[0].method).toEqual("PUT")
+                expect(sandbox.requests.length).toEqual(1)
+                expect(sandbox.requests[0].method).toEqual("PUT")
               })
 
             it("should put up an overlay", function() {
                 expect($("div.ninja_busy")).not.toExist()
                 $("a#simple-form").trigger("click")
                 expect($("div.ninja_busy")).toExist()
-                ajaxRequests[0].response(response)
+                sandbox.requests[0].respond(response)
                 expect($("div.ninja_busy")).not.toExist()
               })
 
             it("should apply the reply javascript", function() {
                 $("a#simple-form").trigger("click")
                 expect($("#ajax-target > *").length).toEqual(0)
-                ajaxRequests[0].response(response)
+                sandbox.requests[0].respond(response)
                 expect($("#ajax-target > *").length).toEqual(3)
               })
           })
@@ -62,4 +69,3 @@ describe("Packaged Behaviors:", function() {
 
 
 // vim: set sw=2 ft=javascript.jasmine-javascript:
-

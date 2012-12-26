@@ -4,6 +4,7 @@
 describe("AjaxToJson", function() {
     var submitter
     var target
+    var sandbox
 
     beforeEach(function() {
         setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
@@ -35,29 +36,33 @@ describe("AjaxToJson", function() {
           })
         submitter = Ninja.tools.ajaxToJson( )
 
-        mockAjax()
+        server = sinon.fakeServer.create()
+        sandbox.useFakeServer()
       })
-    
+
+    afterEach(function(){
+        sandbox.restore()
+      })
+
     it("shouldn't fire until ajax request", function() {
         expect(target.shallow).toBeUndefined()
         expect(target.deep).toBeUndefined()
       })
 
     it("should send an ajax request on .submit()", function() {
-        expect(ajaxRequests.length).toEqual(0)
+        expect(sandbox.requests.length).toEqual(0)
         submitter.submit()
-        expect(ajaxRequests.length).toEqual(1)
+        expect(sandbox.requests.length).toEqual(1)
       })
 
     describe("acting on JSON result", function() {
         beforeEach(function() {
             submitter.submit()
-            ajaxRequests[0].response({
-                status: 200, 
-                contentType: "application/json", 
-                responseText: '{ "shallow": "testing", "three": { "levels": { "deep": 17 } } }'
-
-              })
+            sandbox.requests[0].respond({[
+                200,
+                {"Content-Type": "application/json"},
+                '{ "shallow": "testing", "three": { "levels": { "deep": 17 } } }'
+              ]})
           })
 
         it("should act on simple keys", function() {

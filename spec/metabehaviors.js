@@ -1,5 +1,6 @@
 describe("Metabehaviors", function() {
     var response
+    var sandbox
     beforeEach(function() {
         Ninja.tools.clearRootCollection()
         setFixtures(fixtures.simpleForm('metabehaviors') + fixtures.simpleLink + fixtures.ajaxTarget + "<table><tr><td id='shouldnt-ajax'</td></tr></table>")
@@ -10,34 +11,36 @@ describe("Metabehaviors", function() {
             '#shouldnt-ajax': Ninja.submitsAsAjax()
           })
         Ninja.go()
-        response = {
-          status: 200,
-          contentType: "text/javascript",
-          responseText: fixtures.scriptResponse
-        }
-        mockAjax()
+        response = [
+          200,
+          {"Content-Type": "text/javascript"},
+          fixtures.scriptResponse
+        ]
+        sandbox = sinon.sandbox.create()
+        sandbox.useFakeServer()
       })
 
-    afterEach(function() { 
-        for(var i in ajaxRequests) {
-          ajaxRequests[i].response(response)
+    afterEach(function() {
+        for(var i in sandbox.requests) {
+          sandbox.requests[i].respond(response)
         }
+
+        sandbox.restore()
       })
 
     it("should handle click", function() {
-        expect(ajaxRequests.length).toEqual(0)
+        expect(sandbox.requests.length).toEqual(0)
         $("a#simple-link").trigger("click")
-        expect(ajaxRequests.length).toEqual(1)
+        expect(sandbox.requests.length).toEqual(1)
       })
 
     it("should handle submit", function() {
-        expect(ajaxRequests.length).toEqual(0)
+        expect(sandbox.requests.length).toEqual(0)
         $("form#simple-form").trigger("submit")
-        expect(ajaxRequests.length).toEqual(1)
+        expect(sandbox.requests.length).toEqual(1)
       })
 
     it("should leave non-ajaxy things alone", function() {
         expect($("#shouldnt-ajax").length).toEqual(1)
       })
   })
-

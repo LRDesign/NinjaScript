@@ -2,11 +2,15 @@
 //
 
 describe("AjaxToJson", function() {
+    var Ninja
+
     var submitter
     var target
     var sandbox
 
     beforeEach(function() {
+        Ninja = ninjascript.build()
+
         setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
         target = {}
         Ninja.respondToJson({
@@ -36,7 +40,7 @@ describe("AjaxToJson", function() {
           })
         submitter = Ninja.tools.ajaxToJson( )
 
-        server = sinon.fakeServer.create()
+        sandbox = sinon.sandbox.create()
         sandbox.useFakeServer()
       })
 
@@ -50,19 +54,19 @@ describe("AjaxToJson", function() {
       })
 
     it("should send an ajax request on .submit()", function() {
-        expect(sandbox.requests.length).toEqual(0)
+        expect(sandbox.server.requests.length).toEqual(0)
         submitter.submit()
-        expect(sandbox.requests.length).toEqual(1)
+        expect(sandbox.server.requests.length).toEqual(1)
       })
 
     describe("acting on JSON result", function() {
         beforeEach(function() {
             submitter.submit()
-            sandbox.requests[0].respond({[
+            sandbox.server.requests[0].respond([
                 200,
                 {"Content-Type": "application/json"},
                 '{ "shallow": "testing", "three": { "levels": { "deep": 17 } } }'
-              ]})
+              ])
           })
 
         it("should act on simple keys", function() {

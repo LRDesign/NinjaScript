@@ -1,18 +1,18 @@
 goog.provide('ninjascript.packagedBehaviors.utility');
 
-goog.require('ninjascript.singleton');
+goog.require('ninjascript.package');
 
 (function() {
-    Ninja.packageBehaviors(function(ninja) {
-        return {
+    ninjascript.package(function(hooks){
+        hooks.behaviors({
           suppressChangeEvents: function() {
-            return new ninja.does({
+            return new this.types.does({
                 events: {
                   DOMSubtreeModified: function(e){},
                   DOMNodeInserted: function(e){}
                 }
               })
           }
-        }
+        })
       })
   })()

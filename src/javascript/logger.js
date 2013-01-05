@@ -18,10 +18,21 @@ ninjascript.Logger = function() {
     },
     prototype.inactive_logging = function(message) {
     },
-    prototype.disactivate_logging = function() {
+    prototype.deactivate_logging = function() {
       this.log_function = this.inactive_logging
     },
     prototype.activate_logging = function() {
       this.log_function = this.active_logging
+    }
+
+    ninjascript.Logger.instance = new ninjascript.Logger()
+    ninjascript.Logger.instance.activate_logging()
+
+    ninjascript.Logger.log = function(message) {
+      ninjascript.Logger.instance.log(message)
+    }
+
+    ninjascript.Logger.deactivate = function() {
+      ninjascript.Logger.instance.deactivate_logging()
     }
   })()

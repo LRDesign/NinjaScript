@@ -1,8 +1,11 @@
 describe("Metabehaviors", function() {
+    var Ninja
+
     var response
     var sandbox
     beforeEach(function() {
-        Ninja.tools.clearRootCollection()
+        Ninja = ninjascript.build()
+
         setFixtures(fixtures.simpleForm('metabehaviors') + fixtures.simpleLink + fixtures.ajaxTarget + "<table><tr><td id='shouldnt-ajax'</td></tr></table>")
         $('#simple-form').bind("submit", function(){return false})
         Ninja.behavior({
@@ -21,23 +24,23 @@ describe("Metabehaviors", function() {
       })
 
     afterEach(function() {
-        for(var i in sandbox.requests) {
-          sandbox.requests[i].respond(response)
+        for(var i in sandbox.server.requests) {
+          sandbox.server.requests[i].respond(response)
         }
 
         sandbox.restore()
       })
 
     it("should handle click", function() {
-        expect(sandbox.requests.length).toEqual(0)
+        expect(sandbox.server.requests.length).toEqual(0)
         $("a#simple-link").trigger("click")
-        expect(sandbox.requests.length).toEqual(1)
+        expect(sandbox.server.requests.length).toEqual(1)
       })
 
     it("should handle submit", function() {
-        expect(sandbox.requests.length).toEqual(0)
+        expect(sandbox.server.requests.length).toEqual(0)
         $("form#simple-form").trigger("submit")
-        expect(sandbox.requests.length).toEqual(1)
+        expect(sandbox.server.requests.length).toEqual(1)
       })
 
     it("should leave non-ajaxy things alone", function() {

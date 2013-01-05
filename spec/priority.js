@@ -1,4 +1,10 @@
 describe("Priorities:", function() {
+    var Ninja
+
+    beforeEach(function(){
+        Ninja = ninjascript.build()
+      })
+
     describe("becomesAjaxLink()", function() {
         function appendData(string, prio) {
           return {

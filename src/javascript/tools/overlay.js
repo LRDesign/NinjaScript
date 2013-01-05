@@ -1,10 +1,9 @@
 goog.provide('ninjascript.tools.Overlay')
 
-goog.require('ninjascript.singleton')
 goog.require('ninjascript.utils')
-//XXX maybe need a 'ninjascript.SETUP or something?
+goog.require('ninjascript.package')
 
-ninjascript.tools.Overlay = function(list) {
+function ninjascript.tools.Overlay(list) {
   var elements = this.convertToElementArray(list)
   this.laziness = 0
   var ov = this
@@ -14,7 +13,7 @@ ninjascript.tools.Overlay = function(list) {
 };
 
 (function() {
-    var Utils = ninjascript.utils
+    var Utils = ninjascript.Utils
     var forEach = Utils.forEach
 
     var prototype = ninjascript.tools.Overlay.prototype
@@ -68,7 +67,8 @@ ninjascript.tools.Overlay = function(list) {
       this.set.remove()
     }
 
-    Ninja.packageTools({
+    ninscript.package(function(hooks){
+        hooks.tools({
         overlay: function() {
           return new ninjascript.tools.Overlay(jQuery.makeArray(arguments))
         },
@@ -92,5 +92,5 @@ ninjascript.tools.Overlay = function(list) {
           overlay.css("zIndex", "2")
           return overlay
         }
-      })
+      })})
   })()

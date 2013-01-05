@@ -1,4 +1,6 @@
 goog.provide('ninjascript.mutation.EventHandler');
+goog.require('ninjascript.Logger');
+goog.require('ninjascript.utils');
 
 ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
   this.eventQueue = []
@@ -9,6 +11,8 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
 
 (function(){
     var prototype = ninjascript.mutation.EventHandler.prototype
+    var log = ninjascript.Logger.log
+    var forEach = ninjascript.utils.forEach
 
     prototype.setup = function() {
       var mutationHandler = this
@@ -16,8 +20,8 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
         mutationHandler.mutationEventTriggered(event)
       }
 
-      docRoot.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
-      docRoot.one("DOMSubtreeModified DOMNodeInserted", function(){
+      this.docRoot.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
+      this.docRoot.one("DOMSubtreeModified DOMNodeInserted", function(){
           mutationHandler.detachSyntheticMutationEvents()
         })
 

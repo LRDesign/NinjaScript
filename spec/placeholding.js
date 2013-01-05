@@ -1,13 +1,14 @@
-
-
 describe("Placeholding", function() {
+    var Ninja
+
     var input_placeholder = !!('placeholder' in document.createElement('input'))
     var textarea_placeholder = !!('placeholder' in document.createElement('textarea'))
 
     var formData
     beforeEach(function() {
+        Ninja = ninjascript.build()
+
         formData = "didn't trigger"
-        Ninja.tools.clearRootCollection()
         Ninja.behavior({
             "#form_a": {
               priority: -10,
@@ -28,6 +29,10 @@ describe("Placeholding", function() {
             "<textarea id='input_d' name='d' />" +
             "</form>"
         )
+        $('#form_a').bind('submit', function(event){
+                formData = $(this.element).serializeArray()
+                event.preventDefault()
+              })
         Ninja.go()
       })
 

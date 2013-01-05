@@ -2,6 +2,7 @@ goog.provide('ninjascript.tools.JSONDispatcher')
 
 goog.require('ninjascript.tools.JSONHandler')
 goog.require('ninjascript.utils')
+goog.require('ninjascript.Logger')
 
 ninjascript.tools.JSONDispatcher = function() {
   this.handlers = []
@@ -10,6 +11,7 @@ ninjascript.tools.JSONDispatcher = function() {
 (function() {
     var Utils = ninjascript.utils
     var prototype = ninjascript.tools.JSONDispatcher.prototype
+    var log = ninjascript.Logger.log
 
     prototype.addHandler = function(handler) {
       this.handlers.push(new ninjascript.tools.JSONHandler(handler))
@@ -21,7 +23,7 @@ ninjascript.tools.JSONDispatcher = function() {
           this.handlers[i].receive(json)
         }
         catch(problem) {
-          Utils.log("prototype.Caught = " + problem + " while handling JSON response.")
+          log("prototype.Caught = " + problem + " while handling JSON response.")
         }
       }
     },

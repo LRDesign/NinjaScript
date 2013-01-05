@@ -1,13 +1,13 @@
 goog.provide('ninjascript.packagedBehaviors.confirm');
 
-goog.require('ninjascript.singleton');
+goog.require('ninjascript.package');
 
 (function(){
-    Ninja.packageBehaviors( function(ninja) {
-        return {
+    ninjascript.package(function(hooks){
+        hooks.behaviors({
           confirms: function(configs) {
 
-            configs = Ninja.tools.ensureDefaults(configs,
+            configs = this.tools.ensureDefaults(configs,
               { confirmMessage: function(elem){
                   return $(elem).attr('data-confirm')
                 }})
@@ -25,17 +25,17 @@ goog.require('ninjascript.singleton');
               }
             }
 
-            return new ninja.selects({
-                "form": new ninja.does({
+            return new this.types.selects({
+                "form": new this.types.does({
                   priority: 20,
                   events: { submit: [confirmDefault, "andDoDefault"] }
                 }),
-                "a,input": new ninja.does({
+                "a,input": new this.types.does({
                   priority: 20,
                   events: {  click: [confirmDefault, "andDoDefault"] }
                 })
               })
           }
-        }
+        })
       })
   })()

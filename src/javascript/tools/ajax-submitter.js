@@ -1,10 +1,11 @@
 goog.provide('ninjascript.tools.AjaxSubmitter')
 
-goog.require('ninjascript.singleton')
 goog.require('ninjascript.utils')
 goog.require('ninjascript.Logger')
 goog.require('ninjascript.tools.JSONDispatcher')
 goog.require('ninjascript.tools.Overlay')
+
+goog.require('ninjascript.package')
 
 ninjascript.tools.AjaxSubmitter = function() {
   this.formData = []
@@ -16,9 +17,7 @@ ninjascript.tools.AjaxSubmitter = function() {
 };
 
 (function() {
-    function log(message) {
-      ninjascript.Logger.log(message)
-    }
+    var log =  ninjascript.Logger.log
 
     var Utils = ninjascript.utils
 
@@ -69,41 +68,42 @@ ninjascript.tools.AjaxSubmitter = function() {
       Ninja.tools.message("Server prototype.error = " + xhr.statusText, "error")
     }
 
-    Ninja.packageTools({
-        ajaxSubmitter: function() {
-          return new ninjascript.tools.AjaxSubmitter()
-        },
+    ninjascript.package(function(hooks){
+        hooks.tools({
+            ajaxSubmitter: function() {
+              return new ninjascript.tools.AjaxSubmitter()
+            },
 
-        ajaxToJson: function(desc) {
-          var submitter = this.ajaxSubmitter()
-          submitter.dataType = 'json'
-          submitter.onSuccess = function(xhr, statusText, data) {
-            Ninja.jsonDispatcher.dispatch(data)
-          }
-          return submitter
-        },
+            ajaxToJson: function(desc) {
+              var submitter = this.ajaxSubmitter()
+              submitter.dataType = 'json'
+              submitter.onSuccess = function(xhr, statusText, data) {
+                this.jsonDispatcher.dispatch(data)
+              }
+              return submitter
+            },
 
-        overlayAndSubmit: function(overlaid, target, action, jsonHandling) {
-          var overlay = this.busyOverlay(this.findOverlay(overlaid))
+            overlayAndSubmit: function(overlaid, target, action, jsonHandling) {
+              var overlay = this.busyOverlay(this.findOverlay(overlaid))
 
-          var submitter
-          if( typeof jsonHandling == "undefined" ) {
-            submitter = this.ajaxSubmitter()
-          }
-          else {
-            submitter = this.ajaxToJson(jsonHandling)
-          }
+              var submitter
+              if( typeof jsonHandling == "undefined" ) {
+                submitter = this.ajaxSubmitter()
+              }
+              else {
+                submitter = this.ajaxToJson(jsonHandling)
+              }
 
-          submitter.sourceForm(target)
+              submitter.sourceForm(target)
 
-          submitter.action = action
-          submitter.method = this.extractMethod(target, submitter.formData)
+              submitter.action = action
+              submitter.method = this.extractMethod(target, submitter.formData)
 
-          submitter.onResponse = function(xhr, statusTxt) {
-            overlay.remove()
-          }
-          overlay.affix()
-          submitter.submit()
-        }
-      })
+              submitter.onResponse = function(xhr, statusTxt) {
+                overlay.remove()
+              }
+              overlay.affix()
+              submitter.submit()
+            }
+          })})
   })()

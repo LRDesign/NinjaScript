@@ -17,3 +17,4 @@ src/deps.js
 legacy-spec-main.js
 dependency.MF
 jsTestDriver.conf
+test-results/

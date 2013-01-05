@@ -1,9 +1,10 @@
 describe("Composed Event Handlers", function() {
     var triggeredEvidence = []
+    var Ninja
     beforeEach(function() {
         triggeredEvidence = []
-        Ninja.tools.clearRootCollection()
 
+        Ninja = ninjscript.build()
 
         Ninja.behavior({
             "#test-target": {

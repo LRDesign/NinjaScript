@@ -1,5 +1,7 @@
 goog.provide('ninjascript.tools.JSONHandler')
 
+goog.require('ninjascript.Logger')
+
 /**
  * Intention is to use JSONHandler like this:
  *
@@ -22,6 +24,7 @@ ninjascript.tools.JSONHandler = function(desc) {
 
 (function(){
     var prototype = ninjascript.tools.JSONHandler.prototype
+    var log = ninjascript.Logger.log
 
     prototype.receive = function (data) {
       this.compose([], data, this.desc)
@@ -33,7 +36,7 @@ ninjascript.tools.JSONHandler = function(desc) {
           desc.call(this, data) //Individual functions can share data through handler
         }
         catch(problem) {
-          Utils.log("prototype.Caught = " + problem + " while handling JSON at " + path.join("/"))
+          log("prototype.Caught = " + problem + " while handling JSON at " + path.join("/"))
         }
       }
 

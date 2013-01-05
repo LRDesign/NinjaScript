@@ -22,9 +22,7 @@ ninjascript.BehaviorCollection = function(tools) {
 
     var forEach = Utils.forEach
 
-    function log(message) {
-      Logger.log(message)
-    }
+    var log = ninjascript.Logger.log
 
     var TransformFailedException = ninjascript.exceptions.TransformFailed
     var CouldntChooseException = ninjascript.exceptions.CouldntChoose
@@ -42,7 +40,7 @@ ninjascript.BehaviorCollection = function(tools) {
         this.addBehavior(selector, behavior())
       }
       else {
-        var behavior = new Behaviors.base(behavior)
+        var behavior = new Behaviors.Basic(behavior)
         this.addBehavior(selector, behavior)
       }
     }
@@ -81,9 +79,8 @@ ninjascript.BehaviorCollection = function(tools) {
 
     prototype.applyBehaviorsInContext = function(context, element, behaviors) {
       var curContext,
-      rootContext = context,
-
-      behaviors = this.sortBehaviors(behaviors)
+        rootContext = context,
+        behaviors = this.sortBehaviors(behaviors)
 
       /*
        * This replaces an arcane setup by which transforms that completely
@@ -150,13 +147,15 @@ ninjascript.BehaviorCollection = function(tools) {
             this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
           }
         }
-        this.applyBehaviorsInContext(new BehaviorBinding, element, applicableBehaviors)
+        context = new BehaviorBinding
+        context.ninja = this.tools.ninja
       }
       else {
         context.unbindHandlers()
-        this.applyBehaviorsInContext(context, element, applicableBehaviors)
       }
+      this.applyBehaviorsInContext(context, element, applicableBehaviors)
     }
+
     prototype.applyAll = function(root){
       var len = this.selectors.length
       var collection = this

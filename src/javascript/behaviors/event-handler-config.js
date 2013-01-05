@@ -1,4 +1,5 @@
 goog.provide('ninjascript.behaviors.EventHandlerConfig');
+goog.require('ninjascript.Logger');
 
 ninjascript.behaviors.EventHandlerConfig = function(name, config) {
   this.name = name
@@ -37,7 +38,7 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
         fireMutation = true
       }
       if (!found) {
-        console.log("Event handler modifier unrecognized: " + config[i] + " for " + name)
+        ninjascript.Logger.log("Event handler modifier unrecognized: " + config[i] + " for " + name)
       }
     }
   }
@@ -88,8 +89,7 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
       }
       if(this.fireMutation) {
         handler = this.appendAction(handler, function(eventRecord) {
-            //XXX use Tools to get to mutationHandler???
-            Tools.fireMutationEvent()
+            config.fireMutationEvent()
           })
       }
       handler = this.prependAction(handler, function(eventRecord) {

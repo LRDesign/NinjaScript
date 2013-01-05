@@ -10,6 +10,7 @@ goog.require('ninjascript.utils')
 
 ninjascript.Tools = function() {
   this.ninja = null
+  this.behaviorCollection = null
 };
 
 /*
@@ -21,12 +22,9 @@ ninjascript.Tools = function() {
     var BehaviorCollection = ninjascript.BehaviorCollection
     var Exceptions = ninjascript.exceptions
     var Utils = ninjascript.utils
-    var Logger = ninjascript.Logger
     var TransformFailedException = Exceptions.TransformFailed
 
-    function log(message) {
-      Logger.log(message)
-    }
+    var log = ninjascript.Logger.log
 
     //Handy JS things
     prototype.forEach = Utils.forEach
@@ -53,22 +51,12 @@ ninjascript.Tools = function() {
     }
 
     prototype.getRootCollection = function() {
-      var rootOfDocument = this.getRootOfDocument()
-
-      if(rootOfDocument.data("ninja-behavior") instanceof BehaviorCollection) {
-        return rootOfDocument.data("ninja-behavior")
-      }
-
-      var collection = new BehaviorCollection(this)
-
-      rootOfDocument.data("ninja-behavior", collection);
-      return collection
-    }
-    prototype.clearRootCollection = function() {
-      this.ninja.behavior = this.ninja.goodBehavior
-      this.getRootOfDocument().data("ninja-behavior", null)
+      return this.behaviorCollection
     }
 
+    prototype.fireMutationEvent = function() {
+      this.ninja.mutationHandler.fireMutationEvent()
+    }
 
     //HTML Utils
     //XXX new home

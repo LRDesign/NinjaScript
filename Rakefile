@@ -55,6 +55,7 @@ CLOSURE_DIR = File::join(BUILDTOOLS_DIR, "google-closure-library/closure")
 CLOSURE_DEPSWRITER = File::join(CLOSURE_DIR, "bin/build/depswriter.py")
 CLOSURE_LIBRARY_DIR = File::join(CLOSURE_DIR, "goog")
 CLOSURE_DOTS = File::join(*(%w{..} * CLOSURE_LIBRARY_DIR.split(File::Separator).length))
+SINON_DIR = File::join(BUILDTOOLS_DIR, "sinon")
 
 namespace :test do
   desc "Run JSTestDriver Server"
@@ -74,17 +75,26 @@ namespace :test do
 
   desc "Run tests against JSTestDriver"
   task :run, [:tests] => %w'src/deps.js jsTestDriver.conf' do |task, args|
-    if args[:tests]
+    unless args[:tests].nil? or args[:tests].empty?
       tests = args[:tests]
     else
-      "all"
+      tests = "all"
     end
-    sh %{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --captureConsole --runnerMode DEBUG --tests "#{tests}"}
+    sh %{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --captureConsole --runnerMode DEBUG --testOutput test-results --tests "#{tests}"}
   end
 
+  desc "Reset browsers and run tests against JSTestDriver"
+  task :reset, [:tests] => %w'src/deps.js jsTestDriver.conf' do |task, args|
+    unless args[:tests].nil? or args[:tests].empty?
+      tests = args[:tests]
+    else
+      tests = "all"
+    end
+    sh %{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --captureConsole --runnerMode DEBUG --reset --testOutput test-results --tests "#{tests}"}
+  end
 end
 
-task :buildtools => %w{buildtools:jstestdriver buildtools:jstestdriver_coverage buildtools:closure_compiler}
+task :buildtools => %w{buildtools:jstestdriver buildtools:jstestdriver_coverage buildtools:closure_compiler buildtools:sinon}
 
 namespace :buildtools do
   task :jstestdriver do
@@ -106,6 +116,12 @@ namespace :buildtools do
     chdir CLOSURE_COMPILER_DIR do
       puts "Running ant"
       puts %x{ant jar}
+    end
+  end
+
+  task :sinon do
+    chdir SINON_DIR do
+      sh "./build"
     end
   end
 end
@@ -144,7 +160,7 @@ namespace :build do
   end
 
   file "src/deps.js" => sourcefiles do |file|
-    %x{/bin/env #{CLOSURE_DEPSWRITER} --root_with_prefix="src/javascript #{CLOSURE_DOTS}/src/javascript" > #{file}}
+    sh %{/bin/env #{CLOSURE_DEPSWRITER} --root_with_prefix="src/javascript #{CLOSURE_DOTS}/src/javascript" > #{file}}
   end
 
   file "dependency.MF" => sourcefiles do |file|

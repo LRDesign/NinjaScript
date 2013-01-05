@@ -1,9 +1,11 @@
 // vim: set sw=2 ft=javascript.jasmine-javascript:
-//
-
 describe("AjaxSubmitter", function() {
+    var Ninja
     var submitter
     var sandbox
+    beforeEach(function() {
+        Ninja = ninjascript.build()
+      })
 
     describe("applied to a link", function() {
         beforeEach(function() {
@@ -11,7 +13,7 @@ describe("AjaxSubmitter", function() {
             setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
             submitter = Ninja.tools.ajaxSubmitter($('#simple-link')[0])
 
-            sandbox = sinon.fakeServer.create()
+            sandbox = sinon.sandbox.create()
             sandbox.useFakeServer()
           })
 
@@ -21,19 +23,19 @@ describe("AjaxSubmitter", function() {
 
 
         it("should send an ajax request on .submit()", function() {
-            expect(sandbox.requests.length).toEqual(0)
+            expect(sandbox.server.requests.length).toEqual(0)
             submitter.submit()
-            expect(sandbox.requests.length).toEqual(1)
+            expect(sandbox.server.requests.length).toEqual(1)
           })
 
         it("should apply the resulting javascript", function() {
             expect($("#ajax-target > *").length).toEqual(0)
             submitter.submit()
-            sandbox.requests[0].respond({[
+            sandbox.server.requests[0].respond([
                   200,
                   {"Content-Type": "text/javascript"},
                   fixtures.scriptResponse
-                ]})
+                ])
             expect($("#ajax-target > *").length).toEqual(3)
           })
       })
@@ -47,7 +49,7 @@ describe("AjaxSubmitter", function() {
               </form>'+ fixtures.ajaxTarget)
             submitter = Ninja.tools.ajaxSubmitter($('#simple-form')[0])
 
-            sandbox = sinon.fakeServer.create()
+            sandbox = sinon.sandbox.create()
             sandbox.useFakeServer()
           })
 
@@ -56,19 +58,19 @@ describe("AjaxSubmitter", function() {
           })
 
         it("should send an ajax request on .submit()", function() {
-            expect(sandbox.requests.length).toEqual(0)
+            expect(sandbox.server.requests.length).toEqual(0)
             submitter.submit()
-            expect(sandbox.requests.length).toEqual(1)
+            expect(sandbox.server.requests.length).toEqual(1)
           })
 
         it("should apply the resulting javascript", function() {
             expect($("#ajax-target > *").length).toEqual(0)
             submitter.submit()
-            sandbox.requests[0].respond({[
+            sandbox.server.requests[0].respond([
                   200,
                   {"Content-Type": "text/javascript"},
                   fixtures.scriptResponse
-                ]})
+                ])
             expect($("#ajax-target > *").length).toEqual(3)
           })
       })

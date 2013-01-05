@@ -1,9 +1,13 @@
 describe("Packaged Behaviors:", function() {
+    var Ninja
+    var sandbox
+    beforeEach(function(){
+        Ninja = ninjascript.build()
+      })
+
     describe("becomesAjaxLink()", function() {
-        var sandbox
 
         beforeEach(function() {
-            Ninja.tools.clearRootCollection()
             Ninja.behavior({
                 "#simple-form": Ninja.becomesAjaxLink()
               })
@@ -34,31 +38,31 @@ describe("Packaged Behaviors:", function() {
               })
 
             afterEach(function() {
-                for(var i in sandbox.requests) {
-                  sandbox.requests[i].respond(response)
+                for(var i in sandbox.server.requests) {
+                  sandbox.server.requests[i].respond(response)
                 }
               })
 
 
             it("should handle clicking the link to send a post", function() {
-                expect(sandbox.requests.length).toEqual(0)
+                expect(sandbox.server.requests.length).toEqual(0)
                 $("a#simple-form").trigger("click")
-                expect(sandbox.requests.length).toEqual(1)
-                expect(sandbox.requests[0].method).toEqual("PUT")
+                expect(sandbox.server.requests.length).toEqual(1)
+                expect(sandbox.server.requests[0].method).toEqual("PUT")
               })
 
             it("should put up an overlay", function() {
                 expect($("div.ninja_busy")).not.toExist()
                 $("a#simple-form").trigger("click")
                 expect($("div.ninja_busy")).toExist()
-                sandbox.requests[0].respond(response)
+                sandbox.server.requests[0].respond(response)
                 expect($("div.ninja_busy")).not.toExist()
               })
 
             it("should apply the reply javascript", function() {
                 $("a#simple-form").trigger("click")
                 expect($("#ajax-target > *").length).toEqual(0)
-                sandbox.requests[0].respond(response)
+                sandbox.server.requests[0].respond(response)
                 expect($("#ajax-target > *").length).toEqual(3)
               })
           })

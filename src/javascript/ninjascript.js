@@ -1,22 +1,27 @@
 goog.provide("ninjascript.NinjaScript")
 
-goog.require("ninjascript.utils")
-goog.require("ninjascript.configuration")
+goog.require('ninjascript.Logger');
+
+goog.require('ninjascript.Extensions');
+
+goog.require("ninjascript.utils");
+goog.require("ninjascript.configuration");
 goog.require('ninjascript.mutation.EventHandler');
 
 goog.require('ninjascript.behaviors.Basic');
 goog.require('ninjascript.behaviors.Meta');
 goog.require('ninjascript.behaviors.Select');
 
-ninjascript.NinjaScript = function(tools, config, jsonDispatcher) {
+ninjascript.NinjaScript = function(tools, config, collection, jsonDispatcher) {
   this.config = config
   this.tools = tools
-  this.tools.ninja = this
+  this.behaviorCollection = collection
   this.jsonDispatcher = jsonDispatcher
+
   this.mutationHandler =
     new ninjascript.mutation.EventHandler(
       tools.getRootOfDocument(),
-      tools.getRootCollection()
+      collection
     )
 };
 
@@ -25,29 +30,23 @@ ninjascript.NinjaScript = function(tools, config, jsonDispatcher) {
     var Utils = ninjascript.utils
     var Behaviors = ninjascript.behaviors
 
-    prototype.packageBehaviors = function(callback) {
-      var types = {
-        does: Behaviors.Basic,
-        chooses: Behaviors.Meta,
-        selects: Behaviors.Select
-      }
-      result = callback(types)
-      Utils.enrich(this, result)
-    },
+    var log = ninjascript.Logger.log
 
-    prototype.packageTools = function(object) {
-      Utils.enrich(ninjascript.Tools.prototype, object)
-    },
+    prototype.package = function(callback) {
+      var targets = {
+        Ninja: this,
+        tools: this.tools,
+      }
+      return ninjascript.Extensions.package(targets, callback)
+    }
 
     prototype.configure = function(opts) {
       Utils.enrich(this.config, opts)
-    },
+    }
 
     prototype.respondToJson = function(handlerConfig) {
       this.jsonDispatcher.addHandler(handlerConfig)
-    },
-
-
+    }
 
     prototype.goodBehavior = function(dispatching) {
       var collection = this.tools.getRootCollection()
@@ -61,18 +60,18 @@ ninjascript.NinjaScript = function(tools, config, jsonDispatcher) {
         }
       }
       this.failSafeGo()
-    },
+    }
 
     prototype.behavior = prototype.goodBehavior
 
     prototype.failSafeGo = function() {
       this.failSafeGo = function(){}
       jQuery(window).load( function(){ Ninja.go() } )
-    },
+    }
 
     prototype.badBehavior = function(nonsense) {
       throw new Error("Called Ninja.behavior() after Ninja.go() - don't do that.  'Go' means 'I'm done, please proceed'")
-    },
+    }
 
     prototype.go = function() {
       var Ninja = this

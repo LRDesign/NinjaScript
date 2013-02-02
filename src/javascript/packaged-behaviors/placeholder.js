@@ -164,34 +164,33 @@ goog.require('ninjascript.package');
     }
 
     behaviors.hasPlaceholder = function(configs) {
-      var behaviors = [this.grabsPlaceholderText(configs)]
-      if(!input_placeholder || !textarea_placeholder) {
-        behaviors.push(
-          new this.types.chooses(function(meta) {
-              if(input_placeholder) {
-                meta.asTextInput = null
-                meta.asPassword = null
-              } else {
-                meta.asTextInput = this.hasPlaceholderText(configs)
-                meta.asPassword = this.hasPlaceholderPassword(configs)
-              }
+      var behaviors = [this.grabsPlaceholderText(configs)],
+      asTextInput = null,
+      asPassword = null,
+      asTextArea = null
 
-              if( textarea_placeholder) {
-                meta.asTextArea = null
-              } else {
-                meta.asTextArea = this.hasPlaceholderText(configs)
-              }
-            },
+      if(!input_placeholder || !textarea_placeholder) {
+        if(!input_placeholder) {
+          asTextInput = this.hasPlaceholderText(configs)
+          asPassword = this.hasPlaceholderPassword(configs)
+        }
+
+        if( !textarea_placeholder) {
+          asTextArea = this.hasPlaceholderText(configs)
+        }
+
+        behaviors.push(
+          new this.types.chooses(
             function(elem) {
               elem = $(elem)
               if(elem.is("input[type=text]")) {
-                return this.asTextInput
+                return asTextInput
               }
               else if(elem.is("textarea")) {
-                return this.asTextArea
+                return asTextArea
               }
               else if(elem.is("input[type=password]")) {
-                return this.asPassword
+                return asPassword
               }
             }))
       }

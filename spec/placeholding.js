@@ -36,6 +36,10 @@ describe("Placeholding", function() {
         Ninja.go()
       })
 
+    afterEach(function(){
+        Ninja.stop()
+      })
+
     describe("on the form", function() {
         it("should still trigger previous handlers", function() {
             expect(formData).toEqual("didn't trigger")

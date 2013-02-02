@@ -1,1 +1,5 @@
 Remove interal references to "Ninja" singleton
+
+Add (and detect) a MutationListener based event handler
+
+Name behaviors?  Ideally for generating function, or source file?

@@ -4,16 +4,18 @@ goog.require('ninjascript.sizzle')
 goog.require('ninjascript.behaviors.Abstract')
 goog.require('ninjascript.utils')
 goog.require('ninjascript.exceptions')
+goog.require('ninjascript.BehaviorBinding')
 
-ninjascript.BehaviorCollection = function(tools) {
+ninjascript.BehaviorCollection = function(parts) {
   this.lexicalCount = 0
   this.behaviors = {}
   this.selectors = []
-  this.tools = tools
+  this.parts = parts
+  this.tools = parts.tools
   return this
-};
+}
 
-(function() {
+;(function() {
     var prototype = ninjascript.BehaviorCollection.prototype
 
     var Utils = ninjascript.utils
@@ -27,6 +29,8 @@ ninjascript.BehaviorCollection = function(tools) {
     var TransformFailedException = ninjascript.exceptions.TransformFailed
     var CouldntChooseException = ninjascript.exceptions.CouldntChoose
 
+    prototype.ninja = function() { return this.parts.ninja }
+
     prototype.addBehavior = function(selector, behavior) {
       if(Utils.isArray(behavior)) {
         forEach(behavior, function(behaves){
@@ -37,7 +41,7 @@ ninjascript.BehaviorCollection = function(tools) {
         this.insertBehavior(selector, behavior)
       }
       else if(typeof behavior == "function"){
-        this.addBehavior(selector, behavior())
+        this.addBehavior(selector, behavior.call(this.ninja()))
       }
       else {
         var behavior = new Behaviors.Basic(behavior)
@@ -78,21 +82,28 @@ ninjascript.BehaviorCollection = function(tools) {
     }
 
     prototype.applyBehaviorsInContext = function(context, element, behaviors) {
-      var curContext,
-        rootContext = context,
+      var rootContext = context,
         behaviors = this.sortBehaviors(behaviors)
 
-      /*
-       * This replaces an arcane setup by which transforms that completely
-       * changed the element in question "broke" the chain of event handlers
-       *
-       * At the moment, I have a vague un-ease that that had a purpose, but I
-       * don't remember what it was.
-       */
-      forEach(behaviors,
-        function(behavior){
+        // There was code here (and a comment about "why is this here?"
+        // It was here because each transform *might* completely replace the element
+        // being worked on - which means that the context-chain needs to be split:
+        // The existing chain needs to go with the old element
+        // A new chain with these event handlers needs to be started
+        //
+        // TODO:
+        // Figure out the best place to land those concerns
+        //
+        // Also:
+        // ninja-hide currently is protected from mutation events (for various reasons)
+        // cascadeEvent (which would trigger the prior chain) also puts element into the hide
+        //
+        // The "stashed" elements should a) only get put-into-hide once b) get the chain
+        // handlers bound when they're injected.
+      forEach(behaviors, function(behavior){
           try {
             context = context.binding(behavior, element)
+            element = context.element
           }
           catch(ex) {
             if(ex instanceof TransformFailedException) {
@@ -103,8 +114,7 @@ ninjascript.BehaviorCollection = function(tools) {
               throw ex
             }
           }
-        }
-      )
+        })
 
       rootContext.visibleElement = element
 
@@ -112,7 +122,7 @@ ninjascript.BehaviorCollection = function(tools) {
 
       context.bindHandlers()
 
-      this.fireMutationEvent()
+      this.tools.fireMutationEvent()
 
       return element
     }
@@ -147,8 +157,7 @@ ninjascript.BehaviorCollection = function(tools) {
             this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
           }
         }
-        context = new BehaviorBinding
-        context.ninja = this.tools.ninja
+        context = BehaviorBinding(this.tools)
       }
       else {
         context.unbindHandlers()

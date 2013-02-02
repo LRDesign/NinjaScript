@@ -76,9 +76,10 @@ ninjascript.tools.AjaxSubmitter = function() {
 
             ajaxToJson: function(desc) {
               var submitter = this.ajaxSubmitter()
+              var dispatcher = this.jsonDispatcher
               submitter.dataType = 'json'
               submitter.onSuccess = function(xhr, statusText, data) {
-                this.jsonDispatcher.dispatch(data)
+                dispatcher.dispatch(data)
               }
               return submitter
             },

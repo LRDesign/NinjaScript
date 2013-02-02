@@ -15,9 +15,6 @@ describe("Metabehaviors", function() {
           })
         Ninja.go()
         response = [
-          200,
-          {"Content-Type": "text/javascript"},
-          fixtures.scriptResponse
         ]
         sandbox = sinon.sandbox.create()
         sandbox.useFakeServer()
@@ -25,10 +22,15 @@ describe("Metabehaviors", function() {
 
     afterEach(function() {
         for(var i in sandbox.server.requests) {
-          sandbox.server.requests[i].respond(response)
+          sandbox.server.requests[i].respond(
+            200,
+            {"Content-Type": "text/javascript"},
+            fixtures.scriptResponse
+          )
         }
 
         sandbox.restore()
+        Ninja.stop()
       })
 
     it("should handle click", function() {

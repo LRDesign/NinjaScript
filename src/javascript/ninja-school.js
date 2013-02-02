@@ -4,7 +4,6 @@ goog.require('ninjascript.NinjaScript');
 goog.require('ninjascript.Tools');
 goog.require('ninjascript.configuration');
 goog.require('ninjascript.tools.JSONDispatcher');
-goog.require('ninjascript.Extensions');
 goog.require('ninjascript.mutation.EventHandler');
 
 goog.require('ninjascript.behaviors.Basic');
@@ -12,26 +11,25 @@ goog.require('ninjascript.behaviors.Meta');
 goog.require('ninjascript.behaviors.Select');
 
 ninjascript.build = function(){
-  var components = new ninjascript.Extensions
-  components.tools = new ninjascript.Tools(componenets)
-  components.config = ninjascript.configuration
-  components.collection = new ninjascript.BehaviorCollection(tools)
-  components.jsonDispatcher = new ninjascript.tools.JSONDispatcher()
-  components.mutationHandler = new ninjascript.mutation.EventHandler(tools.getRootOfDocument(), collection)
-  components.ninja = new ninjascript.NinjaScript(components)
+  var components = {}
+  components["tools"] = new ninjascript.Tools(components)
+  components["config"] = ninjascript.configuration
+  components["collection"] = new ninjascript.BehaviorCollection(components)
+  components["jsonDispatcher"] = new ninjascript.tools.JSONDispatcher()
+  components["mutationHandler"] = new ninjascript.mutation.EventHandler(components.tools.getRootOfDocument(), components.collection)
 
-  components.types = {
+  components["types"] = {
     "does": ninjascript.behaviors.Basic,
     "chooses": ninjascript.behaviors.Meta,
     "selects": ninjascript.behaviors.Select
   }
 
-  tools.behaviorCollection = collection
-  tools.ninja = ninja
+  components["ninja"] = new ninjascript.NinjaScript(components)
 
-  components.expose()
+  components["tools"].inject(components)
+  components["ninja"].inject(components)
 
-  return ninja
+  return components.ninja
 }
 
 Ninja = ninjascript.build()

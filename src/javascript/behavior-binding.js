@@ -3,101 +3,125 @@ goog.provide('ninjascript.BehaviorBinding')
 goog.require('ninjascript.utils')
 goog.require('ninjascript.Tools')
 
-ninjascript.BehaviorBinding = function() {
-  this.stashedElements = []
-  this.eventHandlerSet = {}
-};
-ninjascript.BehaviorBinding.prototype = new ninjascript.Tools;
+ninjascript.BehaviorBinding = function(tools){
+  var parentClass = function(){
+    this.stashedElements = []
+    this.eventHandlerSet = {}
+  }
+  parentClass.prototype = tools
 
-(function() {
-    var Utils = ninjascript.utils
-    var forEach = Utils.forEach
+  var prototype = new parentClass
 
-    var prototype = ninjascript.BehaviorBinding.prototype
-    var binding = ninjascript.BehaviorBinding
+  var Utils = ninjascript.utils
+  var forEach = Utils.forEach
 
-    binding.initialize = function(parent, config, element) {
-      this.behaviorConfig = config
-      this.parent = parent
+  var identityBehavior = { }
+  identityBehavior.transform = function(element){ return element }
+  identityBehavior.eventHandlers = []
+  identityBehavior.helpers = {}
 
-      this.acquireTransform(config.transform)
-      this.acquireEventHandlers(config.eventHandlers)
-      this.acquireHelpers(config.helpers)
+  prototype.initialize = function(parent, config, element) {
+    this.behaviorConfig = config
+    this.parent = parent
 
-      this.previousElement = element
-      this.postElement = element
-      var newElem = config.transform.call(this, elem)
-      if(newElem !== undefined) {
-        this.postElement = newElem
-      }
+    this.acquireTransform(config.transform)
+    this.acquireEventHandlers(config.eventHandlers)
+    this.acquireHelpers(config.helpers)
 
-      return this
+    this.previousElement = element
+    this.postElement = element
+    var newElem = this.transform(element)
+    if(newElem !== undefined) {
+      this.postElement = newElem
     }
+    this.element = this.postElement
 
-    binding.acquireEventHandlers = function(handlers) {
-      var len = handlers.length
-      var i = 0
-      var eventName
-      for(i=0; i < len; i++) {
-        eventName = handlers[i].name
-        this[eventName] = handlers[i].buildHandlerFunction(this.parent[eventName])
-      }
+    return this
+  }
+
+  prototype.binding = function(behaviorConfig, element) {
+    var parent = this
+    var binding = function() {
+      this.initialize(parent, behaviorConfig, element)
     }
+    binding.prototype = this
+    return new binding()
+  }
 
-    binding.acquireHelpers = function(helpers) {
-      for(var name in helpers) {
-        this[name] = helpers[name]
-      }
-    }
+  prototype.acquireEventHandlers = function(handlers) {
+    var len = handlers.length
+    var i = 0
+    var eventName
+    for(i=0; i < len; i++) {
+      eventName = handlers[i].name
+      var context = this
+      var handles = handlers[i].buildHandlerFunction(this.parent[eventName])
+      this[eventName] = function(){
+        var eventRecord = Array.prototype.shift.call(arguments)
+        Array.prototype.unshift.call(arguments, this) //Because 'this' is the receiving element
+        Array.prototype.unshift.call(arguments, eventRecord)
 
-    prototype.binding = function(behaviorConfig, element) {
-      function binding(config, element) {
-        binding.initialize.call(this, config, element)
-      }
-      binding.prototype = this
-      return new binding(behaviorConfig)
-    }
-
-    prototype.stash = function(element) {
-      this.stashedElements.unshift(element)
-    }
-
-    prototype.unstash = function() {
-      return this.stashedElements.shift()
-    }
-
-    prototype.clearStash = function() {
-      this.stashedElements = []
-    }
-
-    //XXX Of prototype.concern = how do cascading events work out?
-    //Should there be a first catch?  Or a "doesn't cascade" or something?
-    prototype.cascadeEvent = function(event) {
-      var formDiv = this.hiddenDiv()
-      forEach(this.stashedElements, function(element) {
-          var elem = jQuery(element)
-          elem.data("ninja-visited", this)
-          jQuery(formDiv).append(elem)
-          elem.trigger(event)
-        })
-    }
-
-    prototype.bindHandlers = function() {
-      var el = jQuery(this.element)
-      var handlers = this.behaviorConfig.eventHandlers
-      var len = handlers.length
-      for(var i = 0; i < len; i++) {
-        el.bind(handlers[i].name, this[handlers[i].name])
-      }
-    }
-
-    prototype.unbindHandlers = function() {
-      var el = jQuery(this.element)
-      var handlers = this.behaviorConfig.eventHandlers
-      var len = handlers.length
-      for(var i = 0; i < len; i++) {
-        el.unbind(handlers[i].name, this[handlers[i].name])
+        return handles.apply(context, arguments)
       }
     }
   }
-)()
+
+  prototype.acquireHelpers = function(helpers) {
+    for(var name in helpers) {
+      this[name] = helpers[name]
+    }
+  }
+
+  prototype.acquireTransform = function(transform) {
+    this.transform = transform
+  }
+
+  //XXX Should some or all of these methods migrate to Tools
+  //Criteria: accessible outside of behaviors proper (e.g. other tools)
+  prototype.stash = function(element) {
+    this.stashedElements.unshift(element)
+    jQuery(element).detach()
+    return element
+  }
+
+  prototype.unstash = function() {
+    var elem = jQuery(this.stashedElements.shift())
+    var formDiv = this.hiddenDiv()
+    elem.data("ninja-visited", this)
+    jQuery(formDiv).append(elem)
+    this.parent.bindHandlers()
+    return elem
+  }
+
+  prototype.clearStash = function() {
+    this.stashedElements = []
+  }
+
+  //XXX Of prototype.concern = how do cascading events work out?
+  //Should there be a first catch?  Or a "doesn't cascade" or something?
+  prototype.cascadeEvent = function(event) {
+    while(this.stashedElements.length > 0) {
+      this.unstash().trigger(event)
+    }
+  }
+
+  prototype.bindHandlers = function() {
+    var el = jQuery(this.postElement)
+    var handlers = this.behaviorConfig.eventHandlers
+    var len = handlers.length
+    for(var i = 0; i < len; i++) {
+      el.bind(handlers[i].name, this[handlers[i].name])
+    }
+  }
+
+  prototype.unbindHandlers = function() {
+    var el = jQuery(this.postElement)
+    var handlers = this.behaviorConfig.eventHandlers
+    var len = handlers.length
+    for(var i = 0; i < len; i++) {
+      el.unbind(handlers[i].name, this[handlers[i].name])
+    }
+  }
+
+  return prototype.binding(identityBehavior, null)
+}

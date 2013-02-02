@@ -2,7 +2,7 @@ goog.provide("ninjascript.NinjaScript")
 
 goog.require('ninjascript.Logger');
 
-goog.require('ninjascript.Extensions');
+goog.require('ninjascript.Extensible');
 
 goog.require("ninjascript.utils");
 goog.require("ninjascript.configuration");
@@ -12,20 +12,12 @@ goog.require('ninjascript.behaviors.Basic');
 goog.require('ninjascript.behaviors.Meta');
 goog.require('ninjascript.behaviors.Select');
 
-ninjascript.NinjaScript = function(tools, config, collection, jsonDispatcher) {
-  this.config = config
-  this.tools = tools
-  this.behaviorCollection = collection
-  this.jsonDispatcher = jsonDispatcher
-
-  this.mutationHandler =
-    new ninjascript.mutation.EventHandler(
-      tools.getRootOfDocument(),
-      collection
-    )
+ninjascript.NinjaScript = function() {
 };
 
-(function(){
+ninjascript.NinjaScript.prototype = new ninjascript.Extensible
+
+;(function(){
     var prototype = ninjascript.NinjaScript.prototype
     var Utils = ninjascript.utils
     var Behaviors = ninjascript.behaviors
@@ -37,7 +29,7 @@ ninjascript.NinjaScript = function(tools, config, collection, jsonDispatcher) {
         Ninja: this,
         tools: this.tools,
       }
-      return ninjascript.Extensions.package(targets, callback)
+      return ninjascript.Extensible.package(targets, callback)
     }
 
     prototype.configure = function(opts) {
@@ -49,7 +41,7 @@ ninjascript.NinjaScript = function(tools, config, collection, jsonDispatcher) {
     }
 
     prototype.goodBehavior = function(dispatching) {
-      var collection = this.tools.getRootCollection()
+      var collection = this.extensions.collection
       for(var selector in dispatching)
       {
         if(typeof dispatching[selector] == "undefined") {
@@ -74,12 +66,15 @@ ninjascript.NinjaScript = function(tools, config, collection, jsonDispatcher) {
     }
 
     prototype.go = function() {
-      var Ninja = this
-
       if(this.behavior != this.badBehavior) {
         this.mutationHandler.setup()
         this.behavior = this.badBehavior
         this.mutationHandler.fireMutationEvent()
       }
+    }
+
+    prototype.stop = function() {
+      this.mutationHandler.teardown()
+      this.behavior = this.goodBehavior
     }
   })()

@@ -4,6 +4,10 @@ describe("Ninja.tools: ", function() {
         Ninja = ninjascript.build()
       })
 
+    afterEach(function(){
+        Ninja.stop()
+      })
+
     describe("cant transform", function() {
         it("should raise a CantTransformException", function() {
             expect( function() {

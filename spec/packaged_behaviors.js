@@ -5,6 +5,10 @@ describe("Packaged Behaviors:", function() {
         Ninja = ninjascript.build()
       })
 
+    afterEach(function(){
+        Ninja.stop()
+      })
+
     describe("becomesAjaxLink()", function() {
 
         beforeEach(function() {
@@ -39,7 +43,7 @@ describe("Packaged Behaviors:", function() {
 
             afterEach(function() {
                 for(var i in sandbox.server.requests) {
-                  sandbox.server.requests[i].respond(response)
+                  sandbox.server.requests[i].respond(response[0], response[1], response[2])
                 }
               })
 
@@ -55,14 +59,14 @@ describe("Packaged Behaviors:", function() {
                 expect($("div.ninja_busy")).not.toExist()
                 $("a#simple-form").trigger("click")
                 expect($("div.ninja_busy")).toExist()
-                sandbox.server.requests[0].respond(response)
+                sandbox.server.requests[0].respond(response[0], response[1], response[2])
                 expect($("div.ninja_busy")).not.toExist()
               })
 
             it("should apply the reply javascript", function() {
                 $("a#simple-form").trigger("click")
                 expect($("#ajax-target > *").length).toEqual(0)
-                sandbox.server.requests[0].respond(response)
+                sandbox.server.requests[0].respond(response[0], response[1], response[2])
                 expect($("#ajax-target > *").length).toEqual(3)
               })
           })

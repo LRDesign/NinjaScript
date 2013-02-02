@@ -46,6 +46,7 @@ describe("AjaxToJson", function() {
 
     afterEach(function(){
         sandbox.restore()
+        Ninja.stop()
       })
 
     it("shouldn't fire until ajax request", function() {
@@ -62,11 +63,11 @@ describe("AjaxToJson", function() {
     describe("acting on JSON result", function() {
         beforeEach(function() {
             submitter.submit()
-            sandbox.server.requests[0].respond([
+            sandbox.server.requests[0].respond(
                 200,
                 {"Content-Type": "application/json"},
                 '{ "shallow": "testing", "three": { "levels": { "deep": 17 } } }'
-              ])
+              )
           })
 
         it("should act on simple keys", function() {

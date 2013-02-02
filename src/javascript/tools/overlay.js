@@ -3,7 +3,7 @@ goog.provide('ninjascript.tools.Overlay')
 goog.require('ninjascript.utils')
 goog.require('ninjascript.package')
 
-function ninjascript.tools.Overlay(list) {
+ninjascript.tools.Overlay = function(list) {
   var elements = this.convertToElementArray(list)
   this.laziness = 0
   var ov = this
@@ -13,7 +13,7 @@ function ninjascript.tools.Overlay(list) {
 };
 
 (function() {
-    var Utils = ninjascript.Utils
+    var Utils = ninjascript.utils
     var forEach = Utils.forEach
 
     var prototype = ninjascript.tools.Overlay.prototype
@@ -67,7 +67,7 @@ function ninjascript.tools.Overlay(list) {
       this.set.remove()
     }
 
-    ninscript.package(function(hooks){
+    ninjascript.package(function(hooks){
         hooks.tools({
         overlay: function() {
           return new ninjascript.tools.Overlay(jQuery.makeArray(arguments))

@@ -3,8 +3,7 @@ goog.provide('ninjascript.behaviors.Meta');
 goog.require('ninjascript.behaviors.Abstract');
 goog.require('ninjascript.exceptions');
 
-ninjascript.behaviors.Meta = function(setup, callback) {
-  setup(this)
+ninjascript.behaviors.Meta = function(callback) {
   this.chooser = callback
 };
 
@@ -19,7 +18,7 @@ ninjascript.behaviors.Meta.prototype = new ninjascript.behaviors.Abstract;
         return chosen.choose(element)
       }
       else {
-        throw new ninjascript.exceptions.CouldntChooseException("Couldn't choose behavior for " . element.toString())
+        throw new ninjascript.exceptions.CouldntChoose("Couldn't choose behavior for " + element.toString())
       }
     }
   })()

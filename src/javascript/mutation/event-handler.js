@@ -7,6 +7,14 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
   this.mutationTargets = []
   this.behaviorCollection = rootCollection
   this.docRoot = docRoot
+
+  var mutationHandler = this
+  this.handleMutationEvent = function(event) {
+    mutationHandler.mutationEventTriggered(event)
+  }
+  this.handleNaturalMutationEvent = function(){
+    mutationHandler.detachSyntheticMutationEvents()
+  }
 };
 
 (function(){
@@ -15,17 +23,15 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
     var forEach = ninjascript.utils.forEach
 
     prototype.setup = function() {
-      var mutationHandler = this
-      function handleMutation(event) {
-        mutationHandler.mutationEventTriggered(event)
-      }
-
-      this.docRoot.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", handleMutation);
-      this.docRoot.one("DOMSubtreeModified DOMNodeInserted", function(){
-          mutationHandler.detachSyntheticMutationEvents()
-        })
+      this.docRoot.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", this.handleMutationEvent)
+      this.docRoot.one("DOMSubtreeModified DOMNodeInserted", this.handleNaturalMutationEvent)
 
       this.setup = function(){}
+    }
+
+    prototype.teardown = function() {
+      delete this.setup //restore to prototype
+      this.docRoot.unbind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", this.handleMutationEvent)
     }
 
     prototype.detachSyntheticMutationEvents = function() {
@@ -51,12 +57,12 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
 
     prototype.mutationEventTriggered = function(evnt){
       if(this.eventQueue.length == 0){
-        log("mutation event - first")
+        //log("mutation event - first")
         this.enqueueEvent(evnt)
         this.handleQueue()
       }
       else {
-        log("mutation event - queueing")
+        //log("mutation event - queueing")
         this.enqueueEvent(evnt)
       }
     }

@@ -1,6 +1,6 @@
 goog.provide('ninjascript.package')
 
-goog.require('ninjascript.Extensions')
+goog.require('ninjascript.Extensible')
 goog.require('ninjascript.NinjaScript')
 goog.require('ninjascript.Tools')
 
@@ -9,5 +9,5 @@ ninjascript.package = function(callback){
     Ninja: ninjascript.NinjaScript.prototype,
     tools: ninjascript.Tools.prototype
   }
-  ninjascript.Extensions.package(targets, callback)
+  ninjascript.Extensible.package(targets, callback)
 }

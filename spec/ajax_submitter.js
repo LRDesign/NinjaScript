@@ -7,6 +7,10 @@ describe("AjaxSubmitter", function() {
         Ninja = ninjascript.build()
       })
 
+    afterEach(function(){
+        Ninja.stop()
+      })
+
     describe("applied to a link", function() {
         beforeEach(function() {
 
@@ -31,11 +35,11 @@ describe("AjaxSubmitter", function() {
         it("should apply the resulting javascript", function() {
             expect($("#ajax-target > *").length).toEqual(0)
             submitter.submit()
-            sandbox.server.requests[0].respond([
+            sandbox.server.requests[0].respond(
                   200,
                   {"Content-Type": "text/javascript"},
                   fixtures.scriptResponse
-                ])
+                )
             expect($("#ajax-target > *").length).toEqual(3)
           })
       })
@@ -66,11 +70,11 @@ describe("AjaxSubmitter", function() {
         it("should apply the resulting javascript", function() {
             expect($("#ajax-target > *").length).toEqual(0)
             submitter.submit()
-            sandbox.server.requests[0].respond([
+            sandbox.server.requests[0].respond(
                   200,
                   {"Content-Type": "text/javascript"},
                   fixtures.scriptResponse
-                ])
+                )
             expect($("#ajax-target > *").length).toEqual(3)
           })
       })

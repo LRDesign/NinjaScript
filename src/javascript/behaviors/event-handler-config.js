@@ -51,15 +51,12 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
       var handle = this.handle
       var config = this
 
-      var handler = function() {
-        var eventRecord = Array.prototype.shift.call(arguments)
-        Array.prototype.unshift.call(arguments, this)
-        Array.prototype.unshift.call(arguments, eventRecord)
-
+      var handler = function(eventRecord) {
         handle.apply(this, arguments)
-        if(!eventRecord.isFallthroughPrevented()) {
+        if(!eventRecord.isFallthroughPrevented() && typeof previousHandler !== "undefined") {
           previousHandler.apply(this, arguments)
         }
+
         if(config.stopDefault){
           return false
         } else {

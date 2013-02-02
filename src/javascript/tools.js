@@ -1,5 +1,7 @@
 goog.provide('ninjascript.Tools')
 
+goog.require('ninjascript.Extensible')
+
 goog.require('ninjascript.behaviors.Basic')
 goog.require('ninjascript.behaviors.Select')
 goog.require('ninjascript.behaviors.Meta')
@@ -9,14 +11,14 @@ goog.require('ninjascript.exceptions')
 goog.require('ninjascript.utils')
 
 ninjascript.Tools = function() {
-  this.ninja = null
-  this.behaviorCollection = null
 };
+
+ninjascript.Tools.prototype = new ninjascript.Extensible
 
 /*
  * Essential to the working of Ninjascript, but not part of the API
  */
-(function() {
+;(function() {
     var prototype = ninjascript.Tools.prototype
 
     var BehaviorCollection = ninjascript.BehaviorCollection
@@ -51,7 +53,7 @@ ninjascript.Tools = function() {
     }
 
     prototype.getRootCollection = function() {
-      return this.behaviorCollection
+      return this.ninja.collection
     }
 
     prototype.fireMutationEvent = function() {

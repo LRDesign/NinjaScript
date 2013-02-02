@@ -1,6 +1,6 @@
 goog.provide('ninjascript.packagedBehaviors.triggerOn');
 
-goog.require('ninjascript.singleton');
+goog.require('ninjascript.package');
 
 (function() {
     ninjascript.package(function(hooks) { hooks.behaviors({

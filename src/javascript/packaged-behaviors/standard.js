@@ -23,14 +23,14 @@ goog.require('ninjascript.Logger');
              * submitsAsAjaxForm, c.f.
              **/
              submitsAsAjax: function(configs) {
-               return new this.types.chooses(function(meta) {
-                   meta.asLink = this.submitsAsAjaxLink(configs),
-                   meta.asForm = this.submitsAsAjaxForm(configs)
-                 },
+               var asLink = this.submitsAsAjaxLink(configs)
+               var asForm = this.submitsAsAjaxForm(configs)
+
+               return new this.types.chooses(
                  function(elem) {
                    switch(elem.tagName.toLowerCase()) {
-                   case "a": return this.asLink
-                   case "form": return this.asForm
+                   case "a": return asLink
+                   case "form": return asForm
                    }
                  })
              },

@@ -10,7 +10,7 @@ goog.provide('ninjascript.exceptions');
         this.name = named; // Used to cause messages like "UserError: message" instead of the default "Error: message"
         this.message = message; // Used to set the message
       }
-      exceptionConstructor.prototype = Error.prototype
+      exceptionConstructor.prototype = new Error
       return exceptionConstructor
     }
 

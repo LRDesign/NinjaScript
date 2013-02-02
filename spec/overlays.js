@@ -6,6 +6,10 @@ describe("Overlays", function() {
         setFixtures(fixtures.simpleForm('overlays') + fixtures.simpleForm('overlays') + fixtures.simpleLink)
       })
 
+    afterEach(function() {
+        Ninja.stop()
+      })
+
     it("should target undefined", function() {
         var overlay = Ninja.tools.overlay(undefined)
         overlay.set.each(function(idx, elem){elem.addClass("testing")})

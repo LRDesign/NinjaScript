@@ -18,3 +18,4 @@ legacy-spec-main.js
 dependency.MF
 jsTestDriver.conf
 test-results/
+coverage/

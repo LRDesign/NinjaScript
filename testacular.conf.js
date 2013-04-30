@@ -16,11 +16,16 @@ autoWatch = true;
 
 browsers = ['Chrome'];
 
-reporters = ['coverage', 'progress'];
+var coverage = false
+if(coverage){
+  reporters = ['coverage', 'progress'];
 
-preprocessors = {
-  '**/src/javascript/**/*.js': 'coverage'
-};
+  preprocessors = {
+    '**/src/javascript/**/*.js': 'coverage'
+  };
+} else {
+  reporters = ['progress'];
+}
 
 junitReporter = {
   outputFile: 'test_out/unit.xml',

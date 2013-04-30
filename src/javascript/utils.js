@@ -4,7 +4,11 @@ goog.provide("ninjascript.utils");
     var utils = ninjascript.utils
 
     utils.isArray = function(candidate) {
-      return (candidate.constructor == Array)
+      if(typeof candidate == "undefined"){
+        return false
+      } else {
+        return (candidate.constructor == Array)
+      }
     },
 
     utils.enrich = function(left, right) {

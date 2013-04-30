@@ -67,8 +67,9 @@ ninjascript.NinjaScript.prototype = new ninjascript.Extensible
 
     prototype.go = function() {
       if(this.behavior != this.badBehavior) {
-        this.mutationHandler.setup()
         this.behavior = this.badBehavior
+        this.extensions.collection.finalize()
+        this.mutationHandler.setup()
         this.mutationHandler.fireMutationEvent()
       }
     }

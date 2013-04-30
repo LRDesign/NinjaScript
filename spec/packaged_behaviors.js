@@ -3,10 +3,12 @@ describe("Packaged Behaviors:", function() {
     var sandbox
     beforeEach(function(){
         Ninja = ninjascript.build()
+        sandbox = sinon.sandbox.create()
       })
 
     afterEach(function(){
         Ninja.stop()
+        sandbox.restore()
       })
 
     describe("becomesAjaxLink()", function() {
@@ -17,13 +19,8 @@ describe("Packaged Behaviors:", function() {
               })
             Ninja.go()
             setFixtures( fixtures.simpleForm('packaged') + fixtures.ajaxTarget)
-            sandbox = sinon.sandbox.create()
             sandbox.useFakeServer()
             Ninja.tools.fireMutationEvent()
-          })
-
-        afterEach(function(){
-            sandbox.restore()
           })
 
         it("should transform the form into a link", function() {
@@ -69,6 +66,34 @@ describe("Packaged Behaviors:", function() {
                 sandbox.server.requests[0].respond(response[0], response[1], response[2])
                 expect($("#ajax-target > *").length).toEqual(3)
               })
+          })
+      })
+
+
+    describe("confirms()", function() {
+        beforeEach(function(){
+            Ninja.behavior({
+                "#confirmable-checkbox": Ninja.confirms({confirmMessage: "Are you sure you want to check this?"})
+              })
+            Ninja.go()
+            setFixtures( fixtures.confirmingCheckbox )
+            Ninja.tools.fireMutationEvent()
+          })
+
+        it("should allow action if confirmed", function(){
+            var mockWindow = sandbox.mock(window)
+            mockWindow.expects("confirm").atLeast(1).withArgs("Are you sure you want to check this?").returns(true)
+
+            $("input#confirmable-checkbox").trigger("click")
+            expect($("#confirmable-checkbox:checked").length).toEqual(1)
+          })
+
+        it("should cancel action if not confirmed", function(){
+            var mockWindow = sandbox.mock(window)
+            mockWindow.expects("confirm").atLeast(1).withArgs("Are you sure you want to check this?").returns(false)
+
+            $("input#confirmable-checkbox").trigger("click")
+            expect($("#confirmable-checkbox:checked").length).toEqual(0)
           })
       })
   })

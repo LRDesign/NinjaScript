@@ -57,61 +57,9 @@ CLOSURE_LIBRARY_DIR = File::join(CLOSURE_DIR, "goog")
 CLOSURE_DOTS = File::join(*(%w{..} * CLOSURE_LIBRARY_DIR.split(File::Separator).length))
 SINON_DIR = File::join(BUILDTOOLS_DIR, "sinon")
 
-namespace :test do
-  desc "Run JSTestDriver Server"
-  task :server => 'jsTestDriver.conf' do
-    puts %x{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --port 9876 &}
-  end
-
-  desc "Run chrome against server"
-  task :chromium do
-    %x{/bin/env chromium --new-window localhost:9876/capture &}
-  end
-
-  desc "Run firefox against server"
-  task :firefox do
-    %x{/bin/env firefox localhost:9876/capture &}
-  end
-
-  desc "Run tests against JSTestDriver"
-  task :run, [:tests] => %w'src/deps.js jsTestDriver.conf' do |task, args|
-    unless args[:tests].nil? or args[:tests].empty?
-      tests = args[:tests]
-    else
-      tests = "all"
-    end
-    sh %{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --captureConsole --runnerMode DEBUG --testOutput test-results --tests "#{tests}"}
-  end
-
-  desc "Reset browsers and run tests against JSTestDriver"
-  task :reset, [:tests] => %w'src/deps.js jsTestDriver.conf' do |task, args|
-    unless args[:tests].nil? or args[:tests].empty?
-      tests = args[:tests]
-    else
-      tests = "all"
-    end
-    sh %{/bin/env java -jar #{JS_TEST_DRIVER_JAR} --captureConsole --runnerMode DEBUG --reset --testOutput test-results --tests "#{tests}"}
-  end
-end
-
-task :buildtools => %w{buildtools:jstestdriver buildtools:jstestdriver_coverage buildtools:closure_compiler buildtools:sinon}
+task :buildtools => %w{buildtools:closure_compiler buildtools:sinon}
 
 namespace :buildtools do
-  task :jstestdriver do
-    chdir JS_TEST_DRIVER_DIR do
-      puts "Running ant"
-      puts %x{ant jstestdriver}
-    end
-  end
-
-  task :jstestdriver_coverage do
-    chdir JS_TEST_DRIVER_DIR do
-      puts "Running ant"
-      puts %x{ant jstestdriver-coverage}
-    end
-  end
-
-
   task :closure_compiler do
     chdir CLOSURE_COMPILER_DIR do
       puts "Running ant"
@@ -127,7 +75,6 @@ namespace :buildtools do
 end
 
 namespace :build do
-
   directory "generated/javascript"
   directory "auto-constants"
   directory "tmp"
@@ -165,16 +112,6 @@ namespace :build do
 
   file "dependency.MF" => sourcefiles do |file|
     sh %{/bin/env java -jar #{CLOSURE_JAR} #{sourcefiles.map{|src| "--js #{src}"}.join(" ")} --output_manifest #{file}}
-  end
-
-  file 'jsTestDriver.conf' => ['jsTestDriver.yaml', 'dependency.MF'] do |cfg|
-    require 'yaml'
-    jstd_conf = YAML::load(File::read('jsTestDriver.yaml'))
-    deps = File::read("dependency.MF").lines.map{|line| line.chomp}
-    jstd_conf['load'] += deps
-    File::open(cfg.name, 'w') do |file|
-      file.write(YAML::dump(jstd_conf))
-    end
   end
 
   task :clobber_header_comments do

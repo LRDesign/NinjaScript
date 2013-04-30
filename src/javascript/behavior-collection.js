@@ -5,11 +5,11 @@ goog.require('ninjascript.behaviors.Abstract')
 goog.require('ninjascript.utils')
 goog.require('ninjascript.exceptions')
 goog.require('ninjascript.BehaviorBinding')
+goog.require('ninjascript.BehaviorRule')
 
 ninjascript.BehaviorCollection = function(parts) {
   this.lexicalCount = 0
-  this.behaviors = {}
-  this.selectors = []
+  this.rules = []
   this.parts = parts
   this.tools = parts.tools
   return this
@@ -21,6 +21,7 @@ ninjascript.BehaviorCollection = function(parts) {
     var Utils = ninjascript.utils
     var Behaviors = ninjascript.behaviors
     var BehaviorBinding = ninjascript.BehaviorBinding
+    var BehaviorRule = ninjascript.BehaviorRule
 
     var forEach = Utils.forEach
 
@@ -31,54 +32,97 @@ ninjascript.BehaviorCollection = function(parts) {
 
     prototype.ninja = function() { return this.parts.ninja }
 
-    prototype.addBehavior = function(selector, behavior) {
+    prototype.addBehavior = function(finder, behavior) {
       if(Utils.isArray(behavior)) {
         forEach(behavior, function(behaves){
-            this.addBehavior(selector, behaves)
+            this.addBehavior(finder, behaves)
           }, this)
-      }
-      else if(behavior instanceof ninjascript.behaviors.Abstract) {
-        this.insertBehavior(selector, behavior)
-      }
-      else if(typeof behavior == "function"){
-        this.addBehavior(selector, behavior.call(this.ninja()))
-      }
-      else {
-        var behavior = new Behaviors.Basic(behavior)
-        this.addBehavior(selector, behavior)
+      } else {
+        this.addBehaviorRule(BehaviorRule.build(this.ninja(), finder, behavior))
       }
     }
 
-    prototype.insertBehavior = function(selector, behavior) {
-      behavior.lexicalOrder = this.lexicalCount
+    prototype.addBehaviorRule = function(rule) {
+      rule.behavior.lexicalOrder = this.lexicalCount
       this.lexicalCount += 1
-      if(this.behaviors[selector] === undefined) {
-        this.selectors.push(selector)
-        this.behaviors[selector] = [behavior]
-      }
-      else {
-        this.behaviors[selector].push(behavior)
+      this.rules.push(rule)
+    }
+
+    prototype.finalize = function() {
+      var rule
+      var newRules
+      for(var i = 0; i < this.rules.length; i++) {
+        rule = this.rules[i]
+        newRules = rule.behavior.expandRules(rule)
+        for(var j = 0; j < newRules.length; j++) {
+          this.addBehaviorRule(newRules[j])
+        }
       }
     }
 
-    prototype.sortBehaviors = function(behaviors) {
-      return behaviors.sort(function(left, right) {
-          if(left.priority != right.priority) {
-            if(left.priority === undefined) {
-              return -1
-            }
-            else if(right.priority === undefined) {
-              return 1
-            }
-            else {
-              return left.priority - right.priority
+    prototype.applyAll = function(root){
+      var i, j, k, elemLen, rulesLen, elementList, matrixLen
+      var elFound = false
+      var collection = this
+      var behaviorMatrix = []
+      rulesLen = this.rules.length
+
+      for(i = 0; i < rulesLen; i++) {
+        elementList = this.rules[i].match(root)
+        elemLen = elementList.length
+        matrixLen = behaviorMatrix.length
+        for(j = 0; j < elemLen; j++){
+          for(k = 0; k < matrixLen; k++){
+            if(elementList[j] == behaviorMatrix[k].element) {
+              behaviorMatrix[k].behaviors.push(this.rules[i].behavior)
+              elFound = true
+              break
             }
           }
-          else {
-            return left.lexicalOrder - right.lexicalOrder
+          if(!elFound) {
+            behaviorMatrix.push({ element: elementList[j], behaviors: [ this.rules[i].behavior ]})
+            matrixLen = behaviorMatrix.length
           }
         }
-      )
+      }
+
+      for(i = 0; i < matrixLen; i++){
+        if (!jQuery(behaviorMatrix[i].element).data("ninja-visited")) { //Pure optimization
+          this.apply(behaviorMatrix[i].element, behaviorMatrix[i].behaviors)
+        }
+      }
+    }
+
+    //XXX Still doesn't quite handle the sub-behavior case - order of application
+    prototype.apply = function(element, startBehaviors) {
+      var applicableBehaviors = [], applicableBehaviors = this.collectBehaviors(element, startBehaviors)
+
+      var context = jQuery(element).data('ninja-visited')
+      if (!context) {
+        context = BehaviorBinding(this.tools)
+      } else {
+        context.unbindHandlers()
+      }
+      this.applyBehaviorsInContext(context, element, applicableBehaviors)
+    }
+
+    prototype.collectBehaviors = function(element, behaviors) {
+      var collection = []
+      forEach(behaviors, function(val) {
+          try {
+            collection.push(val.choose(element))
+          }
+          catch(ex) {
+            if(ex instanceof CouldntChooseException) {
+              log("!!! couldn't choose")
+            }
+            else {
+              log(ex)
+              throw(ex)
+            }
+          }
+        })
+      return collection
     }
 
     prototype.applyBehaviorsInContext = function(context, element, behaviors) {
@@ -126,56 +170,25 @@ ninjascript.BehaviorCollection = function(parts) {
 
       return element
     }
-    prototype.collectBehaviors = function(element, collection, behaviors) {
-      forEach(behaviors, function(val) {
-          try {
-            collection.push(val.choose(element))
-          }
-          catch(ex) {
-            if(ex instanceof CouldntChooseException) {
-              log("!!! couldn't choose")
+
+    prototype.sortBehaviors = function(behaviors) {
+      return behaviors.sort(function(left, right) {
+          if(left.priority != right.priority) {
+            if(left.priority === undefined) {
+              return -1
+            }
+            else if(right.priority === undefined) {
+              return 1
             }
             else {
-              log(ex)
-              throw(ex)
+              return left.priority - right.priority
             }
           }
-        })
-    }
-
-    //XXX Still doesn't quite handle the sub-behavior case - order of application
-    prototype.apply = function(element, startBehaviors, selectorIndex) {
-      var applicableBehaviors = [], len = this.selectors.length
-      this.collectBehaviors(element, applicableBehaviors, startBehaviors)
-      var context = jQuery(element).data('ninja-visited')
-      if (!context) {
-        if(typeof selectorIndex == "undefined") {
-          selectorIndex = 0
-        }
-        for(var j = selectorIndex; j < len; j++) {
-          if(jQuery(element).is(this.selectors[j])) {
-            this.collectBehaviors(element, applicableBehaviors, this.behaviors[this.selectors[j]])
+          else {
+            return left.lexicalOrder - right.lexicalOrder
           }
         }
-        context = BehaviorBinding(this.tools)
-      }
-      else {
-        context.unbindHandlers()
-      }
-      this.applyBehaviorsInContext(context, element, applicableBehaviors)
+      )
     }
 
-    prototype.applyAll = function(root){
-      var len = this.selectors.length
-      var collection = this
-      for(var i = 0; i < len; i++) {
-        //Sizzle?
-        forEach(ninjascript.sizzle( this.selectors[i], root), //an array, not a jQuery
-          function(elem){
-            if (!jQuery(elem).data("ninja-visited")) { //Pure optimization
-              collection.apply(elem, [], i)
-            }
-          })
-      }
-    }
   })()

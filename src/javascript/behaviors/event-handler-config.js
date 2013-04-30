@@ -20,22 +20,22 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
       var found = true
       if (config[i] == "dontContinue" ||
         config[i] == "overridesOthers") {
-        fallThrough = false
+        this.fallThrough = false
       }
       if (config[i] == "andDoDefault" ||
         config[i] == "continues" ||
         config[i] == "allowDefault") {
-        stopDefault = false
+        this.stopDefault = false
       }
       if (config[i] == "allowPropagate" || config[i] == "dontStopPropagation") {
-        stopPropagate = false
+        this.stopPropagate = false
       }
       //stopImmediatePropagation is a jQuery thing
       if (config[i] == "andDoOthers") {
-        stopImmediate = false
+        this.stopImmediate = false
       }
       if (config[i] == "changesDOM") {
-        fireMutation = true
+        this.fireMutation = true
       }
       if (!found) {
         ninjascript.Logger.log("Event handler modifier unrecognized: " + config[i] + " for " + name)

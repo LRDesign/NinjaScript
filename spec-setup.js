@@ -9,7 +9,8 @@ var fixtures = {
   <input type="hidden" name="thing" value="16"></input>\
   <input type="submit" name="Submit!" value="To the Zod">\
 </form>'},
-  scriptResponse: '$("#ajax-target").append("<p>One</p>").append("<p>Two</p>").append("<p>Threeeeee!</p>")'
+  scriptResponse: '$("#ajax-target").append("<p>One</p>").append("<p>Two</p>").append("<p>Threeeeee!</p>")',
+  confirmingCheckbox: '<form><input id="confirmable-checkbox" type="checkbox" name="checkmeout" /><label for="checkmeout">Check it!</label></form>'
 }
 
 /*

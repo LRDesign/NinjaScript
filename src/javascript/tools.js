@@ -110,13 +110,12 @@ ninjascript.Tools.prototype = new ninjascript.Extensible
     prototype.cantTransform = function(message) {
       throw new TransformFailedException(message)
     }
-    prototype.applyBehaviors = function(element, behaviors) {
-      this.getRootCollection().apply(element, behaviors)
-    }
+
     prototype.message = function(text, classes) {
       var addingMessage = this.ninja.config.messageWrapping(text, classes)
       jQuery(this.ninja.config.messageList).append(addingMessage)
     }
+
     prototype.hiddenDiv = function() {
       var existing = jQuery("div#ninja-hide")
       if(existing.length > 0) {

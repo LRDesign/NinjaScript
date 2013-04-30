@@ -60,5 +60,9 @@ ninjascript.behaviors.Basic.prototype = new ninjascript.behaviors.Abstract;
       return elem
     }
 
+    prototype.expandRules = function(rule){
+      return []
+    }
+
     prototype.helpers = {}
   })()

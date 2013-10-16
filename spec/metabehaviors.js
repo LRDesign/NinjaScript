@@ -6,7 +6,11 @@ describe("Metabehaviors", function() {
     beforeEach(function() {
         Ninja = ninjascript.build()
 
-        setFixtures(fixtures.simpleForm('metabehaviors') + fixtures.simpleLink + fixtures.ajaxTarget + "<table><tr><td id='shouldnt-ajax'</td></tr></table>")
+        document.body.innerHTML =
+          __html__["spec_support/fixtures/simple-form.html"] +
+          __html__["spec_support/fixtures/simple-link.html"] +
+          __html__["spec_support/fixtures/not-ajax-table.html"];
+
         $('#simple-form').bind("submit", function(){return false})
         Ninja.behavior({
             "#simple-form": Ninja.submitsAsAjax(),
@@ -14,8 +18,6 @@ describe("Metabehaviors", function() {
             '#shouldnt-ajax': Ninja.submitsAsAjax()
           })
         Ninja.go()
-        response = [
-        ]
         sandbox = sinon.sandbox.create()
         sandbox.useFakeServer()
       })
@@ -25,7 +27,7 @@ describe("Metabehaviors", function() {
           sandbox.server.requests[i].respond(
             200,
             {"Content-Type": "text/javascript"},
-            fixtures.scriptResponse
+            __html__["spec_support/fixtures/script-response.js"]
           )
         }
 

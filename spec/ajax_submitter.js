@@ -14,7 +14,9 @@ describe("AjaxSubmitter", function() {
     describe("applied to a link", function() {
         beforeEach(function() {
 
-            setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
+            document.body.innerHTML =
+              __html__["spec_support/fixtures/simple-link.html"] +
+              __html__["spec_support/fixtures/ajax-target.html"];
             submitter = Ninja.tools.ajaxSubmitter($('#simple-link')[0])
 
             sandbox = sinon.sandbox.create()
@@ -38,7 +40,7 @@ describe("AjaxSubmitter", function() {
             sandbox.server.requests[0].respond(
                   200,
                   {"Content-Type": "text/javascript"},
-                  fixtures.scriptResponse
+                  __html__["spec_support/fixtures/script-response.js"]
                 )
             expect($("#ajax-target > *").length).toEqual(3)
           })
@@ -46,11 +48,10 @@ describe("AjaxSubmitter", function() {
 
     describe("applied to a form", function() {
         beforeEach(function() {
-            setFixtures( '<form id="simple-form" action="/testing-ajax-link-submitter" method="post">\
-              <input type="hidden" name="Method" value="put"></input>\
-              <input type="hidden" name="thing" value="16"></input>\
-              <input type="submit" name="Submit!" value="To the Zod">\
-              </form>'+ fixtures.ajaxTarget)
+            document.body.innerHTML =
+              __html__["spec_support/fixtures/simple-form.html"] +
+              __html__["spec_support/fixtures/ajax-target.html"];
+
             submitter = Ninja.tools.ajaxSubmitter($('#simple-form')[0])
 
             sandbox = sinon.sandbox.create()
@@ -73,7 +74,7 @@ describe("AjaxSubmitter", function() {
             sandbox.server.requests[0].respond(
                   200,
                   {"Content-Type": "text/javascript"},
-                  fixtures.scriptResponse
+                  __html__["spec_support/fixtures/script-response.js"]
                 )
             expect($("#ajax-target > *").length).toEqual(3)
           })

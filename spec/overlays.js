@@ -3,7 +3,11 @@ describe("Overlays", function() {
 
     beforeEach(function() {
         Ninja = ninjascript.build()
-        setFixtures(fixtures.simpleForm('overlays') + fixtures.simpleForm('overlays') + fixtures.simpleLink)
+
+        document.body.innerHTML =
+          __html__["spec_support/fixtures/simple-form.html"] +
+          __html__["spec_support/fixtures/simple-form.html"] +
+          __html__["spec_support/fixtures/simple-link.html"];
       })
 
     afterEach(function() {
@@ -14,7 +18,7 @@ describe("Overlays", function() {
         var overlay = Ninja.tools.overlay(undefined)
         overlay.set.each(function(idx, elem){elem.addClass("testing")})
         overlay.affix()
-        expect($("div.testing")).not.toExist()
+        expect($("div.testing").length).toBe(0);
         overlay.remove()
       })
 
@@ -22,7 +26,7 @@ describe("Overlays", function() {
         var overlay = Ninja.tools.overlay()
         overlay.set.each(function(idx, elem){elem.addClass("testing")})
         overlay.affix()
-        expect($("div.testing")).not.toExist()
+        expect($("div.testing").length).toBe(0);
         overlay.remove()
       })
 
@@ -31,21 +35,21 @@ describe("Overlays", function() {
         var overlay = Ninja.tools.overlay($("#simple-link"))
         overlay.set.addClass("testing")
         overlay.affix()
-        expect($("div.testing")).toExist()
+        expect($("div.testing").length).toBeGreaterThan(0);
         expect($(".testing").length).toEqual(1)
         overlay.remove()
-        expect($("div.testing")).not.toExist()
+        expect($("div.testing").length).toBe(0);
       })
-
+    ;
     it("should target multiple elements", function() {
         expect($("form").length).toEqual(2)
         var overlay = Ninja.tools.overlay($("form"))
         overlay.set.addClass("testing")
         overlay.affix()
-        expect($("div.testing")).toExist()
+        expect($("div.testing").length).toBeGreaterThan(0);
         expect($(".testing").length).toEqual(2)
         overlay.remove()
-        expect($("div.testing")).not.toExist()
+        expect($("div.testing").length).toBe(0);
       })
 
   })

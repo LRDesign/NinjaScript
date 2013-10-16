@@ -10,7 +10,7 @@ describe("Placeholding", function() {
 
         formData = "didn't trigger"
         Ninja.behavior({
-            "#form_a": {
+            "#placeholder-form": {
               priority: -10,
               submit: function(event) {
                 formData = $(this.element).serializeArray()
@@ -18,18 +18,9 @@ describe("Placeholding", function() {
             },
             "#input_a,#input_d,#pass_c": Ninja.hasPlaceholder
           })
-        setFixtures( "<form onsubmit='console.log(\"submitting fixture form\");' id='form_a' action='/fail_on_purpose' method='PUT'>" +
-            "<label id='label_a' data-for='input_a'>INPUT A!</label>" +
-            "<input id='input_a' name='a' type='text' />" +
-            "<label id='label_b' data-for='input_b'>INPUT B!</label>" +
-            "<input id='input_b' name='b' type='text' />" +
-            "<label id='label_c' data-for='pass_c'>SECRET</label>" +
-            "<input id='pass_c' name='c' type='password' />" +
-            "<label id='label_d' data-for='input_d'>TEXTAREA!</label>" +
-            "<textarea id='input_d' name='d' />" +
-            "</form>"
-        )
-        $('#form_a').bind('submit', function(event){
+        document.body.innerHTML = __html__["spec_support/fixtures/placeholder-form.html"]
+
+        $('#placeholder-form').bind('submit', function(event){
                 formData = $(this.element).serializeArray()
                 event.preventDefault()
               })
@@ -43,13 +34,13 @@ describe("Placeholding", function() {
     describe("on the form", function() {
         it("should still trigger previous handlers", function() {
             expect(formData).toEqual("didn't trigger")
-            $('#form_a').trigger('submit')
+            $('#placeholder-form').trigger('submit')
             expect(typeof formData).not.toEqual("string")
             expect(formData.length).toEqual(4)
           })
 
         it("should clear inputs before submitting", function() {
-            $('#form_a').trigger('submit')
+            $('#placeholder-form').trigger('submit')
             expect(typeof formData).not.toEqual("string")
             expect($.map(formData, function(itm) {
                   return itm.value
@@ -73,7 +64,7 @@ describe("Placeholding", function() {
             })
 
           it("should retain user input", function() {
-            $('#form_a').trigger('submit')
+            $('#placeholder-form').trigger('submit')
             expect(typeof formData).not.toEqual("string")
             expect($.map(formData, function(itm) {
                   return itm.value

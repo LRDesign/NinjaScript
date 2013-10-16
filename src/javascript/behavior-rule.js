@@ -55,10 +55,7 @@ ninjascript.BehaviorRule.build = function(ninja, finder, behavior) {
     }
   })()
 
-;(function(){
-    var prototype = ninjascript.BehaviorRuleBuilder.prototype
-    var Utils = ninjascript.utils
-
+;(function(prototype, Utils){
     prototype.normalizeFinder = function(finder) {
       if(typeof finder == "string") {
         return function(root){
@@ -69,7 +66,7 @@ ninjascript.BehaviorRule.build = function(ninja, finder, behavior) {
       }
     }
 
-    prototype.normalizeBehavior = function(ninja, behavior) {
+    prototype.normalizeBehavior = function(behavior) {
       if(behavior instanceof ninjascript.behaviors.Abstract) {
         return behavior
       } else if(typeof behavior == "function"){
@@ -91,7 +88,8 @@ ninjascript.BehaviorRule.build = function(ninja, finder, behavior) {
 
       var i, len = this.behaviors.length
       while(this.behaviors.length > 0) {
-        var behavior = this.normalizeBehavior(this.behaviors.shift())
+        var behavior = this.behaviors.shift();
+        behavior = this.normalizeBehavior(behavior);
         if(Utils.isArray(behavior)){
           this.behaviors = this.behaviors.concat(behavior)
         } else {
@@ -102,4 +100,4 @@ ninjascript.BehaviorRule.build = function(ninja, finder, behavior) {
         }
       }
     }
-  })()
+  })(ninjascript.BehaviorRuleBuilder.prototype, ninjascript.utils)

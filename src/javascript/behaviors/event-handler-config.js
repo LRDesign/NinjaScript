@@ -14,6 +14,7 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
   }
   else {
     this.handle = config[0]
+    console.log(config)
     config = config.slice(1,config.length)
     var len = config.length
     for(var i = 0; i < len; i++) {

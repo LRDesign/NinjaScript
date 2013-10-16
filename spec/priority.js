@@ -1,3 +1,5 @@
+goog.require('ninjascript.loaded');
+
 describe("Priorities:", function() {
     var Ninja
 
@@ -14,85 +16,86 @@ describe("Priorities:", function() {
           return {
               transform: function(element) {
                 $(element).attr("data-list", $(element).attr("data-list") + string)
-                //TODO removing this tests the default tranform value
+                //TODO removing this tests the default transform value
               },
               priority: prio
             }
         }
         beforeEach(function() {
-            setFixtures( "<div id='priority-target' data-list='x='></div>" )
+            document.body.innerHTML = __html__["spec_support/fixtures/ajax-target.html"];
           })
 
         it("1 before 10", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2", 10),
                   appendData("1", 1)
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=12")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=12")
           })
         it("-1 before 1", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2", 1),
                   appendData("1", -1)
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=12")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=12")
           })
         it("-10 before -1", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2", -1),
                   appendData("1", -10)
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=12")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=12")
           })
 
         it("undefined before 1", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2", 1),
                   appendData("1")
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=12")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=12")
+
           })
         it("-1 before undefined", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2"),
                   appendData("1", -1)
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=12")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=12")
           })
         it("same prio: lexical order", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2", 17),
                   appendData("1", 17)
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=21")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=21")
           })
         it("both undefined: lexical order", function() {
             Ninja.behavior({
-                "#priority-target": [
+                "#ajax-target": [
                   appendData("2"),
                   appendData("1")
                   ]
               })
             Ninja.go()
-            expect($("#priority-target").attr("data-list")).toEqual("x=21")
+            expect($("#ajax-target").attr("data-list")).toEqual("x=21")
           })
       })
   })

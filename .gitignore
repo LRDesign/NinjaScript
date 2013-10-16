@@ -19,3 +19,7 @@ dependency.MF
 jsTestDriver.conf
 test-results/
 coverage/
+.bundle/
+_hiding_old_things/
+tools/
+node_modules/

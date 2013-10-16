@@ -1,4 +1,17 @@
 ASSET_ROOT = 'generated'
+BUILDTOOLS_DIR = "tools"
+NODE_MODULES = "node_modules"
+
+CLOSURE_JAR = File::join(BUILDTOOLS_DIR, "compiler.jar")
+
+CLOSURE_DIR = File::join(NODE_MODULES, "closure-library/closure")
+CLOSURE_DEPSWRITER = File::join(CLOSURE_DIR, "bin/build/depswriter.py")
+CLOSURE_LIBRARY_DIR = File::join(CLOSURE_DIR, "goog")
+CLOSURE_DOTS = File::join(*(%w{..} * CLOSURE_LIBRARY_DIR.split(File::Separator).length))
+SINON_DIR = File::join(BUILDTOOLS_DIR, "sinon")
+
+NPM_BIN = File::join(NODE_MODULES, ".bin")
+KARMA = File::join(NPM_BIN, "karma")
 
 rule ".html" => [
     proc{|name| name.sub(/\.html\Z/, '.haml').sub(/\Adoc\//, 'doc-src/')}
@@ -20,14 +33,26 @@ rule ".html" => [
   }
   ] do |t|
     puts " generate #{t.name}"
-    require 'haml/util'
-    require 'sass/engine'
+    require 'haml'
+    require 'sass'
     template = File::read(t.source)
     engine = Sass::Engine.new(template)
     File::open(t.name, "w") do |f|
       f.write(engine.render)
     end
   end
+
+namespace :test do
+  desc "Start a Karma runner"
+  task :start do
+    exec(KARMA, "start")
+  end
+
+  desc "Force Karma to run the test suite"
+  task :run do
+    exec(KARMA, "run")
+  end
+end
 
 namespace :stylesheets do
   stylefiles = Rake::FileList['src/sass/**/*.sass']
@@ -46,31 +71,18 @@ namespace :stylesheets do
   end
 end
 
-BUILDTOOLS_DIR = "buildtools"
-JS_TEST_DRIVER_DIR = File::join(BUILDTOOLS_DIR, "js-test-driver/JsTestDriver")
-JS_TEST_DRIVER_JAR = File::join(JS_TEST_DRIVER_DIR, "target/bin/JsTestDriver.jar")
-CLOSURE_COMPILER_DIR = File::join(BUILDTOOLS_DIR, "closure-compiler")
-CLOSURE_JAR = File::join(CLOSURE_COMPILER_DIR, "build", "compiler.jar")
-CLOSURE_DIR = File::join(BUILDTOOLS_DIR, "google-closure-library/closure")
-CLOSURE_DEPSWRITER = File::join(CLOSURE_DIR, "bin/build/depswriter.py")
-CLOSURE_LIBRARY_DIR = File::join(CLOSURE_DIR, "goog")
-CLOSURE_DOTS = File::join(*(%w{..} * CLOSURE_LIBRARY_DIR.split(File::Separator).length))
-SINON_DIR = File::join(BUILDTOOLS_DIR, "sinon")
-
-task :buildtools => %w{buildtools:closure_compiler buildtools:sinon}
+task :buildtools => CLOSURE_JAR
 
 namespace :buildtools do
-  task :closure_compiler do
-    chdir CLOSURE_COMPILER_DIR do
-      puts "Running ant"
-      puts %x{ant jar}
-    end
+  directory BUILDTOOLS_DIR
+  closure_zip = File::join(BUILDTOOLS_DIR, "closure.zip")
+
+  file closure_zip => BUILDTOOLS_DIR do
+    puts %x{curl http://closure-compiler.googlecode.com/files/compiler-latest.zip -o #{closure_zip}}
   end
 
-  task :sinon do
-    chdir SINON_DIR do
-      sh "./build"
-    end
+  file CLOSURE_JAR => closure_zip do
+    puts %x{unzip -d #{BUILDTOOLS_DIR} #{closure_zip}}
   end
 end
 

@@ -38,7 +38,11 @@ ninjascript.BehaviorCollection = function(parts) {
             this.addBehavior(finder, behaves)
           }, this)
       } else {
-        this.addBehaviorRule(BehaviorRule.build(this.ninja(), finder, behavior))
+        forEach(
+          BehaviorRule.build(this.ninja(), finder, behavior),
+          function(rule){
+            this.addBehaviorRule(rule)
+          }, this)
       }
     }
 

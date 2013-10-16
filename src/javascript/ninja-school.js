@@ -11,33 +11,33 @@ goog.require('ninjascript.behaviors.Meta');
 goog.require('ninjascript.behaviors.Select');
 
 ninjascript.build = function(){
-  var components = {}
-  components["tools"] = new ninjascript.Tools(components)
-  components["config"] = ninjascript.configuration
-  components["collection"] = new ninjascript.BehaviorCollection(components)
-  components["jsonDispatcher"] = new ninjascript.tools.JSONDispatcher()
-  components["mutationHandler"] = new ninjascript.mutation.EventHandler(components.tools.getRootOfDocument(), components.collection)
+  var components = {};
+  components["tools"] = new ninjascript.Tools(components);
+  components["config"] = ninjascript.configuration;
+  components["collection"] = new ninjascript.BehaviorCollection(components);
+  components["jsonDispatcher"] = new ninjascript.tools.JSONDispatcher();
+  components["mutationHandler"] = new ninjascript.mutation.EventHandler(components.tools.getRootOfDocument(), components.collection);
 
   components["types"] = {
     "does": ninjascript.behaviors.Basic,
     "chooses": ninjascript.behaviors.Meta,
     "selects": ninjascript.behaviors.Select
-  }
+  };
 
-  components["ninja"] = new ninjascript.NinjaScript(components)
+  components["ninja"] = new ninjascript.NinjaScript(components);
 
-  components["tools"].inject(components)
-  components["ninja"].inject(components)
+  components["tools"].inject(components);
+  components["ninja"].inject(components);
 
-  return components.ninja
+  return components.ninja;
 }
 
-Ninja = ninjascript.build()
+Ninja = ninjascript.build();
 
 //Covers for deprecated API requirement
 Ninja.orders = function(funk) {
-  funk(window.Ninja)
+  funk(window.Ninja);
 }
 
-goog.exportSymbol('Ninja', Ninja)
-goog.exportSymbol('ninjascript.build', ninjascript.build)
+goog.exportSymbol('Ninja', Ninja);
+goog.exportSymbol('ninjascript.build', ninjascript.build);

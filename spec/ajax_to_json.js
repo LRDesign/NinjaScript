@@ -11,7 +11,10 @@ describe("AjaxToJson", function() {
     beforeEach(function() {
         Ninja = ninjascript.build()
 
-        setFixtures(fixtures.simpleLink + fixtures.ajaxTarget)
+        document.body.innerHTML =
+          __html__["spec_support/fixtures/simple-link.html"] +
+          __html__["spec_support/fixtures/ajax-target.html"];
+
         target = {}
         Ninja.respondToJson({
             shallow: function(html) {

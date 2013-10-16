@@ -1,3 +1,5 @@
+goog.require('ninjascript.loaded');
+
 describe("Packaged Behaviors:", function() {
     var Ninja
     var sandbox
@@ -18,14 +20,17 @@ describe("Packaged Behaviors:", function() {
                 "#simple-form": Ninja.becomesAjaxLink()
               })
             Ninja.go()
-            setFixtures( fixtures.simpleForm('packaged') + fixtures.ajaxTarget)
+            document.body.innerHTML =
+              __html__["spec_support/fixtures/simple-form.html"] +
+              __html__["spec_support/fixtures/ajax-target.html"];
+
             sandbox.useFakeServer()
             Ninja.tools.fireMutationEvent()
           })
 
         it("should transform the form into a link", function() {
-            expect($("form#simple-form")).not.toExist()
-            expect($("a#simple-form")).toExist()
+            expect($("form#simple-form").length).toBe(0);
+            expect($("a#simple-form").length).toBeGreaterThan(0);
           })
 
         describe("handling clicking the link", function() {
@@ -34,7 +39,7 @@ describe("Packaged Behaviors:", function() {
                 response = [
                   200,
                   {"Content-Type": "text/javascript"},
-                  fixtures.scriptResponse
+                  __html__["spec_support/fixtures/script-response.js"]
                 ]
               })
 
@@ -53,11 +58,11 @@ describe("Packaged Behaviors:", function() {
               })
 
             it("should put up an overlay", function() {
-                expect($("div.ninja_busy")).not.toExist()
+                expect($("div.ninja_busy").length).toBe(0);
                 $("a#simple-form").trigger("click")
-                expect($("div.ninja_busy")).toExist()
+                expect($("div.ninja_busy").length).toBeGreaterThan(0);
                 sandbox.server.requests[0].respond(response[0], response[1], response[2])
-                expect($("div.ninja_busy")).not.toExist()
+                expect($("div.ninja_busy").length).toBe(0);
               })
 
             it("should apply the reply javascript", function() {
@@ -76,7 +81,7 @@ describe("Packaged Behaviors:", function() {
                 "#confirmable-checkbox": Ninja.confirms({confirmMessage: "Are you sure you want to check this?"})
               })
             Ninja.go()
-            setFixtures( fixtures.confirmingCheckbox )
+            document.body.innerHTML = __html__["spec_support/fixtures/confirming-checkbox.html"]
             Ninja.tools.fireMutationEvent()
           })
 
@@ -95,6 +100,9 @@ describe("Packaged Behaviors:", function() {
             $("input#confirmable-checkbox").trigger("click")
             expect($("#confirmable-checkbox:checked").length).toEqual(0)
           })
+      })
+
+    describe("triggersOnSelect()", function(){
       })
   })
 

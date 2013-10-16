@@ -20,8 +20,8 @@ hosted on http://js-testing.lrdesign.com, so it should just work.
 
 To set up a development environment you will need:
 
-* Ruby + Rake installed
-* Node.js + NPM
+* Ruby + Bundler installed
+* Node.js
 * A JVM (for the Closure Compiler)
 
 Once you've cloned the project, run
@@ -30,6 +30,14 @@ Once you've cloned the project, run
     npm install
 
 And you should get all the developement dependencies.
+
+From there try:
+
+    rake
+
+which should start up the test system.
+
+## Environment troubleshooting
 
 We're using Karma for testing - there's a karma.conf.js already set up -
 hopefully it's assumptions will work for your environment.

@@ -61,7 +61,7 @@ namespace :stylesheets do
     "src/assets/css/\\1.css"
   )
 
-  desc "Generates the CSS for use with NinjaScript"
+  #desc "Generates the CSS for use with NinjaScript"
   task :generate
 
   stylefiles.each do |path|
@@ -143,7 +143,7 @@ namespace :build do
     sh "cat tmp/header-comments.js #{tmpfile} > #{file}"
   end
 
-  desc "Build Ninjascript & assets"
+  #desc "Build Ninjascript & assets"
   task :project => %w{stylesheets:generate clobber_header_comments generated/javascript/ninjascript.js generated/javascript/ns.min.js}
 
   require 'rake/packagetask'
@@ -166,7 +166,7 @@ namespace :doc do
     'doc/\1.css'
   )
 
-  desc "Generates all HTML docco based on HAML"
+  #desc "Generates all HTML docco based on HAML"
   task :generate
 
   docfiles.each do |path|
@@ -176,6 +176,6 @@ namespace :doc do
   end
 end
 
+task :default => 'test:start'
 
-desc "Generate all static content from source files"
-task :default => ["doc:generate", "stylesheets:generate"]
+#desc "Generate all static content from source files"

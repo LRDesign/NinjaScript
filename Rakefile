@@ -44,12 +44,12 @@ rule ".html" => [
 
 namespace :test do
   desc "Start a Karma runner"
-  task :start do
+  task :start => 'src/deps.js' do
     exec(KARMA, "start")
   end
 
   desc "Force Karma to run the test suite"
-  task :run do
+  task :run => 'src/deps.js' do
     exec(KARMA, "run")
   end
 end

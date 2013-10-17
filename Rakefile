@@ -119,11 +119,11 @@ namespace :build do
   end
 
   file "src/deps.js" => sourcefiles do |file|
-    sh %{/bin/env #{CLOSURE_DEPSWRITER} --root_with_prefix="src/javascript #{CLOSURE_DOTS}/src/javascript" > #{file}}
+    sh %{/usr/bin/env python #{CLOSURE_DEPSWRITER} --root_with_prefix="src/javascript #{CLOSURE_DOTS}/src/javascript" > #{file}}
   end
 
   file "dependency.MF" => sourcefiles do |file|
-    sh %{/bin/env java -jar #{CLOSURE_JAR} #{sourcefiles.map{|src| "--js #{src}"}.join(" ")} --output_manifest #{file}}
+    sh %{/usr/bin/env java -jar #{CLOSURE_JAR} #{sourcefiles.map{|src| "--js #{src}"}.join(" ")} --output_manifest #{file}}
   end
 
   task :clobber_header_comments do

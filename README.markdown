@@ -12,9 +12,7 @@ Or jump right in: download it at: https://github.com/downloads/LRDesign/NinjaScr
 ## Contributing
 
 To contribute to NinjaScript, fork it on GitHub and issue pull requests.   Make
-sure you run the tests; this can be accomplished just by loading the file
-"SpecRunner.html" in a browser, locally.  All the test libraries necessary are
-hosted on http://js-testing.lrdesign.com, so it should just work.
+sure you run the tests; `rake test:start` should get you going.
 
 ## Development
 
@@ -27,9 +25,9 @@ To set up a development environment you will need:
 Once you've cloned the project, run
 
     bundle
-    npm install
+    rake buildtools
 
-And you should get all the developement dependencies.
+And you should get all the development dependencies.
 
 From there try:
 

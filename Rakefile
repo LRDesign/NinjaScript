@@ -42,6 +42,27 @@ rule ".html" => [
     end
   end
 
+namespace :doc do
+  docfiles = Rake::FileList['doc-src/**/*.haml', 'doc-src/**/*.sass']
+
+  docfiles.sub!(
+    /\Adoc-src\/(.*)\.haml\Z/,
+    'doc/\1.html'
+  ).sub!(
+    /\Adoc-src\/(.*)\.sass\Z/,
+    'doc/\1.css'
+  )
+
+  #desc "Generates all HTML docco based on HAML"
+  task :generate
+
+  docfiles.each do |path|
+    dir = File::dirname(path)
+    directory dir
+    task :generate => [dir, path]
+  end
+end
+
 namespace :test do
   desc "Start a Karma runner"
   task :start => 'src/deps.js' do
@@ -71,7 +92,7 @@ namespace :stylesheets do
   end
 end
 
-task :buildtools => CLOSURE_JAR
+task :buildtools => 'buildtools:all'
 
 namespace :buildtools do
   directory BUILDTOOLS_DIR
@@ -84,6 +105,12 @@ namespace :buildtools do
   file CLOSURE_JAR => closure_zip do
     puts %x{unzip -d #{BUILDTOOLS_DIR} #{closure_zip}}
   end
+
+  task :npm_install do
+    sh 'npm install'
+  end
+
+  task :all => [:npm_install, CLOSURE_JAR]
 end
 
 namespace :build do
@@ -162,28 +189,6 @@ namespace :build do
     t.package_files.include("#{ASSET_ROOT}/**/*")
   end
 end
-
-namespace :doc do
-  docfiles = Rake::FileList['doc-src/**/*.haml', 'doc-src/**/*.sass']
-
-  docfiles.sub!(
-    /\Adoc-src\/(.*)\.haml\Z/,
-    'doc/\1.html'
-  ).sub!(
-    /\Adoc-src\/(.*)\.sass\Z/,
-    'doc/\1.css'
-  )
-
-  #desc "Generates all HTML docco based on HAML"
-  task :generate
-
-  docfiles.each do |path|
-    dir = File::dirname(path)
-    directory dir
-    task :generate => [dir, path]
-  end
-end
-
 task :default => 'test:start'
 
 #desc "Generate all static content from source files"

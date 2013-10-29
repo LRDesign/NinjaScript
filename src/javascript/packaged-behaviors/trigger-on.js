@@ -1,6 +1,6 @@
 goog.provide('ninjascript.packagedBehaviors.triggerOn');
 
-goog.require('ninjascript.package');
+goog.require('ninjascript.plugin');
 
 // There's several things happening here is ways that should be more configurable:
 // * A standard overlayAndSubmit
@@ -60,7 +60,7 @@ goog.require('ninjascript.package');
 // scope than what { "selector": behavior } allows for...
 //
 ;(function() {
-    ninjascript.package(function(hooks) { hooks.behaviors({
+    ninjascript.plugin(function(hooks) { hooks.behaviors({
             cascadeEvent: function(configs){
             },
             removed: function(){

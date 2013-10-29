@@ -112,7 +112,7 @@ namespace :build do
     erb = ERB.new(File::read('src/header-comment.js.erb'))
     File::open(file.to_s, "w") do |file|
       build_date = PACKAGE_CONFIG["BUILD_DATE"]
-      copyright_year = COPYRIGHT_YEAR["COPYRIGHT_YEAR"]
+      copyright_year = PACKAGE_CONFIG["COPYRIGHT_YEAR"]
       version = PACKAGE_CONFIG["VERSION"]
       file.write( erb.result binding)
     end
@@ -131,15 +131,23 @@ namespace :build do
   end
 
   file "generated/javascript/ninjascript.js" => %w{tmp/header-comments.js generated/javascript} + sourcefiles do |file|
+    puts sourcefiles
     tmpfile = File::join("tmp", file.to_s.gsub(File::Separator, "_"))
-    sh "libs/requirejs/build/buildj.sh name=main out=#{tmpfile} baseUrl=src/javascript includeRequire=true optimize=none"
+    sh "java -jar #{BUILDTOOLS_DIR}/compiler.jar \
+    --closure_entry_point 'ninjascript.loaded' \
+    --create_source_map 'generated/javascript/ninjascript-sourcemap-js' \
+    --formatting PRETTY_PRINT \
+    --manage_closure_dependencies \
+    #{sourcefiles.map{|file| "--js #{file} "}} \
+    --js_output_file #{tmpfile}"
+
     sh "cat tmp/header-comments.js #{tmpfile} > #{file}"
   end
 
   file "generated/javascript/ns.min.js" =>
   %w{generated/javascript/ninjascript.js tmp/header-comments.js} do |file|
     tmpfile = File::join("tmp", file.to_s.gsub(File::Separator, "_"))
-    sh "java -jar libs/compiler.jar --js generated/javascript/ninjascript.js --js_output_file #{tmpfile}"
+    sh "java -jar #{BUILDTOOLS_DIR}/compiler.jar --js generated/javascript/ninjascript.js --js_output_file #{tmpfile}"
     sh "cat tmp/header-comments.js #{tmpfile} > #{file}"
   end
 

@@ -1,7 +1,6 @@
 goog.provide('ninjascript.BehaviorBinding')
 
 goog.require('ninjascript.utils')
-goog.require('ninjascript.Tools')
 
 ninjascript.BehaviorBinding = function(tools){
   var parentClass = function(){

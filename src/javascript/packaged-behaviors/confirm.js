@@ -1,9 +1,9 @@
 goog.provide('ninjascript.packagedBehaviors.confirm');
 
-goog.require('ninjascript.package');
+goog.require('ninjascript.plugin');
 
 (function(){
-    ninjascript.package(function(hooks){
+    ninjascript.plugin(function(hooks){
         hooks.behaviors({
           confirms: function(configs) {
 

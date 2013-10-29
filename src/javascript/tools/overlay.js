@@ -1,7 +1,7 @@
 goog.provide('ninjascript.tools.Overlay')
 
 goog.require('ninjascript.utils')
-goog.require('ninjascript.package')
+goog.require('ninjascript.plugin')
 
 ninjascript.tools.Overlay = function(list) {
   var elements = this.convertToElementArray(list)
@@ -67,7 +67,7 @@ ninjascript.tools.Overlay = function(list) {
       this.set.remove()
     }
 
-    ninjascript.package(function(hooks){
+    ninjascript.plugin(function(hooks){
         hooks.tools({
         overlay: function() {
           return new ninjascript.tools.Overlay(jQuery.makeArray(arguments))

@@ -1,6 +1,6 @@
 goog.provide('ninjascript.packagedBehaviors.placeholder');
 
-goog.require('ninjascript.package');
+goog.require('ninjascript.plugin');
 
 (function() {
     var behaviors = {}
@@ -197,7 +197,7 @@ goog.require('ninjascript.package');
       return behaviors
     }
 
-    ninjascript.package( function(hooks){
+    ninjascript.plugin( function(hooks){
         hooks.Ninja(behaviors)
       })
   })()

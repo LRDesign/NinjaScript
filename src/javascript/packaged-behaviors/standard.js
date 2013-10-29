@@ -1,6 +1,6 @@
 goog.provide('ninjascript.packagedBehaviors.standard');
 
-goog.require('ninjascript.package');
+goog.require('ninjascript.plugin');
 goog.require('ninjascript.utils');
 goog.require('ninjascript.Logger');
 
@@ -8,7 +8,7 @@ goog.require('ninjascript.Logger');
     var Utils = ninjascript.utils
     var log = ninjascript.Logger.log
 
-    ninjascript.package(function(hooks){
+    ninjascript.plugin(function(hooks){
         hooks.ninja({
             /**
              * Ninja.submitsAsAjax(configs) -> null

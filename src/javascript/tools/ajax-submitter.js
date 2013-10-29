@@ -5,7 +5,7 @@ goog.require('ninjascript.Logger')
 goog.require('ninjascript.tools.JSONDispatcher')
 goog.require('ninjascript.tools.Overlay')
 
-goog.require('ninjascript.package')
+goog.require('ninjascript.plugin')
 
 ninjascript.tools.AjaxSubmitter = function() {
   this.formData = []
@@ -68,7 +68,7 @@ ninjascript.tools.AjaxSubmitter = function() {
       Ninja.tools.message("Server prototype.error = " + xhr.statusText, "error")
     }
 
-    ninjascript.package(function(hooks){
+    ninjascript.plugin(function(hooks){
         hooks.tools({
             ajaxSubmitter: function() {
               return new ninjascript.tools.AjaxSubmitter()

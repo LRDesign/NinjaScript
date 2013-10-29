@@ -24,12 +24,13 @@ ninjascript.NinjaScript.prototype = new ninjascript.Extensible
 
     var log = ninjascript.Logger.log
 
-    prototype.package = function(callback) {
+    //XXX Needed here, or in package?
+    prototype.plugin = function(callback) {
       var targets = {
         Ninja: this,
-        tools: this.tools,
+        tools: this.tools
       }
-      return ninjascript.Extensible.package(targets, callback)
+      return ninjascript.Extensible.addPackage(targets, callback)
     }
 
     prototype.configure = function(opts) {

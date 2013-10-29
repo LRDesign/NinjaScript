@@ -3,7 +3,15 @@ goog.provide('ninjascript.Extensible');
 ninjascript.Extensible = function(){
 };
 
-ninjascript.Extensible.package = function(targets, callback){
+/* This class-level function sets up access functions on a throwaway object and
+ * passes it into a callback method. Extensions to Ninjascript call
+ * ninjascript.plugin with a callback function that can then call
+ * hooks.behaviors or hooks.tools to add methods to those prototypes.
+ *
+ * c.f. the packaged-behaviors directory for examples of use
+ *
+ */
+ninjascript.Extensible.addPackage = function(targets, callback){
   var hooks = {}
   var buildHookingFunction = function(target){
     return function(extension){

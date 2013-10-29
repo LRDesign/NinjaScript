@@ -1,5 +1,3 @@
-
-
 dir = ARGV[0]
 
 provides = {}
@@ -12,7 +10,7 @@ Dir["#{dir}/**/*.js"].each do |path|
     if match = /goog.require\(['"]([^)]*)['"]\)/.match(line)
       required << match[1]
     elsif match = /goog.provide\(['"]([^)]*)['"]\)/.match(line)
-      raise "Double provide!: #{provide}/#{match[0]}" unless provide.nil?
+      raise "Double provide in #{path}!: #{provide}/#{match[0]}" unless provide.nil?
       provide = match[1]
     end
   end
@@ -24,9 +22,6 @@ end
 reqs.uniq!
 
 require 'pp'
-pp provides
-
-pp reqs
 
 missing_reqs = reqs - provides.keys
 unless missing_reqs.empty?
@@ -50,14 +45,11 @@ provides.each_pair do |provided, requirements|
     tree.last.filled << req
     need = provides[req] - tree.last.filled
 
-    if need.empty?
-      tree.pop
-      next
-    end
-
     if need.include? provided
       raise "Cycle detected: #{(tree.map(&:prov) + [req]).inspect} => #{provided}"
     end
     tree.push Step.new(req, need, tree.last.filled.dup + [req])
   end
 end
+
+puts "All looks well"

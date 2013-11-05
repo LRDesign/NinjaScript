@@ -33,15 +33,18 @@ From there try:
 
     rake
 
-which should start up the test system.
+which should start up the test system. All tests should pass.
 
 Finally, once you get things going and are ready to use Ninjascript somewhere:
 
-    rake build:package
+    rake build
 
 And look in pkg/
 
 ## Environment troubleshooting
+
+You'll need a working Node.js installation. On Mac OS this seems to require recent working XCode.
+(Welcomed: a PR explaining details of this.)
 
 We're using Karma for testing - there's a karma.conf.js already set up -
 hopefully it's assumptions will work for your environment.

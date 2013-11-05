@@ -35,6 +35,12 @@ From there try:
 
 which should start up the test system.
 
+Finally, once you get things going and are ready to use Ninjascript somewhere:
+
+    rake build:package
+
+And look in pkg/
+
 ## Environment troubleshooting
 
 We're using Karma for testing - there's a karma.conf.js already set up -

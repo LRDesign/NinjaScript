@@ -64,7 +64,6 @@ namespace :doc do
 end
 
 namespace :test do
-  desc "Start a Karma runner"
   task :start => 'src/deps.js' do
     exec(KARMA, "start")
   end
@@ -181,14 +180,71 @@ namespace :build do
   #desc "Build Ninjascript & assets"
   task :project => %w{stylesheets:generate clobber_header_comments generated/javascript/ninjascript.js generated/javascript/ns.min.js}
 
-  require 'rake/packagetask'
-  Rake::PackageTask.new('ninjascript', PACKAGE_CONFIG["VERSION"]) do |t|
-    t.need_zip = true
-    t.need_tar_bz2 = true
-    t.need_tar_gz = true
-    t.package_files.include("#{ASSET_ROOT}/**/*")
+  namespace :package do
+    task :package
+
+    task :repackage => [:clobber_package, :package]
+
+    task :clobber_package do
+      rm_r "pkg" rescue nil
+    end
+
+    task :clobber => [:clobber_package]
+
+    package_dir_path = "pkg/ninjascript"
+    package_files = Rake::FileList.new
+    %w{javascript css images}.each do |type|
+      package_files.include("generated/#{type}/**/*")
+    end
+
+    [ "ninjascript.tgz", "ninjascript.tbz2" ].each do |file|
+      task :package => ["pkg/#{file}"]
+      file "pkg/#{file}" => [package_dir_path] + package_files do
+        chdir("pkg") do
+          sh %{tar --auto-compress -cvf #{file} ninjascript}
+        end
+      end
+    end
+
+    task :package => ["pkg/ninjascript.zip"]
+    file "pkg/ninjascript.zip" => [package_dir_path] + package_files do
+      chdir("pkg") do
+        sh %{zip -r ninjascript.zip ninjascript}
+      end
+    end
+
+    directory "pkg"
+
+    file package_dir_path => package_files do
+      mkdir_p "pkg" rescue nil
+      package_files.each do |source|
+        target = source.sub(/\Agenerated\//,'')
+        f = File.join(package_dir_path, target)
+        fdir = File.dirname(f)
+        mkdir_p(fdir) unless File.exist?(fdir)
+        if File.directory?(source)
+          mkdir_p(f)
+        else
+          rm_f f
+          safe_ln(source, f)
+        end
+      end
+    end
+    self
   end
+
+  task :package => 'package:package'
+
+  desc "Force a rebuild of the package files"
+  task :repackage => 'package:repackage'
+
+  task :package => :project
 end
+
+desc "Start a Karma test server"
 task :default => 'test:start'
+
+desc "Build the project and produce archived packages"
+task :build => "build:package"
 
 #desc "Generate all static content from source files"

@@ -13,6 +13,12 @@ SINON_DIR = File::join(BUILDTOOLS_DIR, "sinon")
 NPM_BIN = File::join(NODE_MODULES, ".bin")
 KARMA = File::join(NPM_BIN, "karma")
 
+PACKAGE_CONFIG= {
+  "VERSION" => "0.10",
+  "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
+  "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
+}
+
 rule ".html" => [
     proc{|name| name.sub(/\.html\Z/, '.haml').sub(/\Adoc\//, 'doc-src/')}
   ] do |t|
@@ -117,12 +123,6 @@ namespace :build do
   directory "auto-constants"
   directory "tmp"
 
-  PACKAGE_CONFIG= {
-    "VERSION" => "0.10",
-    "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
-    "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
-  }
-
   task :constants => %w{auto-constants} do
     require 'yaml'
 
@@ -191,13 +191,14 @@ namespace :build do
 
     task :clobber => [:clobber_package]
 
+    package_name = "ninjascript-#{PACKAGE_CONFIG["VERSION"]}"
     package_dir_path = "pkg/ninjascript"
     package_files = Rake::FileList.new
     %w{javascript css images}.each do |type|
       package_files.include("generated/#{type}/**/*")
     end
 
-    [ "ninjascript.tgz", "ninjascript.tbz2" ].each do |file|
+    [ "#{package_name}.tgz", "#{package_name}.tbz2" ].each do |file|
       task :package => ["pkg/#{file}"]
       file "pkg/#{file}" => [package_dir_path] + package_files do
         chdir("pkg") do
@@ -206,10 +207,10 @@ namespace :build do
       end
     end
 
-    task :package => ["pkg/ninjascript.zip"]
-    file "pkg/ninjascript.zip" => [package_dir_path] + package_files do
+    task :package => ["pkg/#{package_name}.zip"]
+    file "pkg/#{package_name}.zip" => [package_dir_path] + package_files do
       chdir("pkg") do
-        sh %{zip -r ninjascript.zip ninjascript}
+        sh %{zip -r #{package_name}.zip ninjascript}
       end
     end
 

@@ -7,7 +7,8 @@ elements, or in different projects.
 
 For more information, see https://github.com/LRDesign/NinjaScript/wiki
 
-Or jump right in: download it at: https://github.com/downloads/LRDesign/NinjaScript/ninjascript.zip
+Or jump right in: download it at: [Downloads for Ninjascript](https://googledrive.com/host/0B3Pcyyb1e1BPT2pRX1ZIREdhSjQ/)
+
 
 ## Contributing
 

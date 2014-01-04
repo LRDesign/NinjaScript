@@ -14,7 +14,7 @@ NPM_BIN = File::join(NODE_MODULES, ".bin")
 KARMA = File::join(NPM_BIN, "karma")
 
 PACKAGE_CONFIG= {
-  "VERSION" => "0.10",
+  "VERSION" => "0.10.1",
   "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
   "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
 }
@@ -78,6 +78,16 @@ namespace :test do
   task :run => 'src/deps.js' do
     exec(KARMA, "run")
   end
+
+  task :built => "generated/javascript/ninjascript.js" do
+    sh(KARMA, "start", "karma-built.conf.js")
+  end
+
+  task :min => "generated/javascript/ns.min.js" do
+    sh(KARMA, "start", "karma-min.conf.js")
+  end
+
+  task :generated => [:built, :min]
 end
 
 namespace :stylesheets do
@@ -197,6 +207,8 @@ namespace :build do
     %w{javascript css images}.each do |type|
       package_files.include("generated/#{type}/**/*")
     end
+
+    task :package => "test:generated"
 
     [ "#{package_name}.tgz", "#{package_name}.tbz2" ].each do |file|
       task :package => ["pkg/#{file}"]

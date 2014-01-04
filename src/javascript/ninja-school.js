@@ -38,6 +38,3 @@ Ninja = ninjascript.build();
 Ninja.orders = function(funk) {
   funk(window.Ninja);
 }
-
-goog.exportSymbol('Ninja', Ninja);
-goog.exportSymbol('ninjascript.build', ninjascript.build);

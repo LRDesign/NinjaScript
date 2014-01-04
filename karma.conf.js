@@ -4,7 +4,8 @@ module.exports = function(config){
   conf.files = [
     //Library
     'node_modules/closure-library/closure/goog/base.js',
-    'spec_support/**/*.js',
+    'spec_support/jquery-1.6.1.js',
+    'spec_support/fixtures/*.js',
     'spec_support/**/*.html',
     {pattern: 'node_modules/closure-library/closure/goog/deps.js', included: false },
     'src/deps.js',
@@ -13,6 +14,7 @@ module.exports = function(config){
     {pattern: 'src/javascript/**/*.js', included: false},
 
     //Tests
+    'spec_support/loaded.js',
     'spec/**/*.js'
    ];
 

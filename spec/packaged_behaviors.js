@@ -1,5 +1,3 @@
-goog.require('ninjascript.loaded');
-
 describe("Packaged Behaviors:", function() {
     var Ninja
     var sandbox

@@ -1,5 +1,3 @@
-goog.require('ninjascript.loaded');
-
 describe("Priorities:", function() {
     var Ninja
 

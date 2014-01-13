@@ -14,7 +14,8 @@ NPM_BIN = File::join(NODE_MODULES, ".bin")
 KARMA = File::join(NPM_BIN, "karma")
 
 PACKAGE_CONFIG= {
-  "VERSION" => "0.10.1",
+  #{MAJOR: incompatible}.{MINOR added feature}.{PATCH bugfix}-{LABEL}
+  "VERSION" => "0.11.1",
   "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
   "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
 }

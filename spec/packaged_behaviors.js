@@ -11,6 +11,26 @@ describe("Packaged Behaviors:", function() {
         sandbox.restore()
       })
 
+    describe("becomesAjaxLink() with a button submit", function() {
+        beforeEach(function() {
+            Ninja.behavior({
+                "#simple-form": Ninja.becomesAjaxLink()
+              });
+            Ninja.go();
+            document.body.innerHTML =
+              __html__["spec_support/fixtures/button-form.html"] +
+              __html__["spec_support/fixtures/ajax-target.html"];
+
+            sandbox.useFakeServer();
+            Ninja.tools.fireMutationEvent();
+          });
+
+        it("should transform the form into a link", function() {
+            expect($("form#simple-form").length).toBe(0);
+            expect($("a#simple-form").length).toBeGreaterThan(0);
+          });
+      });
+
     describe("becomesAjaxLink()", function() {
 
         beforeEach(function() {

@@ -142,17 +142,20 @@ goog.require('ninjascript.Logger');
                    return new this.types.does({
                        priority: 30,
                        transform: function(form){
-                         var linkText
-                         if ((images = jQuery('input[type=image]', form)).size() > 0){
-                           image = images[0]
+                         var linkText, submits;
+                         if ((submits = jQuery('button[type=submit]')).size() > 0) {
+                           console.log(submits);
+                           linkText = submits.first().text();
+                         }
+                         else if((submits = jQuery('input[type=image]', form)).size() > 0){
+                           var image = submits[0]
                            linkText = "<img src='" + image.src + "' alt='" + image.alt +"'";
                          }
                          else if((submits = jQuery('input[type=submit]', form)).size() > 0) {
-                           submit = submits[0]
                            if(submits.size() > 1) {
-                             log("Multiple submits.  Using: " + submit)
+                             log("Multiple submits.  Using: " + submits[0])
                            }
-                           linkText = submit.value
+                           linkText = submits[0].value
                          }
                          else {
                            log("Couldn't find a submit input in form");

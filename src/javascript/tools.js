@@ -26,7 +26,7 @@ ninjascript.Tools.prototype = new ninjascript.Extensible
     var Utils = ninjascript.utils
     var TransformFailedException = Exceptions.TransformFailed
 
-    var log = ninjascript.Logger.log
+    var logger = ninjascript.Logger.forComponent("tools");
 
     //Handy JS things
     prototype.forEach = Utils.forEach
@@ -84,18 +84,18 @@ ninjascript.Tools.prototype = new ninjascript.Extensible
       if(element.dataset !== undefined &&
         element.dataset["method"] !== undefined &&
         element.dataset["method"].length > 0) {
-        log("Override via prototype.dataset = " + element.dataset["method"])
+        logger.info("Override via prototype.dataset = " + element.dataset["method"])
         return element.dataset["method"]
       }
       if(element.dataset === undefined &&
         jQuery(element).attr("data-method") !== undefined) {
-        log("Override via data-prototype.method = " + jQuery(element).attr("data-method"))
+        logger.info("Override via data-prototype.method = " + jQuery(element).attr("data-method"))
         return jQuery(element).attr("data-method")
       }
       if(typeof formData !== "undefined") {
         for(var i=0, len = formData.length; i<len; i++) {
           if(formData[i].name == "Method") {
-            log("Override via prototype.Method = " + formData[i].value)
+            logger.info("Override via prototype.Method = " + formData[i].value)
             return formData[i].value
           }
         }

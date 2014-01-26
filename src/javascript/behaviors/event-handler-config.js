@@ -9,44 +9,49 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
   this.stopImmediate = false
   this.fireMutation = false
 
-  if (typeof config == "function") {
-    this.handle = config
-  }
-  else {
-    this.handle = config[0]
-    console.log(config)
-    config = config.slice(1,config.length)
-    var len = config.length
-    for(var i = 0; i < len; i++) {
-      var found = true
-      if (config[i] == "dontContinue" ||
-        config[i] == "overridesOthers") {
-        this.fallThrough = false
-      }
-      if (config[i] == "andDoDefault" ||
-        config[i] == "continues" ||
-        config[i] == "allowDefault") {
-        this.stopDefault = false
-      }
-      if (config[i] == "allowPropagate" || config[i] == "dontStopPropagation") {
-        this.stopPropagate = false
-      }
-      //stopImmediatePropagation is a jQuery thing
-      if (config[i] == "andDoOthers") {
-        this.stopImmediate = false
-      }
-      if (config[i] == "changesDOM") {
-        this.fireMutation = true
-      }
-      if (!found) {
-        ninjascript.Logger.log("Event handler modifier unrecognized: " + config[i] + " for " + name)
-      }
-    }
-  }
+  this.normalizeConfig(config);
 };
 
 (function() {
     var prototype = ninjascript.behaviors.EventHandlerConfig.prototype
+    var logger = ninjascript.Logger.forComponent("event-handler");
+
+    prototype.normalizeConfig = function(config){
+      if (typeof config == "function") {
+        this.handle = config
+      }
+      else {
+        this.handle = config[0]
+        logger.info(config)
+        config = config.slice(1,config.length)
+        var len = config.length
+        for(var i = 0; i < len; i++) {
+          var found = true
+          if (config[i] == "dontContinue" ||
+            config[i] == "overridesOthers") {
+            this.fallThrough = false
+          }
+          if (config[i] == "andDoDefault" ||
+            config[i] == "continues" ||
+            config[i] == "allowDefault") {
+            this.stopDefault = false
+          }
+          if (config[i] == "allowPropagate" || config[i] == "dontStopPropagation") {
+            this.stopPropagate = false
+          }
+          //stopImmediatePropagation is a jQuery thing
+          if (config[i] == "andDoOthers") {
+            this.stopImmediate = false
+          }
+          if (config[i] == "changesDOM") {
+            this.fireMutation = true
+          }
+          if (!found) {
+            logger.warn("Event handler modifier unrecognized: " + config[i] + " for " + name)
+          }
+        }
+      }
+    };
 
     prototype.buildHandlerFunction = function(previousHandler) {
       var handle = this.handle
@@ -95,6 +100,10 @@ ninjascript.behaviors.EventHandlerConfig = function(name, config) {
           eventRecord.preventFallthrough = function(){
             eventRecord.isFallthroughPrevented =function(){ return true };
           }
+        })
+
+      handler = this.prependAction(handler, function(eventRecord) {
+          logger.debug(eventRecord);
         })
 
       return handler

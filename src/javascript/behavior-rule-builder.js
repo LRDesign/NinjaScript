@@ -33,13 +33,14 @@ ninjascript.BehaviorRuleBuilder = function() {
     }
 
     prototype.buildRules = function(behavior) {
-      this.rules = []
-      this.finder = this.normalizeFinder(this.finder)
+      this.rules = [];
+      this.originalFinder = this.finder;
+      this.finder = this.normalizeFinder(this.finder);
 
       if(Utils.isArray(behavior)) {
-        this.behaviors = behavior
+        this.behaviors = behavior;
       } else {
-        this.behaviors = [behavior]
+        this.behaviors = [behavior];
       }
 
       var i, len = this.behaviors.length
@@ -51,6 +52,11 @@ ninjascript.BehaviorRuleBuilder = function() {
         } else {
           var rule = new ninjascript.BehaviorRule
           rule.finder = this.finder
+          if(this.originalFinder == this.finder){
+            rule.originalFinder = "[same]"
+          } else {
+            rule.originalFinder = this.originalFinder
+          }
           rule.behavior = behavior
           this.rules.push(rule)
         }

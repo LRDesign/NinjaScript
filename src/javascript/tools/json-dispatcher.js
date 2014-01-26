@@ -11,7 +11,7 @@ ninjascript.tools.JSONDispatcher = function() {
 (function() {
     var Utils = ninjascript.utils
     var prototype = ninjascript.tools.JSONDispatcher.prototype
-    var log = ninjascript.Logger.log
+    var logger = ninjascript.Logger.forComponent("json-dispatcher");
 
     prototype.addHandler = function(handler) {
       this.handlers.push(new ninjascript.tools.JSONHandler(handler))
@@ -23,7 +23,7 @@ ninjascript.tools.JSONDispatcher = function() {
           this.handlers[i].receive(json)
         }
         catch(problem) {
-          log("prototype.Caught = " + problem + " while handling JSON response.")
+          logger.error("prototype.Caught = " + problem + " while handling JSON response.")
         }
       }
     },

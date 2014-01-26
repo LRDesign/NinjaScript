@@ -19,8 +19,8 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
 
 (function(){
     var prototype = ninjascript.mutation.EventHandler.prototype
-    var log = ninjascript.Logger.log
-    var forEach = ninjascript.utils.forEach
+    var logger = ninjascript.Logger.forComponent("mutation");
+    var forEach = ninjascript.utils.forEach;
 
     prototype.setup = function() {
       this.docRoot.bind("DOMSubtreeModified DOMNodeInserted thisChangedDOM", this.handleMutationEvent)
@@ -35,6 +35,7 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
     }
 
     prototype.detachSyntheticMutationEvents = function() {
+      logger.debug("Detaching polyfill mutation functions")
       this.fireMutationEvent = function(){}
       this.addMutationTargets = function(){}
     }
@@ -57,12 +58,10 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
 
     prototype.mutationEventTriggered = function(evnt){
       if(this.eventQueue.length == 0){
-        //log("mutation event - first")
         this.enqueueEvent(evnt)
         this.handleQueue()
       }
       else {
-        //log("mutation event - queueing")
         this.enqueueEvent(evnt)
       }
     }
@@ -70,6 +69,7 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
     prototype.enqueueEvent = function(evnt) {
       var eventCovered = false
       var uncovered = []
+      logger.debug("enqueueing")
       forEach(this.eventQueue, function(val) {
           eventCovered = eventCovered || jQuery.contains(val.target, evnt.target)
           if (!(jQuery.contains(evnt.target, val.target))) {
@@ -83,6 +83,7 @@ ninjascript.mutation.EventHandler = function(docRoot, rootCollection) {
     }
 
     prototype.handleQueue = function(){
+      logger.info("consuming queue")
       while (this.eventQueue.length != 0){
         this.behaviorCollection.applyAll(this.eventQueue[0].target)
         this.eventQueue.shift()

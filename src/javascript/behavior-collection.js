@@ -23,9 +23,10 @@ ninjascript.BehaviorCollection = function(parts) {
     var BehaviorBinding = ninjascript.BehaviorBinding
     var BehaviorRule = ninjascript.BehaviorRule
 
-    var forEach = Utils.forEach
+    var forEach = Utils.forEach;
+    var filter = Utils.filter;
 
-    var log = ninjascript.Logger.log
+    var logger = ninjascript.Logger.forComponent("behavior-list");
 
     var TransformFailedException = ninjascript.exceptions.TransformFailed
     var CouldntChooseException = ninjascript.exceptions.CouldntChoose
@@ -55,6 +56,7 @@ ninjascript.BehaviorCollection = function(parts) {
     prototype.finalize = function() {
       var rule
       var newRules
+      logger.info("Finalizing ruleset. Rule count:", this.rules.length);
       for(var i = 0; i < this.rules.length; i++) {
         rule = this.rules[i]
         newRules = rule.behavior.expandRules(rule)
@@ -62,6 +64,7 @@ ninjascript.BehaviorCollection = function(parts) {
           this.addBehaviorRule(newRules[j])
         }
       }
+      logger.debug("Complete ruleset:", this.rules);
     }
 
     prototype.applyAll = function(root){
@@ -71,9 +74,16 @@ ninjascript.BehaviorCollection = function(parts) {
       var behaviorMatrix = []
       rulesLen = this.rules.length
 
+      logger.info("Applying all behavior rules");
       for(i = 0; i < rulesLen; i++) {
-        elementList = this.rules[i].match(root)
+        elementList = this.rules[i].match(document);
+        elementList = filter(elementList, function(elem){
+            return jQuery.contains(root, elem);
+          });
         elemLen = elementList.length
+        if(elemLen <= 0){
+          logger.debug("Behavior matched no elements:", this.rules[i]);
+        }
         matrixLen = behaviorMatrix.length
         for(j = 0; j < elemLen; j++){
           for(k = 0; k < matrixLen; k++){
@@ -89,9 +99,11 @@ ninjascript.BehaviorCollection = function(parts) {
           }
         }
       }
+      logger.debug("Elements with behaviors:", behaviorMatrix);
 
       for(i = 0; i < matrixLen; i++){
         if (!jQuery(behaviorMatrix[i].element).data("ninja-visited")) { //Pure optimization
+          logger.debug("Applying:", behaviorMatrix[i]);
           this.apply(behaviorMatrix[i].element, behaviorMatrix[i].behaviors)
         }
       }
@@ -118,10 +130,10 @@ ninjascript.BehaviorCollection = function(parts) {
           }
           catch(ex) {
             if(ex instanceof CouldntChooseException) {
-              log("!!! couldn't choose")
+              logger.warn("couldn't choose")
             }
             else {
-              log(ex)
+              logger.errror(ex)
               throw(ex)
             }
           }
@@ -155,10 +167,10 @@ ninjascript.BehaviorCollection = function(parts) {
           }
           catch(ex) {
             if(ex instanceof TransformFailedException) {
-              log("!!! Transform failed")
+              logger.warn("Transform failed", context.element, behavior)
             }
             else {
-              log(ex)
+              logger.error(ex)
               throw ex
             }
           }

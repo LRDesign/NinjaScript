@@ -6,7 +6,7 @@ goog.require('ninjascript.Logger');
 
 (function() {
     var Utils = ninjascript.utils
-    var log = ninjascript.Logger.log
+    var logger = ninjascript.Logger.forComponent("standard-behaviors");
 
     ninjascript.plugin(function(hooks){
         hooks.ninja({
@@ -143,8 +143,7 @@ goog.require('ninjascript.Logger');
                        priority: 30,
                        transform: function(form){
                          var linkText, submits;
-                         if ((submits = jQuery('button[type=submit]')).size() > 0) {
-                           console.log(submits);
+                         if ((submits = jQuery('button[type=submit]', form)).size() > 0) {
                            linkText = submits.first().text();
                          }
                          else if((submits = jQuery('input[type=image]', form)).size() > 0){
@@ -153,12 +152,12 @@ goog.require('ninjascript.Logger');
                          }
                          else if((submits = jQuery('input[type=submit]', form)).size() > 0) {
                            if(submits.size() > 1) {
-                             log("Multiple submits.  Using: " + submits[0])
+                             logger.warn("Multiple submits.  Using: " + submits[0])
                            }
                            linkText = submits[0].value
                          }
                          else {
-                           log("Couldn't find a submit input in form");
+                           logger.error("Couldn't find a submit input in form");
                            this.cantTransform("Couldn't find a submit input")
                          }
 

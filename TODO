@@ -1,5 +1,16 @@
-Remove interal references to "Ninja" singleton
+Non-min'd ns.js should not minify function names
+
+Remove internal references to "Ninja" singleton
 
 Add (and detect) a MutationListener based event handler
 
 Name behaviors?  Ideally for generating function, or source file?
+
+BehaviorRule/Collection review - from browser console, should be able to confirm that the ruleset is as intended
+
+Logging: in levels
+
+Ninja.inspect object - where all console debugging stuff goes.
+ .inspect.ruleset
+
+Ninja.config - improve usage

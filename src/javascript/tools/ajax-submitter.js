@@ -17,14 +17,14 @@ ninjascript.tools.AjaxSubmitter = function() {
 };
 
 (function() {
-    var log =  ninjascript.Logger.log
+    var logger =  ninjascript.Logger.forComponent("ajax")
 
     var Utils = ninjascript.utils
 
     var prototype = ninjascript.tools.AjaxSubmitter.prototype
 
     prototype.submit = function() {
-      log("Computed prototype.method = " + this.method)
+      logger.info("Computed prototype.method = " + this.method)
       jQuery.ajax(this.ajaxData())
     },
 
@@ -64,7 +64,7 @@ ninjascript.tools.AjaxSubmitter = function() {
     prototype.onSuccess = function(xhr, statusTxt, data) {
     },
     prototype.onError = function(xhr, statusTxt, errorThrown) {
-      log(xhr.responseText)
+      logger.error(xhr.responseText)
       Ninja.tools.message("Server prototype.error = " + xhr.statusText, "error")
     }
 

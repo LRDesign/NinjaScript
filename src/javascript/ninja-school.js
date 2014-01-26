@@ -18,6 +18,8 @@ ninjascript.build = function(){
   components["jsonDispatcher"] = new ninjascript.tools.JSONDispatcher();
   components["mutationHandler"] = new ninjascript.mutation.EventHandler(components.tools.getRootOfDocument(), components.collection);
 
+  components["config"]["logger"] = ninjascript.Logger.rootConfig;
+
   components["types"] = {
     "does": ninjascript.behaviors.Basic,
     "chooses": ninjascript.behaviors.Meta,

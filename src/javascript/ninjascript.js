@@ -22,7 +22,7 @@ ninjascript.NinjaScript.prototype = new ninjascript.Extensible
     var Utils = ninjascript.utils
     var Behaviors = ninjascript.behaviors
 
-    var log = ninjascript.Logger.log
+    var logger = ninjascript.Logger.forComponent("ninja")
 
     //XXX Needed here, or in package?
     prototype.plugin = function(callback) {
@@ -46,7 +46,7 @@ ninjascript.NinjaScript.prototype = new ninjascript.Extensible
       for(var selector in dispatching)
       {
         if(typeof dispatching[selector] == "undefined") {
-          log("Selector " + selector + " not properly defined - ignoring")
+          logger.warn("Selector " + selector + " not properly defined - ignoring")
         }
         else {
           collection.addBehavior(selector, dispatching[selector])

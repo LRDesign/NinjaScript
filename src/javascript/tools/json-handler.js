@@ -24,7 +24,7 @@ ninjascript.tools.JSONHandler = function(desc) {
 
 (function(){
     var prototype = ninjascript.tools.JSONHandler.prototype
-    var log = ninjascript.Logger.log
+    var logger = ninjascript.Logger.forComponent("json");
 
     prototype.receive = function (data) {
       this.compose([], data, this.desc)
@@ -36,7 +36,7 @@ ninjascript.tools.JSONHandler = function(desc) {
           desc.call(this, data) //Individual functions can share data through handler
         }
         catch(problem) {
-          log("prototype.Caught = " + problem + " while handling JSON at " + path.join("/"))
+          logger.error("prototype.Caught = " + problem + " while handling JSON at " + path.join("/"))
         }
       }
 

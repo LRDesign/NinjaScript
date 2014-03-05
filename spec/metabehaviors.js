@@ -47,6 +47,14 @@ describe("Metabehaviors", function() {
         expect(sandbox.server.requests.length).toEqual(1)
       })
 
+    it("should handle multiple submits", function() {
+        expect(sandbox.server.requests.length).toEqual(0)
+        $("form#simple-form").trigger("submit")
+        expect(sandbox.server.requests.length).toEqual(1)
+        $("form#simple-form").trigger("submit")
+        expect(sandbox.server.requests.length).toEqual(2)
+      });
+
     it("should leave non-ajaxy things alone", function() {
         expect($("#shouldnt-ajax").length).toEqual(1)
       })

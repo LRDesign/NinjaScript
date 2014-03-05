@@ -82,10 +82,17 @@ ninjascript.BehaviorCollection = function(parts) {
           });
         elemLen = elementList.length
         if(elemLen <= 0){
-          logger.debug("Behavior matched no elements:", this.rules[i]);
+          logger.debug("Behavior matched no elements:",
+            (typeof this.rules[i].finder == "function" ? this.rules[i].originalFinder : this.rules[i].finder),
+            this.rules[i]);
+        } else {
+          logger.debug(elemLen + " elements matched by:",
+            (typeof this.rules[i].finder == "function" ? this.rules[i].originalFinder : this.rules[i].finder),
+            this.rules[i]);
         }
         matrixLen = behaviorMatrix.length
         for(j = 0; j < elemLen; j++){
+          elFound = false;
           for(k = 0; k < matrixLen; k++){
             if(elementList[j] == behaviorMatrix[k].element) {
               behaviorMatrix[k].behaviors.push(this.rules[i].behavior)

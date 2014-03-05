@@ -75,6 +75,14 @@ describe("Packaged Behaviors:", function() {
                 expect(sandbox.server.requests[0].method).toEqual("PUT")
               })
 
+            it("should handle multiple clicks", function() {
+                expect(sandbox.server.requests.length).toEqual(0);
+                $("a#simple-form").trigger("click")
+                expect(sandbox.server.requests.length).toEqual(1)
+                $("a#simple-form").trigger("click")
+                expect(sandbox.server.requests.length).toEqual(2)
+              });
+
             it("should put up an overlay", function() {
                 expect($("div.ninja_busy").length).toBe(0);
                 $("a#simple-form").trigger("click")

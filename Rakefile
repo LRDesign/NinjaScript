@@ -15,7 +15,7 @@ KARMA = File::join(NPM_BIN, "karma")
 
 PACKAGE_CONFIG= {
   #{MAJOR: incompatible}.{MINOR added feature}.{PATCH bugfix}-{LABEL}
-  "VERSION" => "0.11.2",
+  "VERSION" => "0.12.0",
   "BUILD_DATE" => Time.new.strftime("%m-%d-%Y"),
   "COPYRIGHT_YEAR" => Time.new.strftime("%Y")
 }

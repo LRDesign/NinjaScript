@@ -5,6 +5,7 @@ goog.require('ninjascript.utils')
 ninjascript.BehaviorBinding = function(tools){
   var parentClass = function(){
     this.stashedElements = []
+    this.hiddenElements = []
     this.eventHandlerSet = {}
   }
   parentClass.prototype = tools
@@ -99,8 +100,13 @@ ninjascript.BehaviorBinding = function(tools){
   //XXX Of prototype.concern = how do cascading events work out?
   //Should there be a first catch?  Or a "doesn't cascade" or something?
   prototype.cascadeEvent = function(event) {
+    var idx, len;
     while(this.stashedElements.length > 0) {
-      this.unstash().trigger(event)
+      this.hiddenElements.unshift(this.unstash())
+    }
+    len = this.hiddenElements.length
+    for(idx = 0; idx < len; idx++){
+      this.hiddenElements[idx].trigger(event)
     }
   }
 
